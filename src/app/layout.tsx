@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant, Cormorant_SC, Noto_Serif_Gujarati, Tiro_Bangla, Tiro_Devanagari_Sanskrit } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SITE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -60,7 +61,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${serif.variable} ${smallCaps.variable} ${bangla.variable} ${deva.variable} ${gujarati.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
