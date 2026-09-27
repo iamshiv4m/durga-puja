@@ -1,8 +1,8 @@
-import { RegionPage } from "@/components/RegionPage";
-import { pageMetadata } from "@/lib/site";
+import { ParvHome } from "@/components/parv/ParvHome";
+import { homeMetadata } from "@/lib/site";
 
-export const metadata = pageMetadata("bengal");
+export const metadata = homeMetadata();
 
 export default function Home() {
-  return <RegionPage style="bengal" />;
+  return <ParvHome />;
 }

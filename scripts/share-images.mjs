@@ -4,7 +4,8 @@
 //
 //   npm run dev                      # in one terminal
 //   npm run share-images             # in another
-//   npm run share-images -- --url https://trinayani.example --domain trinayani.example
+//   npm run share-images -- --url https://parv.example --domain parv.example
+//   npm run share-images -- --only parv   # just the Parv home page's doors and link preview
 //
 // Re-run whenever the pratima art changes.
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -20,6 +21,7 @@ const arg = (name, fallback) => {
 const url = arg("url", "http://localhost:3000");
 const host = new URL(url).host;
 const domain = arg("domain", /^(localhost|127\.)/.test(host) ? "" : host);
+const only = arg("only", "");
 
 const HIDE_UI = `#captions, .corner, #rail, #hints, .sound-toggle, #loader, .tooltip, nextjs-portal { display: none !important; }`;
 const FONTS =
@@ -69,9 +71,9 @@ const browser = await chromium.launch({ args: ["--use-angle=metal", "--enable-gp
 console.log(`Rendering ${url}`);
 
 const REGIONS = [
-  { style: "bengal", path: "/" },
-  { style: "madhubani", path: "/bihar" },
-  { style: "pachedi", path: "/gujarat" },
+  { style: "bengal", path: "/durga-puja" },
+  { style: "madhubani", path: "/durga-puja/bihar" },
+  { style: "pachedi", path: "/durga-puja/gujarat" },
 ];
 
 /** Reads a region page's own words (name in its script, share line, title) from the rendered page. */
@@ -90,7 +92,7 @@ async function words(browser, path) {
   return result;
 }
 
-for (const { style, path } of REGIONS) {
+for (const { style, path } of only ? [] : REGIONS) {
   const text = await words(browser, path);
   const pageUrl = new URL(path, url).toString();
   console.log(`${style}: ${text.native} · ${text.share}`);
@@ -147,6 +149,41 @@ for (const { style, path } of REGIONS) {
         <p class="sc" style="font-size:26px; margin-top:8px">${domain ? `${domain} · ` : ""}${text.label}</p>
       </div>`,
   });
+}
+
+// The Parv home page: a door into each region (the scene alone, no words), and its link preview.
+const doors = [];
+for (const { style, path } of REGIONS) {
+  const scene = await capture(browser, { url: new URL(path, url).toString(), width: 720, height: 1000, progress: 0.47 });
+  doors.push(scene);
+  await compose(browser, {
+    width: 720,
+    height: 1000,
+    out: join(root, `public/parv/door-${style}.jpg`),
+    html: `<div class="scene" style="inset:0; background-image:url(${scene})"></div>`,
+    quality: 80,
+  });
+}
+await compose(browser, {
+  width: 1200,
+  height: 630,
+  out: join(root, "public/share/og-parv.jpg"),
+  html: `
+    <div style="position:absolute; right:48px; top:48px; bottom:48px; display:flex; gap:12px">
+      ${doors.map((d) => `<div style="width:176px; border-radius:6px; background:url(${d}) 50% 24% / auto 150%"></div>`).join("")}
+    </div>
+    <div style="position:absolute; left:80px; top:0; bottom:0; width:520px; display:flex; flex-direction:column; justify-content:center; gap:16px">
+      <p class="bn" style="font-size:52px">पर्व</p>
+      <h1 style="font-size:150px">Parv</h1>
+      <div class="rule"></div>
+      <p style="font-size:32px; font-style:italic; font-weight:300; line-height:1.3; color:rgba(242,233,214,.8)">The festivals of India, one scroll at a time.</p>
+      <p class="sc" style="font-size:20px; margin-top:6px">durga puja · diwali · chhath · holi · ganesh chaturthi</p>
+    </div>`,
+});
+
+if (only) {
+  await browser.close();
+  process.exit(0);
 }
 
 // Apple touch icon from the SVG favicon (iOS rounds the corners itself).

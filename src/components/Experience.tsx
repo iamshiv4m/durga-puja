@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Component, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { ASTRAS } from "@/content/astras";
@@ -154,7 +155,12 @@ export function Experience({ initialStyle }: { initialStyle: PaintingStyle }) {
           <ThirdEyePortal />
 
           <header className="corner corner-tl">
-            <span className="wordmark">{TITLE}</span>
+            <span className="wordmark">
+              <Link href="/" className="parv-link">
+                parv
+              </Link>{" "}
+              · {TITLE}
+            </span>
             <StyleSwitcher fallback={initialStyle} />
           </header>
           <div className="corner corner-tr small-caps" aria-hidden="true">
@@ -263,6 +269,9 @@ export function Experience({ initialStyle }: { initialStyle: PaintingStyle }) {
           <a href="#top" className="small-caps" onClick={() => window.scrollTo({ top: 0, behavior: "auto" })}>
             {story.returnLink}
           </a>
+          <Link href="/" className="small-caps">
+            more festivals on parv
+          </Link>
         </div>
         <footer className="credits">
           <p>

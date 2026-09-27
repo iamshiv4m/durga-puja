@@ -10,7 +10,9 @@ import { STYLES, type PaintingStyle } from "@/lib/styles";
 function siteOrigin(value: string | undefined): string | undefined {
   const trimmed = value?.trim();
   if (!trimmed) return undefined;
-  const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  const withProtocol = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
   try {
     return new URL(withProtocol).origin;
   } catch {
@@ -24,12 +26,29 @@ export const SITE_URL =
   siteOrigin(process.env.VERCEL_URL) ??
   "http://localhost:3000";
 
+/** Parv, the whole site: one page per festival. */
 export const SITE = {
-  name: "Trinayanī",
-  title: "Trinayanī — the eyes of Durga",
+  name: "Parv",
+  title: "Parv — the festivals of India, one scroll at a time",
   description:
-    "Scroll through the five days of Durga Puja: watch her eyes painted on Mahalaya, hear the dhak at Sandhi Puja, and follow her to the river at Bisarjan.",
-  shareText: "The five days of Durga Puja, from Chokkhu Daan to Bisarjan. Scroll, with sound on.",
+    "Scroll-driven, hand-painted journeys through India's festivals. Durga Puja is open now; Diwali, Chhath, Holi and Ganesh Chaturthi are on their way.",
+  keywords: [
+    "Parv",
+    "पर्व",
+    "Indian festivals",
+    "Hindu festivals",
+    "Durga Puja",
+    "Diwali",
+    "Deepavali",
+    "Chhath Puja",
+    "Holi",
+    "Ganesh Chaturthi",
+  ],
+};
+
+/** Trinayanī, the Durga Puja journey at /durga-puja. */
+export const DURGA_PUJA = {
+  name: "Trinayanī",
   keywords: [
     "Durga Puja",
     "Durga Pujo",
@@ -58,7 +77,8 @@ export const SITE = {
 };
 
 export const SHARE_ALT: Record<PaintingStyle, string> = {
-  bengal: "A Bengali Durga pratima with a shola crown, surrounded by a ring of ten golden astras and a row of clay diyas.",
+  bengal:
+    "A Bengali Durga pratima with a shola crown, surrounded by a ring of ten golden astras and a row of clay diyas.",
   madhubani:
     "Durga painted in the Madhubani style of Bihar, with double black outlines, a lotus halo, and a ring of ten golden astras.",
   pachedi:
@@ -69,9 +89,16 @@ export const SHARE_ALT: Record<PaintingStyle, string> = {
 export function pageMetadata(style: PaintingStyle): Metadata {
   const { title, path } = STYLES[style];
   const description = STORIES[style].share + " Scroll, with sound on.";
-  const image = { url: `/share/og-${style}.jpg`, width: 1200, height: 630, alt: SHARE_ALT[style], type: "image/jpeg" };
+  const image = {
+    url: `/share/og-${style}.jpg`,
+    width: 1200,
+    height: 630,
+    alt: SHARE_ALT[style],
+    type: "image/jpeg",
+  };
   return {
     title: { absolute: title },
+    keywords: DURGA_PUJA.keywords,
     alternates: { canonical: path },
     openGraph: {
       type: "website",
@@ -83,6 +110,36 @@ export function pageMetadata(style: PaintingStyle): Metadata {
       alternateLocale: ["bn_IN", "hi_IN", "gu_IN"],
       images: [image],
     },
-    twitter: { card: "summary_large_image", title, description, images: [image] },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
+
+/** Title, canonical URL and link preview for the Parv home page. */
+export function homeMetadata(): Metadata {
+  const image = {
+    url: "/share/og-parv.jpg",
+    width: 1200,
+    height: 630,
+    alt: "Parv: Durga painted in the styles of Bengal, Bihar and Gujarat, beside a list of India's festivals.",
+    type: "image/jpeg",
+  };
+  return {
+    title: { absolute: SITE.title },
+    alternates: { canonical: "/" },
+    openGraph: {
+      type: "website",
+      url: "/",
+      siteName: SITE.name,
+      title: SITE.title,
+      description: SITE.description,
+      locale: "en_IN",
+      images: [image],
+    },
+    twitter: { card: "summary_large_image", title: SITE.title, description: SITE.description, images: [image] },
   };
 }

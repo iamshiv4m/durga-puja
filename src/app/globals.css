@@ -138,6 +138,17 @@ body {
   color: var(--shola);
 }
 
+.parv-link {
+  color: var(--shola-dim);
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+.parv-link:hover,
+.parv-link:focus-visible {
+  color: var(--gold);
+}
+
 #rail {
   position: absolute;
   z-index: 3;

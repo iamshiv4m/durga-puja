@@ -1,12 +1,25 @@
-# Trinayanī
+# Parv
 
-A scroll-driven journey through Durga Puja, from the painting of her eyes on Mahalaya to Bisarjan.
+**पर्व**: the festivals of India, one scroll at a time. Each festival is a single scroll-driven page, painted by hand in code and scored with real recordings.
 
 ```bash
 npm install
 npm run dev     # http://localhost:3000
 npm run build
 ```
+
+| Page | What it is |
+|---|---|
+| `/` | The Parv home page: every festival in the order it comes round, with the open ones linked (`src/components/parv/ParvHome.tsx`, content in `src/content/festivals.ts`) |
+| `/durga-puja`, `/durga-puja/bihar`, `/durga-puja/gujarat` | **Trinayanī**, the Durga Puja journey, described below |
+
+The old Durga Puja links (`/bihar`, `/gujarat`, `/mithila`) redirect to their pages under `/durga-puja` (`next.config.ts`).
+
+To add a festival, give it a folder under `src/app/`, then set its `path` in `FESTIVALS`; the home page links it and drops its "to come" label.
+
+# Trinayanī: Durga Puja
+
+A scroll-driven journey through Durga Puja, from the painting of her eyes on Mahalaya to Bisarjan.
 
 ## The journey
 
@@ -85,9 +98,9 @@ The switcher at the top left shows the same Durga painted in three regional trad
 
 | Region | Page | Tradition | Relief |
 |---|---|---|---|
-| Bengal | `/` | Kumartuli pratima: varnished clay, a tiered shola mukut framed in silver daker saaj, potol-chera eyes, chandan kolka, kaan-pasha chains, Banarasi zari border | full depth |
-| Bihar | `/bihar` | Madhubani: double black outlines, bharni colour and kachni hatching, no empty space, lotus prabhamandal, lotus-bud crown, fish earrings and hansuli | half depth, like a painted mud wall |
-| Gujarat | `/gujarat` | Mata ni Pachedi: a portrait shrine cloth on a maroon ground in red, black and white, with toran, shrine arch and black side panels of devotees, peacocks, garbo and diyas | shallow, and it sways like hanging cloth |
+| Bengal | `/durga-puja` | Kumartuli pratima: varnished clay, a tiered shola mukut framed in silver daker saaj, potol-chera eyes, chandan kolka, kaan-pasha chains, Banarasi zari border | full depth |
+| Bihar | `/durga-puja/bihar` | Madhubani: double black outlines, bharni colour and kachni hatching, no empty space, lotus prabhamandal, lotus-bud crown, fish earrings and hansuli | half depth, like a painted mud wall |
+| Gujarat | `/durga-puja/gujarat` | Mata ni Pachedi: a portrait shrine cloth on a maroon ground in red, black and white, with toran, shrine arch and black side panels of devotees, peacocks, garbo and diyas | shallow, and it sways like hanging cloth |
 
 All three are drawn in code in `src/components/stage/paintings/`. They share one layout (`layout.ts`: face outline, hairline, crown, eye positions and relief height), so Chokkhu Daan, the sindoor, the third eye and Bisarjan work the same on each. To add a tradition, add a drawing module that follows that layout, register it in `paintings/index.ts` and describe it in `src/lib/styles.ts`, then add its captions to `STORIES` in `src/content/chapters.ts`.
 
@@ -114,20 +127,22 @@ A front-facing, evenly lit painting in the Bangla-mukh style with the eyes clear
 Set the public URL before deploying, so link previews get absolute image URLs (on Vercel the production domain is picked up automatically):
 
 ```bash
-NEXT_PUBLIC_SITE_URL=https://trinayani.example
+NEXT_PUBLIC_SITE_URL=https://parv.example
 ```
 
-- Metadata, Open Graph, Twitter card, canonical, robots and theme colour: `src/app/layout.tsx`, with the copy and the per-region `pageMetadata()` in `src/lib/site.ts`
+- Metadata, Open Graph, Twitter card, canonical, robots and theme colour: `src/app/layout.tsx`, with the copy, `homeMetadata()` for Parv and the per-region `pageMetadata()` in `src/lib/site.ts`
 - `robots.txt`, `sitemap.xml`, `manifest.webmanifest` and JSON-LD: `src/app/robots.ts`, `sitemap.ts`, `manifest.ts`, `page.tsx`
 - Each region page has its own images in `public/share/`, where `{style}` is `bengal`, `madhubani` or `pachedi`:
   - link preview for WhatsApp, Instagram DMs, X and iMessage: `og-{style}.jpg`, 1200×630
   - for posting: `instagram-story-{style}.jpg` (1080×1920) and `instagram-post-{style}.jpg` (1080×1350)
+- The Parv home page has its link preview in `public/share/og-parv.jpg` and its three Durga Puja doors in `public/parv/door-{style}.jpg`
 
 All of these are rendered from the live scene, with the text taken from each page. Regenerate them whenever the art changes:
 
 ```bash
 npm run dev                  # in one terminal
-npm run share-images         # in another; add -- --domain trinayani.example to print the domain on them
+npm run share-images         # in another; add -- --domain parv.example to print the domain on them
+npm run share-images -- --only parv   # just the Parv home page's images
 ```
 
 WhatsApp and Instagram cache previews per URL. After changing the image, test by sharing a fresh URL (for example `?v=2`); the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) shows what Meta's crawler sees and can force a re-scrape.

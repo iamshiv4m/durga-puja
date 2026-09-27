@@ -9,13 +9,13 @@ export function generateStaticParams() {
   return Object.keys(REGION_SLUGS).map((region) => ({ region }));
 }
 
-export async function generateMetadata({ params }: PageProps<"/[region]">) {
+export async function generateMetadata({ params }: PageProps<"/durga-puja/[region]">) {
   const { region } = await params;
   const style = REGION_SLUGS[region];
   return style ? pageMetadata(style) : {};
 }
 
-export default async function Region({ params }: PageProps<"/[region]">) {
+export default async function Region({ params }: PageProps<"/durga-puja/[region]">) {
   const { region } = await params;
   const style = REGION_SLUGS[region];
   if (!style) notFound();

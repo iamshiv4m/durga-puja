@@ -1,0 +1,512 @@
+.home {
+  --line: rgba(217, 166, 74, 0.22);
+  min-height: 100svh;
+  padding: 0 var(--edge) 4rem;
+  background:
+    radial-gradient(ellipse 70% 42% at 50% 0%, rgba(150, 30, 18, 0.28), transparent 70%),
+    linear-gradient(var(--ink), var(--ink-2) 60%, var(--ink));
+}
+
+/* ─── Title ─────────────────────────────────────────────────────────────── */
+
+.hero {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  min-height: 64svh;
+  align-content: center;
+  padding: 6rem 0 3rem;
+  text-align: center;
+}
+
+.hero > p {
+  margin: 0;
+}
+
+.native {
+  font-size: clamp(1.6rem, 1.1rem + 1.8vw, 2.6rem);
+  color: var(--gold);
+}
+
+.hero h1 {
+  margin: 0;
+  font-weight: 300;
+  font-size: clamp(5rem, 3rem + 9vw, 10rem);
+  line-height: 0.85;
+  letter-spacing: 0.02em;
+}
+
+.rule {
+  display: block;
+  width: 3.5rem;
+  height: 1px;
+  margin: 1.6rem 0 0.8rem;
+  background: var(--gold);
+}
+
+.intro {
+  max-width: 32rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--shola-dim);
+  text-wrap: balance;
+}
+
+/* ─── Festivals ─────────────────────────────────────────────────────────── */
+
+.festivals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(2.5rem, 5vw, 4.5rem) clamp(1.5rem, 4vw, 3.5rem);
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.open {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  padding-bottom: clamp(2.5rem, 5vw, 4.5rem);
+  border-bottom: 1px solid var(--line);
+}
+
+.text h2 {
+  display: grid;
+  margin: 0 0 0.6rem;
+  font-weight: 300;
+  font-size: clamp(2.2rem, 1.6rem + 2vw, 3.4rem);
+  line-height: 1;
+}
+
+.text h2 span {
+  margin-top: 0.5rem;
+  font-size: 0.42em;
+  color: var(--gold);
+}
+
+.open .text h2 {
+  font-size: clamp(2.8rem, 2rem + 3vw, 4.6rem);
+}
+
+.tithi {
+  margin: 0 0 0.6rem;
+}
+
+.when {
+  margin: 0 0 0.8rem;
+  font-family: var(--sc);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  color: var(--gold-dim);
+}
+
+.line {
+  max-width: 30rem;
+  margin: 0 0 1.2rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--shola-dim);
+}
+
+.enter {
+  display: inline-block;
+  padding: 0.7rem 1.4rem;
+  border: 1px solid var(--gold-dim);
+  border-radius: 999px;
+  color: var(--gold);
+  text-decoration: none;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+.enter:hover,
+.enter:focus-visible {
+  background: var(--gold);
+  color: var(--ink);
+  outline: none;
+}
+
+.status {
+  margin: 0;
+  color: var(--gold-dim);
+}
+
+.status::before {
+  content: "";
+  display: inline-block;
+  width: 1.4rem;
+  height: 1px;
+  margin-right: 0.6rem;
+  vertical-align: middle;
+  background: currentColor;
+}
+
+/* ─── Durga Puja: a door for each region ────────────────────────────────── */
+
+.doors {
+  display: flex;
+  gap: 0.5rem;
+  aspect-ratio: 16 / 10;
+}
+
+.door {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 0.3rem;
+  transition: flex-grow 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.door img {
+  object-fit: cover;
+  object-position: 50% 0;
+  /* Close in on her: the lower part of the scene is only the floor. */
+  transform: scale(1.4);
+  transform-origin: 50% 24%;
+  transition:
+    transform 1.2s cubic-bezier(0.2, 0.7, 0.2, 1),
+    filter 0.6s ease;
+  filter: saturate(0.85) brightness(0.8);
+}
+
+.door::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(7, 3, 4, 0) 55%, rgba(7, 3, 4, 0.85));
+}
+
+.door span {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: 0.9rem;
+  text-align: center;
+  color: var(--shola);
+}
+
+.doors:hover .door {
+  flex-grow: 0.8;
+}
+
+.doors .door:hover,
+.doors .door:focus-visible {
+  flex-grow: 1.8;
+  outline: none;
+}
+
+.door:hover img,
+.door:focus-visible img {
+  transform: scale(1.5);
+  filter: none;
+}
+
+.door:focus-visible {
+  box-shadow: 0 0 0 1px var(--gold);
+}
+
+/* ─── The festivals still to come ───────────────────────────────────────── */
+
+.later {
+  display: grid;
+  align-content: start;
+  gap: 1.4rem;
+}
+
+.art {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border-radius: 0.3rem;
+  background: #0b0507;
+}
+
+/* Diwali: a row of diyas on the darkest night. */
+.diwali {
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 72%, rgba(240, 150, 40, 0.28), transparent 70%),
+    radial-gradient(ellipse 80% 60% at 50% 110%, #2a1206, transparent 70%),
+    #07040a;
+}
+
+.diyas {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 24%;
+  display: flex;
+  justify-content: center;
+  gap: 7%;
+}
+
+.diya {
+  position: relative;
+  width: 11%;
+  aspect-ratio: 2.6;
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  background: linear-gradient(#c0612f, #6b2610);
+  box-shadow: inset 0 3px 0 rgba(255, 190, 120, 0.35);
+  animation: flicker 2.6s ease-in-out infinite;
+}
+
+.diya i {
+  position: absolute;
+  left: 50%;
+  bottom: 90%;
+  width: 34%;
+  aspect-ratio: 0.55;
+  translate: -50% 0;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: radial-gradient(ellipse at 50% 75%, #fff8e0 0 20%, #ffd166 40%, #f07a1a 75%, transparent 76%);
+  box-shadow:
+    0 0 18px 6px rgba(255, 170, 60, 0.45),
+    0 0 60px 18px rgba(240, 120, 30, 0.2);
+  transform-origin: 50% 100%;
+  animation: flame 1.3s ease-in-out infinite alternate;
+  animation-delay: inherit;
+}
+
+@keyframes flame {
+  0% {
+    transform: scale(1, 1) rotate(-3deg);
+  }
+  50% {
+    transform: scale(0.92, 1.1) rotate(2deg);
+  }
+  100% {
+    transform: scale(1.04, 0.94) rotate(-1deg);
+  }
+}
+
+@keyframes flicker {
+  50% {
+    filter: brightness(1.12);
+  }
+}
+
+/* Chhath: the sun on the water at dusk. */
+.chhath {
+  background: linear-gradient(#12060c, #4a1612 38%, #b8461a 56%, #e89040 60%, #2a0e0a 60.5%, #12060a);
+}
+
+.sun {
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  width: 22%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe7a8, #f7a53a 55%, #e0602a);
+  box-shadow: 0 0 60px 20px rgba(240, 120, 40, 0.35);
+  animation: sink 9s ease-in-out infinite alternate;
+}
+
+/* Drawn over the lower half of the sun, so she sets into the river. */
+.river {
+  position: absolute;
+  inset: 60.5% 0 0;
+  background:
+    repeating-linear-gradient(rgba(255, 170, 80, 0.07) 0 2px, transparent 2px 9px),
+    linear-gradient(#2a0e0a, #12060a);
+}
+
+.glint {
+  position: absolute;
+  left: 50%;
+  top: 61%;
+  bottom: 6%;
+  width: 18%;
+  translate: -50% 0;
+  background: repeating-linear-gradient(rgba(255, 190, 100, 0.75) 0 2px, transparent 2px 7px);
+  mask-image: linear-gradient(black, transparent);
+  animation: shimmer 3s ease-in-out infinite alternate;
+}
+
+@keyframes sink {
+  to {
+    translate: -50% -44%;
+  }
+}
+
+@keyframes shimmer {
+  to {
+    width: 12%;
+    opacity: 0.6;
+  }
+}
+
+/* Holi: clouds of gulal. */
+.holi {
+  background: #0c0608;
+}
+
+.gulal {
+  position: absolute;
+  width: 30%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(22px);
+  mix-blend-mode: screen;
+  opacity: 0.62;
+  animation: drift 12s ease-in-out infinite alternate;
+}
+
+.gulal:nth-child(1) {
+  left: 6%;
+  top: 30%;
+  background: #e0287a;
+}
+
+.gulal:nth-child(2) {
+  left: 28%;
+  top: 4%;
+  background: #f5c518;
+}
+
+.gulal:nth-child(3) {
+  left: 50%;
+  top: 38%;
+  background: #2fb36b;
+}
+
+.gulal:nth-child(4) {
+  left: 64%;
+  top: 2%;
+  background: #2a6bd8;
+}
+
+.gulal:nth-child(5) {
+  left: 30%;
+  top: 58%;
+  background: #f07a1a;
+}
+
+@keyframes drift {
+  to {
+    transform: translate(8%, 6%) scale(1.15);
+  }
+}
+
+/* Ganesh Chaturthi: marigolds on the sea after the visarjan. */
+.ganesh {
+  background: linear-gradient(#060712, #0d1426 58%, #081020);
+}
+
+.moon {
+  position: absolute;
+  right: 16%;
+  top: 14%;
+  width: 9%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #f2e9d6;
+  box-shadow: 0 0 40px 10px rgba(242, 233, 214, 0.18);
+}
+
+.sea {
+  position: absolute;
+  inset: 58% -10% 0;
+  background:
+    repeating-radial-gradient(ellipse 30px 8px at 50% 0, transparent 0 5px, rgba(160, 190, 230, 0.12) 6px 7px, transparent 8px),
+    linear-gradient(rgba(242, 233, 214, 0.06), transparent);
+  background-size:
+    60px 16px,
+    auto;
+  animation: swell 6s linear infinite;
+}
+
+.marigold {
+  position: absolute;
+  top: 62%;
+  width: 7%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #ffb13b 0 22%, transparent 24%),
+    repeating-conic-gradient(#f7931e 0 12deg, #d9600c 12deg 24deg);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+  animation: bob 3.4s ease-in-out infinite alternate;
+}
+
+.marigold:nth-of-type(3) {
+  left: 24%;
+}
+
+.marigold:nth-of-type(4) {
+  left: 47%;
+  top: 70%;
+  width: 8%;
+}
+
+.marigold:nth-of-type(5) {
+  left: 68%;
+  top: 64%;
+  width: 6%;
+}
+
+@keyframes swell {
+  to {
+    background-position:
+      60px 0,
+      0 0;
+  }
+}
+
+@keyframes bob {
+  to {
+    transform: translateY(18%) rotate(24deg);
+  }
+}
+
+/* ─── Footer ────────────────────────────────────────────────────────────── */
+
+.footer {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  max-width: 72rem;
+  margin: clamp(4rem, 8vw, 7rem) auto 0;
+  padding-top: 2rem;
+  border-top: 1px solid var(--line);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--shola-dim);
+}
+
+.footer p {
+  margin: 0;
+}
+
+/* ─── Small screens ─────────────────────────────────────────────────────── */
+
+@media (max-width: 760px) {
+  .hero {
+    min-height: 58svh;
+    padding: 4rem 0 2rem;
+  }
+
+  .festivals,
+  .open {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .doors {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home *,
+  .home *::before,
+  .home *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

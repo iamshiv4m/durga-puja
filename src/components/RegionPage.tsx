@@ -1,5 +1,5 @@
 import { STORIES } from "@/content/chapters";
-import { SITE, SITE_URL } from "@/lib/site";
+import { DURGA_PUJA, SITE, SITE_URL } from "@/lib/site";
 import { STYLES, type PaintingStyle } from "@/lib/styles";
 import { Experience } from "./Experience";
 
@@ -12,7 +12,7 @@ export function RegionPage({ style }: { style: PaintingStyle }) {
     description: STORIES[style].share,
     inLanguage: ["en", "bn", "hi", "gu", "sa"],
     isPartOf: { "@type": "WebSite", name: SITE.name, url: SITE_URL },
-    keywords: SITE.keywords.join(", "),
+    keywords: DURGA_PUJA.keywords.join(", "),
     about: {
       "@type": "Thing",
       name: style === "pachedi" ? "Navratri" : "Durga Puja",

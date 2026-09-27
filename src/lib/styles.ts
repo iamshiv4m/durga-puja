@@ -24,7 +24,7 @@ export const STYLE_ORDER: PaintingStyle[] = ["bengal", "madhubani", "pachedi"];
 export const STYLES: Record<PaintingStyle, StyleInfo> = {
   bengal: {
     region: "Bengal",
-    path: "/",
+    path: "/durga-puja",
     title: "Trinayanī — the eyes of Durga",
     name: "Kumartuli pratima",
     native: "কুমোরটুলি",
@@ -36,7 +36,7 @@ export const STYLES: Record<PaintingStyle, StyleInfo> = {
   },
   madhubani: {
     region: "Bihar",
-    path: "/bihar",
+    path: "/durga-puja/bihar",
     title: "Trinayanī — Durga Puja in Bihar",
     name: "Madhubani",
     native: "मधुबनी",
@@ -48,7 +48,7 @@ export const STYLES: Record<PaintingStyle, StyleInfo> = {
   },
   pachedi: {
     region: "Gujarat",
-    path: "/gujarat",
+    path: "/durga-puja/gujarat",
     title: "Trinayanī — Navratri in Gujarat",
     name: "Mata ni Pachedi",
     native: "માતા ની પછેડી",
@@ -60,7 +60,7 @@ export const STYLES: Record<PaintingStyle, StyleInfo> = {
   },
 };
 
-/** The region pages other than the home page, by URL slug. */
+/** The region pages under /durga-puja, other than Bengal at /durga-puja itself, by URL slug. */
 export const REGION_SLUGS: Record<string, PaintingStyle> = { bihar: "madhubani", gujarat: "pachedi" };
 
 export const SCRIPT_CLASS = { bn: "bangla", hi: "deva", gu: "gujarati" } as const;
