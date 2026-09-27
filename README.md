@@ -52,7 +52,7 @@ Every timing lives in two places, kept in step:
 - **Regional rituals** (`Rituals.tsx`) are drawn on a 2D canvas over the stage, one per region:
   - Bengal: a dhunuchi arati at Sandhi. The clay censer follows the pointer or finger, and swings by itself when left alone.
   - Bihar: Pat Khulna. A red curtain with a Madhubani border and a pair of fish is drawn across her at night and pulled back at dawn.
-  - Gujarat: a garba circle turns round a lit garbo, speeds up over the nine nights, and takes up dandiya sticks on Navami.
+  - Gujarat: a garba circle turns round a lit garbo on the floor in front of the cloth (projected through the stage camera, so the dancers drop out of frame in the close-ups), speeds up over the nine nights, and takes up dandiya sticks on Navami.
 - **Mahishasura's shadow** (`MahishaShadow.tsx`) rises beside her on Navami. It becomes a buffalo, a lion, a man with a sword and an elephant, as in the Devi Mahatmya, until fire from her third eye burns it into embers.
 - **Bijoya card** (`BijoyaCard.tsx`, `src/lib/bijoya.ts`): after the journey, the reader types a name and gets a 1080 × 1350 PNG with her face in the region's style and the Dashami greeting (শুভ বিজয়া, शुभ विजयादशमी, શુભ દશેરા). It can be downloaded, or shared through the phone's share sheet.
 - **Inside the third eye** (`ThirdEyePortal.tsx`) is a 2D canvas over the stage. The camera dives into the eye (`CameraRig.tsx`, `dive` in `timeline.ts`) and the canvas fades in over it.

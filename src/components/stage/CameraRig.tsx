@@ -5,7 +5,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { clamp, smoothstep } from "@/lib/math";
 import { scroll } from "@/lib/scroll";
-import { isPortrait, thirdEyeScreen } from "@/lib/screen";
+import { isPortrait, stageCamera, thirdEyeScreen } from "@/lib/screen";
 import { timeline } from "@/lib/timeline";
 import { THIRD_EYE_WORLD } from "./Pratima";
 
@@ -91,6 +91,7 @@ export function CameraRig() {
     projected.copy(THIRD_EYE_WORLD).project(lens);
     thirdEyeScreen.x = projected.x * 0.5 + 0.5;
     thirdEyeScreen.y = 0.5 - projected.y * 0.5;
+    stageCamera.current = lens;
   });
 
   return null;

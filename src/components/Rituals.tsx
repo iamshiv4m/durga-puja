@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { Vector3 } from "three";
 import { smoothstep } from "@/lib/math";
-import { isPortrait } from "@/lib/screen";
+import { isPortrait, stageCamera } from "@/lib/screen";
 import { scroll } from "@/lib/scroll";
 import { getState } from "@/lib/store";
 import { timeline, type Timeline } from "@/lib/timeline";
@@ -650,58 +651,87 @@ function drawGarbo(ctx: Ctx, x: number, y: number, r: number, seconds: number) {
   ctx.globalCompositeOperation = "source-over";
 }
 
+/** The garba circle stands on the stage floor in front of the cloth, in world units. */
+const CIRCLE = { floor: -5.6, radius: 5.6, depth: 2.2, z: 3.4, dancer: 2.1 };
+const world = new Vector3();
+
+type Spot = { x: number; y: number; tall: number };
+
 class Garba {
   private angle = 0;
   private beat = 0;
 
+  /** Where a dancer standing at world (x, floor, z) is on screen, and how tall; null if out of view. */
+  private stand(x: number, z: number, width: number, height: number): Spot | null {
+    const camera = stageCamera.current;
+    if (!camera) return null;
+    world.set(x, CIRCLE.floor, z).project(camera);
+    if (world.z > 1) return null;
+    const foot = { x: (world.x * 0.5 + 0.5) * width, y: (0.5 - world.y * 0.5) * height };
+    world.set(x, CIRCLE.floor + CIRCLE.dancer, z).project(camera);
+    const tall = foot.y - (0.5 - world.y * 0.5) * height;
+    return tall > 1 ? { ...foot, tall: Math.min(tall, height * 0.4) } : null;
+  }
+
+  /** Before the stage has a camera (or without WebGL): a flat circle along the bottom of the screen. */
+  private flat(a: number, width: number, height: number, reach = 1): Spot {
+    const portrait = isPortrait(width, height);
+    const depth = Math.sin(a);
+    const tall = Math.min(height * (portrait ? 0.11 : 0.15), width * 0.24) * (0.68 + 0.21 * (depth + 1));
+    const ground = height * (portrait ? 0.56 : 0.97);
+    const rx = width * (portrait ? 0.44 : 0.42);
+    return { x: width / 2 + Math.cos(a) * rx * reach, y: ground + depth * rx * 0.1 * reach, tall };
+  }
+
   draw(ctx: Ctx, size: Size, dt: number, presence: number, p: number) {
     const { width, height, seconds } = size;
-    const portrait = isPortrait(width, height);
     // The circle quickens over the nine nights, and on Navami the sticks come out.
     const quicken = smoothstep(0.4, 0.66, p);
     this.angle += dt * (0.16 + 0.14 * quicken);
     this.beat += dt * (1.3 + 0.6 * quicken);
     const dandiya = smoothstep(0.6, 0.64, p) * (1 - smoothstep(0.73, 0.76, p));
-    const count = portrait ? 9 : 14;
-    const cx = width / 2;
-    // On a phone the captions fill the bottom, so the circle dances round the foot of the cloth instead.
-    const ground = height * (portrait ? 0.56 : 0.9);
-    const rx = width * (portrait ? 0.44 : 0.4);
-    const ry = rx * 0.2;
-    const tall = Math.min(height * (portrait ? 0.11 : 0.2), width * 0.24);
-    const rise = (1 - presence) * tall * 0.9;
+    const count = isPortrait(width, height) ? 9 : 14;
+    const place = (a: number) =>
+      stageCamera.current
+        ? this.stand(Math.cos(a) * CIRCLE.radius, CIRCLE.z + Math.sin(a) * CIRCLE.depth, width, height)
+        : this.flat(a, width, height);
 
+    // In the close-ups the floor is below the frame, so the dancers are too and her face stays clear.
+    const centre = stageCamera.current ? this.stand(0, CIRCLE.z, width, height) : this.flat(0, width, height, 0);
     const dancers = Array.from({ length: count }, (_, i) => {
       const a = this.angle + (i / count) * TAU;
-      return { i, a, depth: Math.sin(a) };
+      return { i, a, depth: Math.sin(a), spot: place(a) };
     }).sort((u, v) => u.depth - v.depth);
 
     ctx.globalAlpha = presence;
-    // Warm light on the ground inside the circle.
-    const floor = ctx.createRadialGradient(cx, ground, 0, cx, ground, rx * 1.1);
-    floor.addColorStop(0, "rgba(255, 140, 50, 0.28)");
-    floor.addColorStop(1, "rgba(255, 90, 20, 0)");
-    ctx.save();
-    ctx.translate(cx, ground);
-    ctx.scale(1, 0.2);
-    ctx.translate(-cx, -ground);
-    ctx.fillStyle = floor;
-    ctx.fillRect(cx - rx * 1.2, ground - rx * 1.2, rx * 2.4, rx * 2.4);
-    ctx.restore();
-
-    const place = (d: (typeof dancers)[number]) => {
-      const scale = 0.68 + 0.42 * (d.depth + 1) * 0.5;
-      const x = cx + Math.cos(d.a) * rx;
-      const y = ground + d.depth * ry + rise;
+    const draw = (d: (typeof dancers)[number]) => {
+      if (!d.spot || d.spot.y - d.spot.tall > height) return;
+      const rise = (1 - presence) * d.spot.tall * 0.9;
       // Facing the way the circle turns; lit from the garbo on the side facing in.
       const facing = d.depth >= 0 ? -1 : 1;
       const light = 0.35 + 0.65 * (1 - Math.abs(Math.cos(d.a))) * (d.depth < 0 ? 1 : 0.5);
       const beat = this.beat + (d.i % 2) * 0.08;
-      drawDancer(ctx, x, y, tall * scale, facing, beat, dandiya, CHANIYA[d.i % CHANIYA.length], light, seconds, d.i + 1);
+      drawDancer(ctx, d.spot.x, d.spot.y + rise, d.spot.tall, facing, beat, dandiya, CHANIYA[d.i % CHANIYA.length], light, seconds, d.i + 1);
     };
-    dancers.filter((d) => d.depth < 0).forEach(place);
-    drawGarbo(ctx, cx, ground + rise, tall * 0.17, seconds);
-    dancers.filter((d) => d.depth >= 0).forEach(place);
+
+    if (centre && centre.y - centre.tall < height) {
+      // Warm light on the ground inside the circle.
+      const edge = place(0);
+      const rx = edge ? Math.max(Math.abs(edge.x - centre.x), centre.tall) : centre.tall * 2;
+      const floor = ctx.createRadialGradient(centre.x, centre.y, 0, centre.x, centre.y, rx * 1.1);
+      floor.addColorStop(0, "rgba(255, 140, 50, 0.28)");
+      floor.addColorStop(1, "rgba(255, 90, 20, 0)");
+      ctx.save();
+      ctx.translate(centre.x, centre.y);
+      ctx.scale(1, 0.2);
+      ctx.translate(-centre.x, -centre.y);
+      ctx.fillStyle = floor;
+      ctx.fillRect(centre.x - rx * 1.2, centre.y - rx * 1.2, rx * 2.4, rx * 2.4);
+      ctx.restore();
+    }
+    dancers.filter((d) => d.depth < 0).forEach(draw);
+    if (centre) drawGarbo(ctx, centre.x, centre.y + (1 - presence) * centre.tall * 0.9, centre.tall * 0.17, seconds);
+    dancers.filter((d) => d.depth >= 0).forEach(draw);
     ctx.globalAlpha = 1;
   }
 }
