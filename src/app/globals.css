@@ -1,26 +1,1022 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #070304;
+  --ink-2: #140908;
+  --shola: #f2e9d6;
+  --shola-dim: rgba(242, 233, 214, 0.62);
+  --gold: #d9a64a;
+  --gold-dim: rgba(217, 166, 74, 0.55);
+  --sindoor: #c4221a;
+  --serif: var(--font-serif), "Cormorant", Georgia, serif;
+  --sc: var(--font-sc), var(--font-serif), Georgia, serif;
+  --bangla: var(--font-bangla), "Noto Serif Bengali", serif;
+  --deva: var(--font-deva), "Noto Serif Devanagari", serif;
+  --edge: clamp(1.25rem, 3.5vw, 3rem);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--ink);
+  color: var(--shola);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(1.05rem, 0.95rem + 0.4vw, 1.3rem);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--sindoor);
+  color: var(--shola);
+}
+
+.bangla {
+  font-family: var(--bangla);
+}
+
+.deva {
+  font-family: var(--deva);
+}
+
+.small-caps {
+  font-family: var(--sc);
+  letter-spacing: 0.16em;
+  text-transform: lowercase;
+  font-size: 0.82em;
+  color: var(--shola-dim);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.visually-hidden button:focus-visible {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  width: auto;
+  height: auto;
+  clip-path: none;
+}
+
+/* ─── The journey: a tall section with a pinned stage ───────────────────── */
+
+#journey {
+  position: relative;
+  height: 1300vh;
+}
+
+#stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+#gl,
+.fallback {
+  position: absolute !important;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+}
+
+.fallback {
+  background:
+    radial-gradient(ellipse 40% 50% at 50% 45%, rgba(150, 30, 18, 0.55), transparent 70%),
+    var(--ink);
+}
+
+.corner {
+  position: absolute;
+  z-index: 3;
+  top: var(--edge);
+  pointer-events: none;
+}
+
+.corner-tl {
+  left: var(--edge);
+}
+
+.corner-tr {
+  right: var(--edge);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.corner-tr .native {
+  letter-spacing: 0;
+  font-size: 1.05em;
+  color: var(--gold-dim);
+}
+
+.wordmark {
+  font-family: var(--sc);
+  font-size: 1.1rem;
+  letter-spacing: 0.3em;
+  text-transform: lowercase;
+  color: var(--shola);
+}
+
+#rail {
+  position: absolute;
+  z-index: 3;
+  right: calc(var(--edge) * 0.55);
+  top: 50%;
+  width: 1px;
+  height: 28vh;
+  translate: 0 -50%;
+  background: rgba(242, 233, 214, 0.14);
+  pointer-events: none;
+}
+
+#rail i {
+  position: absolute;
+  inset: 0;
+  background: var(--gold);
+  transform-origin: top;
+  transform: scaleY(var(--progress, 0));
+}
+
+/* The regional rituals, Mahishasura's shadow and the inside of the third eye, over the stage and under the captions. */
+#ritual,
+#mahisha,
+#third-eye {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#third-eye {
+  opacity: 0;
+}
+
+/* ─── Captions ──────────────────────────────────────────────────────────── */
+
+#captions {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.caption {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  will-change: opacity, transform;
+  text-shadow: 0 0 24px rgba(7, 3, 4, 0.9), 0 0 4px rgba(7, 3, 4, 0.7);
+}
+
+.hero {
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 0.4rem;
+  padding-top: 42vh;
+}
+
+.hero-bangla {
+  margin: 0;
+  font-size: clamp(1.5rem, 1rem + 1.8vw, 2.4rem);
+  color: var(--gold);
+}
+
+.hero h1 {
+  margin: 0;
+  font-weight: 300;
+  font-size: clamp(3.4rem, 2rem + 6vw, 7.5rem);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+}
+
+.hero .small-caps {
+  margin: 0.6rem 0 0;
+}
+
+.chapter {
+  top: 50%;
+  width: min(24rem, 38vw);
+  translate: 0 -50%;
+}
+
+.chapter.left {
+  left: calc(var(--edge) * 1.6);
+}
+
+.chapter.right {
+  right: calc(var(--edge) * 1.8);
+  text-align: right;
+}
+
+/* The pachedi is a wide white cloth: keep its captions narrow and close to the screen edge,
+   over the dark around it rather than on the cloth. */
+@media (min-width: 701px) and (min-aspect-ratio: 801/1000) {
+  #stage[data-style="pachedi"] .chapter {
+    width: min(19rem, 25vw);
+  }
+
+  #stage[data-style="pachedi"] .chapter.left {
+    left: var(--edge);
+  }
+
+  #stage[data-style="pachedi"] .chapter.right {
+    right: calc(var(--edge) * 1.3);
+  }
+}
+
+.numeral {
+  display: block;
+  font-family: var(--sc);
+  font-size: 0.9rem;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+}
+
+.tithi {
+  margin: 0.2rem 0 0.4rem;
+}
+
+.chapter h2 {
+  margin: 0 0 0.8rem;
+  font-weight: 300;
+  font-size: clamp(2.1rem, 1.5rem + 2.2vw, 3.5rem);
+  line-height: 1;
+}
+
+.chapter h2 .native {
+  display: block;
+  margin-top: 0.45rem;
+  font-size: 0.42em;
+  color: var(--gold-dim);
+}
+
+.chapter p:last-child {
+  margin: 0;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--shola-dim);
+  text-wrap: pretty;
+}
+
+.mantra {
+  left: 0;
+  right: 0;
+  bottom: 16vh;
+  text-align: center;
+}
+
+.mantra .deva {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.6rem);
+  color: var(--shola);
+}
+
+.mantra .small-caps {
+  margin: 0;
+  color: var(--gold-dim);
+}
+
+.whisper {
+  left: 0;
+  right: 0;
+  bottom: 18vh;
+  text-align: center;
+}
+
+.whisper .native {
+  margin: 0 0 0.4rem;
+  font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.6rem);
+  color: var(--shola);
+}
+
+/* ─── Hints, tooltip, loader ────────────────────────────────────────────── */
+
+#hints {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--edge) * 0.9);
+  display: grid;
+  justify-items: center;
+  pointer-events: none;
+}
+
+#hints > span {
+  grid-area: 1 / 1;
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  transition: opacity 0.8s ease;
+}
+
+.hint-scroll i {
+  width: 1px;
+  height: 2.4rem;
+  background: linear-gradient(var(--gold), transparent);
+  animation: drip 2.4s ease-in-out infinite;
+  transform-origin: top;
+}
+
+#stage[data-started="yes"] .hint-scroll,
+#stage[data-astras="off"] .hint-astras,
+#stage[data-dhunuchi="on"] .hint-astras,
+#stage[data-dhunuchi="off"] .hint-dhunuchi {
+  opacity: 0;
+}
+
+@keyframes drip {
+  0% { transform: scaleY(0); opacity: 1; }
+  70% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 5;
+  left: 0;
+  top: 0;
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--gold-dim);
+  background: rgba(20, 9, 8, 0.86);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.tooltip .native {
+  color: var(--gold);
+}
+
+#loader {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1rem;
+  background: var(--ink);
+  transition: opacity 1.4s ease 0.2s, visibility 0s linear 1.6s;
+}
+
+#loader .deva {
+  font-size: 3rem;
+  color: var(--gold);
+  animation: breathe 3s ease-in-out infinite;
+}
+
+#loader[data-ready="yes"] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes breathe {
+  50% { opacity: 0.45; transform: scale(0.94); }
+}
+
+/* ─── The astra card ────────────────────────────────────────────────────── */
+
+.astra-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+  width: min(30rem, calc(100vw - 2rem));
+  max-height: calc(100svh - 2rem);
+  padding: 0;
+  border: 1px solid var(--gold-dim);
+  background: linear-gradient(180deg, #1c0c0a, #0d0605);
+  color: var(--shola);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+}
+
+.astra-dialog::backdrop {
+  background: rgba(7, 3, 4, 0.7);
+  backdrop-filter: blur(3px);
+}
+
+.astra-dialog[open] {
+  animation: rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+}
+
+.astra-card {
+  position: relative;
+  padding: 2.4rem 2rem 1.6rem;
+  text-align: center;
+}
+
+.astra-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.8rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 0;
+  background: none;
+  color: var(--shola-dim);
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.astra-close:hover,
+.astra-close:focus-visible {
+  color: var(--shola);
+}
+
+.astra-medallion {
+  display: grid;
+  place-items: center;
+  width: 3.4rem;
+  height: 3.4rem;
+  margin: 0 auto 1rem;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  font-family: var(--sc);
+  letter-spacing: 0.1em;
+  color: var(--gold);
+}
+
+.astra-bangla {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--gold);
+}
+
+.astra-card h3 {
+  margin: 0.1rem 0 0.2rem;
+  font-weight: 400;
+  font-size: 2.2rem;
+  line-height: 1.1;
+}
+
+.astra-meta {
+  margin: 0 0 1.2rem;
+}
+
+.astra-body p {
+  margin: 0 0 0.8rem;
+  text-wrap: pretty;
+}
+
+.astra-body p:last-child {
+  font-style: italic;
+  color: var(--shola-dim);
+}
+
+.astra-steps {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(217, 166, 74, 0.2);
+}
+
+.astra-steps button {
+  border: 0;
+  background: none;
+  color: var(--shola-dim);
+  font-family: var(--sc);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  padding: 0.4rem 0;
+}
+
+.astra-steps button:hover,
+.astra-steps button:focus-visible {
+  color: var(--gold);
+}
+
+/* ─── After the immersion ───────────────────────────────────────────────── */
+
+#after {
+  position: relative;
+  display: grid;
+  gap: 38vh;
+  justify-items: center;
+  padding: 30vh var(--edge) 34vh;
+  background: linear-gradient(var(--ink), var(--ink-2) 50%, var(--ink));
+}
+
+.verse {
+  max-width: 40rem;
+  margin: 0;
+  text-align: center;
+}
+
+.verse blockquote {
+  margin: 0;
+}
+
+.verse-text {
+  display: grid;
+  gap: 0.3em;
+  margin: 0 0 1.4rem;
+  font-size: clamp(1.4rem, 1rem + 1.6vw, 2.3rem);
+  line-height: 1.5;
+  color: var(--gold);
+}
+
+.verse-english {
+  margin: 0 0 1rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--shola-dim);
+  text-wrap: balance;
+}
+
+.farewell {
+  display: grid;
+  justify-items: center;
+  gap: 1.8rem;
+  text-align: center;
+}
+
+.farewell .native {
+  margin: 0;
+  font-size: clamp(2rem, 1.4rem + 2.4vw, 3.4rem);
+}
+
+.farewell a {
+  color: var(--shola-dim);
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold-dim);
+  padding-bottom: 0.2rem;
+}
+
+.farewell a:hover,
+.farewell a:focus-visible {
+  color: var(--gold);
+}
+
+.bijoya {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  margin: 1.2rem 0 0.6rem;
+  color: var(--shola-dim);
+}
+
+.bijoya > p {
+  margin: 0;
+}
+
+.bijoya form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.bijoya input {
+  width: min(16rem, 70vw);
+  padding: 0.55rem 0.2rem;
+  border: 0;
+  border-bottom: 1px solid var(--gold-dim);
+  background: transparent;
+  color: var(--shola);
+  font: inherit;
+  font-style: italic;
+  text-align: center;
+}
+
+.bijoya input::placeholder {
+  color: var(--shola-dim);
+  opacity: 0.6;
+}
+
+.bijoya input:focus-visible {
+  outline: none;
+  border-bottom-color: var(--gold);
+}
+
+.bijoya button {
+  padding: 0.55rem 1.2rem;
+  border: 1px solid var(--gold-dim);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--gold);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.bijoya button:hover:not(:disabled),
+.bijoya button:focus-visible {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.bijoya button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.bijoya figure {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  margin: 0.6rem 0 0;
+}
+
+.bijoya img {
+  width: min(22rem, 78vw);
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.6), 0 0 0 1px var(--gold-dim);
+}
+
+.bijoya figcaption {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.bijoya-error {
+  font-style: italic;
+}
+
+.credits {
+  max-width: 44rem;
+  /* Sits just under the farewell, inside #after's wide grid gap, and clear of the fixed
+     sound toggle once the page ends. */
+  margin: calc(6rem - 38vh) auto max(-26vh, calc(5.5rem - 34vh));
+  font-size: 0.8rem;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--shola-dim);
+  opacity: 0.7;
+}
+
+.credits a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--gold-dim);
+  text-underline-offset: 0.2em;
+}
+
+.credits a:hover,
+.credits a:focus-visible {
+  color: var(--gold);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 1.6s ease, transform 1.6s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ─── Small screens ─────────────────────────────────────────────────────── */
+
+/* Phones, and tablets held upright (see isPortrait in src/lib/screen.ts): captions run along
+   the bottom, clear of the hints, on a dark wash so they read over the brightest painting. */
+@media (max-width: 700px), (max-aspect-ratio: 4/5) {
+  .chapter,
+  .chapter.left,
+  .chapter.right {
+    left: var(--edge);
+    right: var(--edge);
+    top: auto;
+    bottom: max(15svh, 7.5rem);
+    width: auto;
+    max-width: 34rem;
+    translate: none;
+    text-align: left;
+  }
+
+  .chapter::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -8rem;
+    bottom: -40svh;
+    left: calc(-1 * var(--edge));
+    width: 100vw;
+    background: linear-gradient(rgba(7, 3, 4, 0), rgba(7, 3, 4, 0.7) 8rem, rgba(7, 3, 4, 0.85));
+    pointer-events: none;
+  }
+
+  .chapter h2 {
+    font-size: clamp(2rem, 1.4rem + 3vw, 3rem);
+  }
+
+  /* The header sits over her crown in the close-ups. */
+  #captions::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 10rem;
+    background: linear-gradient(rgba(7, 3, 4, 0.72), rgba(7, 3, 4, 0));
+    pointer-events: none;
+  }
+
+  .hero {
+    padding-top: 46vh;
+  }
+
+  #rail {
+    display: none;
+  }
+}
+
+/* Phones on their side: little height, so everything is smaller and the hero sits higher. */
+@media (max-height: 520px) and (min-aspect-ratio: 801/1000) {
+  .wordmark {
+    font-size: 0.95rem;
+  }
+
+  .style-note .style-detail {
+    display: none;
+  }
+
+  .hero {
+    padding: 24vh 0 20vh;
+  }
+
+  .hero-bangla {
+    font-size: 1.3rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.6rem, 15vh, 4.4rem);
+  }
+
+  .chapter {
+    top: calc(50% + 1.8rem);
+    width: min(18rem, 30vw);
+  }
+
+  /* Her face fills the width in the close-ups, so each caption gets a wash from its own edge. */
+  .chapter::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -100vh;
+    bottom: -100vh;
+    left: -30vw;
+    right: -9rem;
+    background: linear-gradient(to left, rgba(7, 3, 4, 0), rgba(7, 3, 4, 0.72) 9rem);
+    pointer-events: none;
+  }
+
+  .chapter.right::before {
+    left: -9rem;
+    right: -30vw;
+    background: linear-gradient(to right, rgba(7, 3, 4, 0), rgba(7, 3, 4, 0.72) 9rem);
+  }
+
+  .numeral {
+    font-size: 0.75rem;
+  }
+
+  .tithi {
+    margin: 0 0 0.2rem;
+    font-size: 0.75rem;
+  }
+
+  .chapter h2 {
+    margin-bottom: 0.5rem;
+    font-size: clamp(1.6rem, 9vh, 2.4rem);
+  }
+
+  .chapter p:last-child {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .mantra {
+    bottom: 12vh;
+  }
+
+  .whisper {
+    bottom: 14vh;
+  }
+
+  #rail {
+    height: 40vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint-scroll i,
+  #loader .deva {
+    animation: none;
+  }
+
+  .reveal {
+    transition: none;
+  }
+}
+
+/* ─── Sound ─────────────────────────────────────────────────────────────── */
+
+.sound-toggle {
+  position: fixed;
+  z-index: 6;
+  right: var(--edge);
+  bottom: calc(var(--edge) * 0.9);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  padding: 0 0.2rem;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.sound-toggle:hover,
+.sound-toggle:focus-visible,
+.sound-toggle[aria-pressed="true"] {
+  color: var(--shola);
+}
+
+.sound-toggle:focus-visible {
+  outline: 1px solid var(--gold-dim);
+  outline-offset: 4px;
+}
+
+.sound-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 0.9rem;
+}
+
+.sound-bars i {
+  width: 2px;
+  height: 100%;
+  background: var(--gold);
+  transform-origin: bottom;
+  transform: scaleY(0.18);
+  transition: transform 0.4s ease;
+}
+
+.sound-bars[data-on="yes"] i {
+  animation: beat 0.9s ease-in-out infinite;
+}
+
+.sound-bars[data-on="yes"] i:nth-child(2) { animation-delay: -0.3s; }
+.sound-bars[data-on="yes"] i:nth-child(3) { animation-delay: -0.6s; }
+.sound-bars[data-on="yes"] i:nth-child(4) { animation-delay: -0.15s; }
+
+@keyframes beat {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sound-bars[data-on="yes"] i {
+    animation: none;
+    transform: scaleY(0.7);
+  }
+}
+
+/* ─── Painting tradition ────────────────────────────────────────────────── */
+
+.gujarati {
+  font-family: var(--font-gujarati), "Noto Serif Gujarati", serif;
+}
+
+.style-switcher {
+  margin-top: 1.1rem;
+  pointer-events: auto;
+  max-width: 17rem;
+}
+
+.style-options {
+  display: flex;
+  gap: 0.2rem;
+  margin-left: -0.5rem;
+}
+
+.style-options button {
+  min-height: 2.75rem;
+  padding: 0 0.5rem;
+  border: 0;
+  background: none;
+  color: var(--shola-dim);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.style-options button::after {
+  content: "";
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  bottom: 0.55rem;
+  height: 1px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transition: transform 0.35s ease;
+}
+
+.style-options button:hover,
+.style-options button:focus-visible,
+.style-options button[aria-checked="true"] {
+  color: var(--shola);
+}
+
+.style-options button[aria-checked="true"]::after {
+  transform: scaleX(1);
+}
+
+.style-options button:focus-visible {
+  outline: 1px solid var(--gold-dim);
+  outline-offset: -2px;
+}
+
+.style-note {
+  margin: 0.1rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: var(--shola-dim);
+  text-shadow: 0 0 18px rgba(7, 3, 4, 0.9);
+}
+
+.style-note > span:first-child {
+  color: var(--gold);
+}
+
+.style-name {
+  font-style: italic;
+}
+
+.style-detail {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.88rem;
+  font-style: italic;
+  font-weight: 300;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.style-switcher:hover .style-detail,
+.style-switcher:focus-within .style-detail,
+#stage[data-started="no"] .style-detail {
+  opacity: 1;
+}
+
+@media (max-width: 700px), (max-aspect-ratio: 4/5) {
+  .style-switcher {
+    margin-top: 0.6rem;
+  }
+
+  .style-detail {
+    display: none;
+  }
+}
+
+/* A close dark halo around each letter, so captions stay readable where they cross the
+   bright Madhubani yellow or the edge of the pachedi cloth. */
+.chapter,
+.whisper,
+.corner-tl {
+  text-shadow: 0 0 3px rgba(7, 3, 4, 0.75), 0 0 14px rgba(7, 3, 4, 0.7), 0 0 32px rgba(7, 3, 4, 0.5);
 }
