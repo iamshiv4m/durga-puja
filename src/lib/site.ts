@@ -3,15 +3,26 @@ import { STORIES } from "@/content/chapters";
 import { STYLES, type PaintingStyle } from "@/lib/styles";
 
 /**
- * The public URL the site is served from. Link previews (WhatsApp, Instagram, X) need absolute
- * image URLs, so set NEXT_PUBLIC_SITE_URL in production, e.g. https://trinayani.example.
- * On Vercel the production domain is picked up automatically.
+ * Absolute origin for canonical URLs and link-preview images.
+ * A blank NEXT_PUBLIC_SITE_URL is ignored (`??` would keep it, and `new URL("")` crashes the build).
+ * On Vercel, the production domain is used when the public URL is unset.
  */
+function siteOrigin(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) return undefined;
+  const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  try {
+    return new URL(withProtocol).origin;
+  } catch {
+    return undefined;
+  }
+}
+
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "http://localhost:3000");
+  siteOrigin(process.env.NEXT_PUBLIC_SITE_URL) ??
+  siteOrigin(process.env.VERCEL_PROJECT_PRODUCTION_URL) ??
+  siteOrigin(process.env.VERCEL_URL) ??
+  "http://localhost:3000";
 
 export const SITE = {
   name: "Trinayanī",
