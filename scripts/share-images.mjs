@@ -6,7 +6,7 @@
 //   npm run share-images             # in another
 //   npm run share-images -- --url https://parv.example --domain parv.example
 //   npm run share-images -- --only parv   # just the Parv home page's doors and link preview
-//   npm run share-images -- --only diwali,holi   # just these pages (also: bengal, durga-puja, chhath, ganesh)
+//   npm run share-images -- --only diwali,holi   # just these pages (also: bengal, durga-puja, chhath, ganesh, navratri, lohri, sankranti, pongal, bihu, onam, janmashtami)
 //
 // Re-run whenever the pratima art changes.
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -26,7 +26,7 @@ const only = arg("only", "");
 
 const HIDE_UI = `#captions, .corner, #rail, #hints, .sound-toggle, #loader, .tooltip, nextjs-portal { display: none !important; }`;
 const FONTS =
-  "https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=Cormorant+SC:wght@400&family=Tiro+Bangla&family=Tiro+Devanagari+Hindi&family=Noto+Serif+Gujarati&display=block";
+  "https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300&family=Cormorant+SC:wght@400&family=Tiro+Bangla&family=Tiro+Devanagari+Hindi&family=Noto+Serif+Gujarati&family=Noto+Serif+Gurmukhi&family=Noto+Serif+Tamil&family=Noto+Serif+Malayalam&display=block";
 
 async function capture(browser, { url: pageUrl, width, height, progress }) {
   const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1 });
@@ -51,7 +51,7 @@ async function compose(browser, { width, height, html, out, quality = 84 }) {
       * { margin: 0; box-sizing: border-box; }
       body { width: ${width}px; height: ${height}px; overflow: hidden; background: #070304; color: #f2e9d6;
              font-family: Cormorant, Georgia, serif; position: relative; }
-      .bn { font-family: "Tiro Bangla", "Tiro Devanagari Hindi", "Noto Serif Gujarati", serif; color: #d9a64a; }
+      .bn { font-family: "Tiro Bangla", "Tiro Devanagari Hindi", "Noto Serif Gujarati", "Noto Serif Gurmukhi", "Noto Serif Tamil", "Noto Serif Malayalam", serif; color: #d9a64a; }
       .sc { font-family: "Cormorant SC", serif; letter-spacing: 0.22em; text-transform: lowercase; color: rgba(242,233,214,.66); }
       h1 { font-weight: 300; line-height: .9; letter-spacing: .01em; }
       .scene { position: absolute; background-size: cover; background-repeat: no-repeat; }
@@ -155,6 +155,13 @@ const JOURNEYS = [
   { key: "chhath", path: "/chhath", progress: 0.52 },
   { key: "holi", path: "/holi", progress: 0.54 },
   { key: "ganesh", path: "/ganesh-chaturthi", progress: 0.4 },
+  { key: "navratri", path: "/navratri", progress: 0.5 },
+  { key: "lohri", path: "/lohri-baisakhi", progress: 0.5 },
+  { key: "sankranti", path: "/makar-sankranti", progress: 0.5 },
+  { key: "pongal", path: "/pongal", progress: 0.5 },
+  { key: "bihu", path: "/bihu", progress: 0.5 },
+  { key: "onam", path: "/onam", progress: 0.5 },
+  { key: "janmashtami", path: "/janmashtami", progress: 0.5 },
 ];
 
 const wanted = (key) => !only || only.split(",").includes(key);
@@ -206,7 +213,7 @@ if (doors.length) await compose(browser, {
       <h1 style="font-size:150px">Parv</h1>
       <div class="rule"></div>
       <p style="font-size:32px; font-style:italic; font-weight:300; line-height:1.3; color:rgba(242,233,214,.8)">The festivals of India, one scroll at a time.</p>
-      <p class="sc" style="font-size:20px; margin-top:6px">durga puja · diwali · chhath · holi · ganesh chaturthi</p>
+      <p class="sc" style="font-size:20px; margin-top:6px">durga puja · navratri · diwali · chhath · lohri · pongal · holi · bihu · onam · janmashtami · ganesh</p>
     </div>`,
 });
 

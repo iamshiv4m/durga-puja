@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { DURGA_DOORS, FESTIVALS, type Festival, type FestivalArt } from "@/content/festivals";
+import {
+  DURGA_DOORS,
+  FESTIVALS,
+  type Festival,
+  type FestivalArt,
+} from "@/content/festivals";
 import { SITE, SITE_URL } from "@/lib/site";
 import styles from "./ParvHome.module.css";
 
@@ -15,7 +20,7 @@ export function ParvHome() {
     alternateName: "पर्व",
     url: SITE_URL,
     description: SITE.description,
-    inLanguage: ["en", "hi", "bn", "gu", "sa"],
+    inLanguage: ["en", "hi", "bn", "gu", "mr", "pa", "as", "ta", "ml", "sa"],
     hasPart: FESTIVALS.filter((f) => f.path).map((f) => ({
       "@type": "WebPage",
       name: f.journey ?? f.name,
@@ -25,18 +30,25 @@ export function ParvHome() {
 
   return (
     <main className={styles.home}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
 
       <header className={styles.hero}>
         <p className={`deva ${styles.native}`} lang="hi">
           पर्व
         </p>
         <h1>{SITE.name}</h1>
-        <p className="small-caps">the festivals of India, one scroll at a time</p>
+        <p className="small-caps">
+          the festivals of India, one scroll at a time
+        </p>
         <i className={styles.rule} aria-hidden="true" />
         <p className={styles.intro}>
-          Each festival is a single page you scroll through, painted by hand in code and scored with real recordings. Turn
-          the sound on.
+          Each festival is a single page you scroll through, painted by hand in
+          code and scored with real recordings. Turn the sound on.
         </p>
       </header>
 
@@ -63,7 +75,11 @@ export function ParvHome() {
         {REST.map((festival) => (
           <li key={festival.id} className={styles.later}>
             {festival.path ? (
-              <Link href={festival.path} className={styles.artLink} aria-label={`Enter ${festival.journey ?? festival.name}`}>
+              <Link
+                href={festival.path}
+                className={styles.artLink}
+                aria-label={`Enter ${festival.journey ?? festival.name}`}
+              >
                 <Art id={festival.id} />
               </Link>
             ) : (
@@ -84,13 +100,22 @@ export function ParvHome() {
   );
 }
 
-function FestivalText({ festival, status }: { festival: Festival; status: string }) {
+function FestivalText({
+  festival,
+  status,
+}: {
+  festival: Festival;
+  status: string;
+}) {
   return (
     <div className={styles.text}>
       <p className={`small-caps ${styles.tithi}`}>{festival.tithi}</p>
       <h2>
         {festival.name}
-        <span className="deva" lang="hi">
+        <span
+          className={festival.script ?? "deva"}
+          lang={festival.lang ?? "hi"}
+        >
           {festival.native}
         </span>
       </h2>
@@ -98,7 +123,8 @@ function FestivalText({ festival, status }: { festival: Festival; status: string
       <p className={styles.line}>{festival.line}</p>
       {festival.path ? (
         <Link href={festival.path} className={`small-caps ${styles.enter}`}>
-          enter {festival.journey ?? festival.name} <span aria-hidden="true">→</span>
+          enter {festival.journey ?? festival.name}{" "}
+          <span aria-hidden="true">→</span>
         </Link>
       ) : (
         <p className={`small-caps ${styles.status}`}>{status}</p>
@@ -114,7 +140,11 @@ function Art({ id }: { id: FestivalArt }) {
       {id === "diwali" && (
         <div className={styles.diyas}>
           {[0, 1, 2, 3, 4].map((i) => (
-            <span key={i} className={styles.diya} style={{ animationDelay: `${i * -0.37}s` }}>
+            <span
+              key={i}
+              className={styles.diya}
+              style={{ animationDelay: `${i * -0.37}s` }}
+            >
               <i />
             </span>
           ))}
@@ -128,13 +158,86 @@ function Art({ id }: { id: FestivalArt }) {
         </>
       )}
       {id === "holi" &&
-        [0, 1, 2, 3, 4].map((i) => <span key={i} className={styles.gulal} style={{ animationDelay: `${i * -2.3}s` }} />)}
+        [0, 1, 2, 3, 4].map((i) => (
+          <span
+            key={i}
+            className={styles.gulal}
+            style={{ animationDelay: `${i * -2.3}s` }}
+          />
+        ))}
+      {id === "navratri" && (
+        <>
+          <span className={styles.garbo} />
+          <span className={styles.circle}>
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <i key={i} style={{ rotate: `${i * 40}deg` }} />
+            ))}
+          </span>
+        </>
+      )}
+      {id === "lohri" && (
+        <>
+          <span className={styles.fire} />
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <span
+              key={i}
+              className={styles.spark}
+              style={{
+                left: `${40 + ((i * 37) % 20)}%`,
+                animationDelay: `${i * -0.5}s`,
+              }}
+            />
+          ))}
+        </>
+      )}
+      {id === "sankranti" &&
+        [0, 1, 2].map((i) => (
+          <span
+            key={i}
+            className={styles.kite}
+            style={{ animationDelay: `${i * -1.7}s` }}
+          >
+            <i />
+          </span>
+        ))}
+      {id === "pongal" && (
+        <>
+          <span className={styles.dawn} />
+          <span className={styles.pot}>
+            <i />
+          </span>
+        </>
+      )}
+      {id === "bihu" && (
+        <>
+          <span className={styles.hills} />
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <span
+              key={i}
+              className={styles.petal}
+              style={{ left: `${8 + i * 15}%`, animationDelay: `${i * -1.3}s` }}
+            />
+          ))}
+          <span className={styles.gamosa} />
+        </>
+      )}
+      {id === "onam" && <span className={styles.pookalam} />}
+      {id === "janmashtami" && (
+        <>
+          <span className={styles.rain} />
+          <span className={styles.feather} />
+        </>
+      )}
       {id === "ganesh" && (
         <>
           <span className={styles.moon} />
           <span className={styles.sea} />
           {[0, 1, 2].map((i) => (
-            <span key={i} className={styles.marigold} style={{ animationDelay: `${i * -1.1}s` }} />
+            <span
+              key={i}
+              className={styles.marigold}
+              style={{ animationDelay: `${i * -1.1}s` }}
+            />
           ))}
         </>
       )}

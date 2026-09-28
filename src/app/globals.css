@@ -968,6 +968,18 @@ body {
   font-family: var(--font-gujarati), "Noto Serif Gujarati", serif;
 }
 
+.gurmukhi {
+  font-family: var(--font-gurmukhi), "Noto Serif Gurmukhi", serif;
+}
+
+.tamil {
+  font-family: var(--font-tamil), "Noto Serif Tamil", serif;
+}
+
+.malayalam {
+  font-family: var(--font-malayalam), "Noto Serif Malayalam", serif;
+}
+
 .style-switcher {
   margin-top: 1.1rem;
   pointer-events: auto;

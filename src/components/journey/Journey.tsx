@@ -20,6 +20,7 @@ const PIXEL_RATIO_MAX = 2;
  * It shares its layout and responsive styles with the Durga Puja journey (globals.css).
  */
 export function Journey({ content }: { content: JourneyContent }) {
+  const script = content.script ?? "deva";
   const journey = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -168,14 +169,14 @@ export function Journey({ content }: { content: JourneyContent }) {
               · {content.name}
             </span>
             <p className="style-note">
-              <span className="deva" lang={content.lang}>
+              <span className={script} lang={content.lang}>
                 {content.native}
               </span>{" "}
               <span className="style-name">{content.festival}</span>
             </p>
           </header>
           <div className="corner corner-tr small-caps" aria-hidden="true">
-            <span className="native deva" lang={content.lang}>
+            <span className={`native ${script}`} lang={content.lang}>
               {content.greeting}
             </span>
             <span ref={counter}>0 / {content.chapters.length}</span>
@@ -186,7 +187,7 @@ export function Journey({ content }: { content: JourneyContent }) {
 
           <div id="captions">
             <div className="caption hero" data-window={w(content.hero)}>
-              <p className="native deva hero-bangla" lang={content.lang}>
+              <p className={`native ${script} hero-bangla`} lang={content.lang}>
                 {content.native}
               </p>
               <h1>{content.name}</h1>
@@ -198,7 +199,7 @@ export function Journey({ content }: { content: JourneyContent }) {
                 <p className="small-caps tithi">{chapter.tithi}</p>
                 <h2>
                   {chapter.title}
-                  <span className="native deva" lang={content.lang}>
+                  <span className={`native ${script}`} lang={content.lang}>
                     {chapter.native}
                   </span>
                 </h2>
@@ -206,7 +207,7 @@ export function Journey({ content }: { content: JourneyContent }) {
               </article>
             ))}
             <div className="caption whisper" data-window={w(content.finale.window)}>
-              <p className="native deva" lang={content.lang}>
+              <p className={`native ${script}`} lang={content.lang}>
                 {content.finale.native}
               </p>
               <p className="small-caps">{content.finale.english}</p>
@@ -236,7 +237,7 @@ export function Journey({ content }: { content: JourneyContent }) {
         {content.verse && (
           <figure className="verse reveal">
             <blockquote>
-              <p className="verse-text deva" lang={content.verse.lang}>
+              <p className={`verse-text ${content.verse.script ?? "deva"}`} lang={content.verse.lang}>
                 {content.verse.lines.map((line) => (
                   <span key={line}>{line}</span>
                 ))}
@@ -247,7 +248,7 @@ export function Journey({ content }: { content: JourneyContent }) {
           </figure>
         )}
         <div className="farewell reveal">
-          <p className="native deva" lang={content.lang}>
+          <p className={`native ${script}`} lang={content.lang}>
             {content.finale.native}
           </p>
           <GreetingCard content={content} kit={kit} />

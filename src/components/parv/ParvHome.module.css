@@ -3,7 +3,11 @@
   min-height: 100svh;
   padding: 0 var(--edge) 4rem;
   background:
-    radial-gradient(ellipse 70% 42% at 50% 0%, rgba(150, 30, 18, 0.28), transparent 70%),
+    radial-gradient(
+      ellipse 70% 42% at 50% 0%,
+      rgba(150, 30, 18, 0.28),
+      transparent 70%
+    ),
     linear-gradient(var(--ink), var(--ink-2) 60%, var(--ink));
 }
 
@@ -246,7 +250,11 @@
 /* Diwali: a row of diyas on the darkest night. */
 .diwali {
   background:
-    radial-gradient(ellipse 60% 40% at 50% 72%, rgba(240, 150, 40, 0.28), transparent 70%),
+    radial-gradient(
+      ellipse 60% 40% at 50% 72%,
+      rgba(240, 150, 40, 0.28),
+      transparent 70%
+    ),
     radial-gradient(ellipse 80% 60% at 50% 110%, #2a1206, transparent 70%),
     #07040a;
 }
@@ -279,7 +287,13 @@
   aspect-ratio: 0.55;
   translate: -50% 0;
   border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
-  background: radial-gradient(ellipse at 50% 75%, #fff8e0 0 20%, #ffd166 40%, #f07a1a 75%, transparent 76%);
+  background: radial-gradient(
+    ellipse at 50% 75%,
+    #fff8e0 0 20%,
+    #ffd166 40%,
+    #f07a1a 75%,
+    transparent 76%
+  );
   box-shadow:
     0 0 18px 6px rgba(255, 170, 60, 0.45),
     0 0 60px 18px rgba(240, 120, 30, 0.2);
@@ -308,7 +322,14 @@
 
 /* Chhath: the sun on the water at dusk. */
 .chhath {
-  background: linear-gradient(#12060c, #4a1612 38%, #b8461a 56%, #e89040 60%, #2a0e0a 60.5%, #12060a);
+  background: linear-gradient(
+    #12060c,
+    #4a1612 38%,
+    #b8461a 56%,
+    #e89040 60%,
+    #2a0e0a 60.5%,
+    #12060a
+  );
 }
 
 .sun {
@@ -329,7 +350,10 @@
   position: absolute;
   inset: 60.5% 0 0;
   background:
-    repeating-linear-gradient(rgba(255, 170, 80, 0.07) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(
+      rgba(255, 170, 80, 0.07) 0 2px,
+      transparent 2px 9px
+    ),
     linear-gradient(#2a0e0a, #12060a);
 }
 
@@ -340,7 +364,10 @@
   bottom: 6%;
   width: 18%;
   translate: -50% 0;
-  background: repeating-linear-gradient(rgba(255, 190, 100, 0.75) 0 2px, transparent 2px 7px);
+  background: repeating-linear-gradient(
+    rgba(255, 190, 100, 0.75) 0 2px,
+    transparent 2px 7px
+  );
   mask-image: linear-gradient(black, transparent);
   animation: shimmer 3s ease-in-out infinite alternate;
 }
@@ -430,7 +457,12 @@
   position: absolute;
   inset: 58% -10% 0;
   background:
-    repeating-radial-gradient(ellipse 30px 8px at 50% 0, transparent 0 5px, rgba(160, 190, 230, 0.12) 6px 7px, transparent 8px),
+    repeating-radial-gradient(
+      ellipse 30px 8px at 50% 0,
+      transparent 0 5px,
+      rgba(160, 190, 230, 0.12) 6px 7px,
+      transparent 8px
+    ),
     linear-gradient(rgba(242, 233, 214, 0.06), transparent);
   background-size:
     60px 16px,
@@ -478,6 +510,362 @@
 @keyframes bob {
   to {
     transform: translateY(18%) rotate(24deg);
+  }
+}
+
+/* Navratri: the garbo lamp in its clay pot, and the circle turning round it. */
+.navratri {
+  background:
+    radial-gradient(
+      ellipse 50% 45% at 50% 58%,
+      rgba(230, 60, 90, 0.22),
+      transparent 70%
+    ),
+    #0b0410;
+}
+
+.garbo {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  width: 13%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50% 50% 46% 46%;
+  background:
+    radial-gradient(circle at 30% 45%, #ffe7a0 0 5%, transparent 7%),
+    radial-gradient(circle at 55% 38%, #ffe7a0 0 5%, transparent 7%),
+    radial-gradient(circle at 70% 58%, #ffe7a0 0 5%, transparent 7%),
+    radial-gradient(circle at 42% 66%, #ffe7a0 0 5%, transparent 7%),
+    linear-gradient(#b8461a, #6b2210);
+  box-shadow: 0 0 40px 12px rgba(255, 170, 60, 0.35);
+  animation: flicker 2.2s ease-in-out infinite;
+}
+
+.circle {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  width: 62%;
+  aspect-ratio: 2.6;
+  translate: -50% -50%;
+  animation: turn 14s linear infinite;
+}
+
+.circle i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5%;
+  aspect-ratio: 0.45;
+  margin: -6% 0 0 -2.5%;
+  border-radius: 40% 40% 10% 10%;
+  transform-origin: 50% 50%;
+  transform: translateX(560%);
+}
+
+.circle i:nth-child(3n) {
+  background: #e0287a;
+}
+
+.circle i:nth-child(3n + 1) {
+  background: #f5c518;
+}
+
+.circle i:nth-child(3n + 2) {
+  background: #2fb36b;
+}
+
+@keyframes turn {
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* Lohri: the bonfire, and its sparks going up into the winter night. */
+.lohri {
+  background:
+    radial-gradient(
+      ellipse 45% 55% at 50% 90%,
+      rgba(240, 110, 30, 0.35),
+      transparent 70%
+    ),
+    #080405;
+}
+
+.fire {
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  width: 20%;
+  aspect-ratio: 0.9;
+  translate: -50% 0;
+  border-radius: 50% 50% 40% 40% / 70% 70% 30% 30%;
+  background: radial-gradient(
+    ellipse at 50% 85%,
+    #fff4c8 0 12%,
+    #ffc23a 32%,
+    #f06a1a 58%,
+    rgba(200, 40, 10, 0) 72%
+  );
+  filter: blur(1px);
+  transform-origin: 50% 100%;
+  animation: flame 0.9s ease-in-out infinite alternate;
+}
+
+.spark {
+  position: absolute;
+  bottom: 30%;
+  width: 1.2%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffcf6a;
+  box-shadow: 0 0 8px 2px rgba(255, 170, 60, 0.7);
+  animation: spark 3s ease-out infinite;
+}
+
+@keyframes spark {
+  from {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate(40%, -900%);
+    opacity: 0;
+  }
+}
+
+/* Makar Sankranti: kites on a winter-blue sky. */
+.sankranti {
+  background: linear-gradient(#1c3f6e, #6a9cc8 70%, #e8c890);
+}
+
+.kite {
+  position: absolute;
+  width: 10%;
+  aspect-ratio: 1;
+  animation: sway 5s ease-in-out infinite alternate;
+}
+
+.kite::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  rotate: 45deg;
+  background: linear-gradient(90deg, #e0287a 50%, #f5c518 50%);
+}
+
+.kite i {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 1px;
+  height: 500%;
+  background: rgba(255, 255, 255, 0.5);
+  transform-origin: top;
+  rotate: 18deg;
+}
+
+.kite:nth-child(1) {
+  left: 18%;
+  top: 16%;
+}
+
+.kite:nth-child(2) {
+  left: 54%;
+  top: 10%;
+  width: 8%;
+}
+
+.kite:nth-child(2)::before {
+  background: linear-gradient(90deg, #2a6bd8 50%, #f2e9d6 50%);
+}
+
+.kite:nth-child(3) {
+  left: 74%;
+  top: 34%;
+  width: 7%;
+}
+
+.kite:nth-child(3)::before {
+  background: linear-gradient(90deg, #2fb36b 50%, #f07a1a 50%);
+}
+
+@keyframes sway {
+  to {
+    transform: translate(12%, -10%) rotate(8deg);
+  }
+}
+
+/* Pongal: the clay pot boiling over in the morning sun. */
+.pongal {
+  background: linear-gradient(#2a1206, #8a3a12 55%, #d9822b);
+}
+
+.dawn {
+  position: absolute;
+  left: 50%;
+  top: 34%;
+  width: 34%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe7a8, #f7a53a 60%, transparent 72%);
+}
+
+.pot {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  width: 20%;
+  aspect-ratio: 1.1;
+  translate: -50% 0;
+  border-radius: 45% 45% 50% 50% / 40% 40% 60% 60%;
+  background:
+    linear-gradient(
+      transparent 38%,
+      #f2e9d6 38% 41%,
+      #c8261e 41% 44%,
+      transparent 44%
+    ),
+    radial-gradient(ellipse at 40% 40%, #a8542a, #5a2410);
+}
+
+.pot i {
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  top: -12%;
+  height: 30%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 60%, #fff 0 20%, transparent 22%),
+    radial-gradient(circle at 60% 40%, #fff8e8 0 26%, transparent 28%),
+    radial-gradient(circle at 80% 70%, #fff 0 18%, transparent 20%);
+  animation: boil 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes boil {
+  to {
+    transform: translateY(-18%) scale(1.15, 1.05);
+  }
+}
+
+/* Bihu: spring hills, blossom on the wind, and the red-and-white gamosa. */
+.bihu {
+  background: linear-gradient(#1a2c24, #5a8a5a 60%, #24401e);
+}
+
+.hills {
+  position: absolute;
+  inset: 45% -10% 0;
+  background:
+    radial-gradient(ellipse 40% 60% at 25% 100%, #2c5a2a 98%, transparent 100%),
+    radial-gradient(ellipse 45% 70% at 75% 100%, #1f4a22 98%, transparent 100%);
+}
+
+.petal {
+  position: absolute;
+  top: -8%;
+  width: 3%;
+  aspect-ratio: 1;
+  border-radius: 60% 0;
+  background: #e88ab8;
+  animation: fall 8s linear infinite;
+}
+
+.petal:nth-child(odd) {
+  background: #b06ad8;
+}
+
+.gamosa {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 14%;
+  background:
+    repeating-linear-gradient(90deg, #c8261e 0 6px, transparent 6px 18px) 0
+      30% / 100% 30% no-repeat,
+    linear-gradient(#f2e9d6 0 22%, #c8261e 22% 32%, #f2e9d6 32%);
+}
+
+@keyframes fall {
+  to {
+    transform: translate(120%, 1500%) rotate(540deg);
+  }
+}
+
+/* Onam: a pookalam of flowers, turning slowly. */
+.onam {
+  background: #0a1208;
+}
+
+.pookalam {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #fff3c8 0 8%, #f5c518 8% 16%, transparent 16.5%),
+    radial-gradient(
+      circle,
+      transparent 0 34%,
+      #c8261e 34.5% 44%,
+      #f2e9d6 44.5% 47%,
+      #7a2a8a 47.5% 60%,
+      #f2e9d6 60.5% 62%,
+      #2f8a3b 62.5% 70%,
+      transparent 70.5%
+    ),
+    repeating-conic-gradient(#f07a1a 0 15deg, #f5c518 15deg 30deg);
+  box-shadow: 0 0 0 4px #2f8a3b;
+  animation: turn 40s linear infinite;
+}
+
+/* Janmashtami: a storm over the Yamuna at midnight, and a peacock feather. */
+.janmashtami {
+  background: radial-gradient(ellipse 60% 50% at 50% 50%, #0f1c3a, #04060c);
+}
+
+.rain {
+  position: absolute;
+  inset: -20% 0 0;
+  background: repeating-linear-gradient(
+    105deg,
+    transparent 0 14px,
+    rgba(170, 200, 255, 0.18) 14px 15px
+  );
+  animation: rain 0.8s linear infinite;
+}
+
+.feather {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16%;
+  aspect-ratio: 0.7;
+  translate: -50% -50%;
+  rotate: -18deg;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 50% 55%,
+    #0a1a5a 0 14%,
+    #1a7a8a 15% 26%,
+    #c8a030 27% 34%,
+    #2a7a3a 35% 62%,
+    transparent 64%
+  );
+  box-shadow: 0 0 40px 8px rgba(40, 140, 160, 0.25);
+  animation: bob 4s ease-in-out infinite alternate;
+}
+
+@keyframes rain {
+  to {
+    background-position: -4px 30px;
   }
 }
 

@@ -1,9 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import type { JourneyContent, Kit } from "@/journeys/types";
+import type { JourneyContent, Kit, Script } from "@/journeys/types";
 
 const SIZE = { width: 1080, height: 1350 };
+
+/** The next/font CSS variable for each script (see app/layout.tsx). */
+const SCRIPT_FONTS: Record<Script, string> = {
+  deva: "--font-deva",
+  gujarati: "--font-gujarati",
+  bangla: "--font-bangla",
+  gurmukhi: "--font-gurmukhi",
+  tamil: "--font-tamil",
+  malayalam: "--font-malayalam",
+};
 
 function family(variable: string, fallback: string) {
   const value = getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
@@ -40,7 +50,7 @@ export function GreetingCard({ content, kit }: { content: JourneyContent; kit: K
       const fonts = {
         serif: family("--font-serif", "Georgia, serif"),
         sc: family("--font-sc", "Georgia, serif"),
-        deva: family("--font-deva", "serif"),
+        deva: family(SCRIPT_FONTS[content.script ?? "deva"], "serif"),
       };
       await Promise.all([
         document.fonts.load(`96px ${fonts.deva}`, native + content.finale.native),

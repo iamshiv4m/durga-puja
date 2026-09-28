@@ -32,7 +32,7 @@ export const SITE = {
   name: "Parv",
   title: "Parv — the festivals of India, one scroll at a time",
   description:
-    "Scroll-driven, hand-painted journeys through India's festivals: Durga Puja, Diwali, Chhath, Holi and Ganesh Chaturthi, each a single page with its own music.",
+    "Scroll-driven, hand-painted journeys through India's festivals: Durga Puja, Navratri, Diwali, Chhath, Lohri and Baisakhi, Makar Sankranti, Pongal, Holi, Bihu, Onam, Janmashtami and Ganesh Chaturthi, each a single page with its own music.",
   keywords: [
     "Parv",
     "पर्व",
@@ -44,6 +44,16 @@ export const SITE = {
     "Chhath Puja",
     "Holi",
     "Ganesh Chaturthi",
+    "Navratri",
+    "Garba",
+    "Lohri",
+    "Baisakhi",
+    "Makar Sankranti",
+    "Uttarayan",
+    "Pongal",
+    "Bihu",
+    "Onam",
+    "Janmashtami",
   ],
 };
 
