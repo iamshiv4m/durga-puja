@@ -11,11 +11,32 @@ npm run build
 | Page | What it is |
 |---|---|
 | `/` | The Parv home page: every festival in the order it comes round, with the open ones linked (`src/components/parv/ParvHome.tsx`, content in `src/content/festivals.ts`) |
-| `/durga-puja`, `/durga-puja/bihar`, `/durga-puja/gujarat` | **Trinayanī**, the Durga Puja journey, described below |
+| `/durga-puja`, `/durga-puja/bihar`, `/durga-puja/gujarat` | **Trinayanī**, the Durga Puja journey (WebGL), described below |
+| `/diwali` | **Deepāvalī**: one lamp at the door, the rangoli, Lakshmi's footprints, Ayodhya lit for Ram, fireworks, dawn |
+| `/chhath` | Chhath: the river at dusk and at dawn |
+| `/holi` | Holi: Holika's fire, then the colour |
+| `/ganesh-chaturthi` | Ganeshotsav: from the murtikar's clay to the visarjan at Chowpatty |
 
 The old Durga Puja links (`/bihar`, `/gujarat`, `/mithila`) redirect to their pages under `/durga-puja` (`next.config.ts`).
 
-To add a festival, give it a folder under `src/app/`, then set its `path` in `FESTIVALS`; the home page links it and drops its "to come" label.
+## Festival journeys
+
+Every festival after Durga Puja runs on one lighter engine in `src/journeys`, painted on a 2D canvas:
+
+- `types.ts`: what a journey is. `JourneyContent` is plain data the server renders (words, caption timings, metadata). `Kit` is the browser-only code, loaded on its page only (`kits.ts`):
+  - `scene`: draws a frame from the scroll progress, and takes pointer and touch
+  - `score`: the music, scheduled ahead on the audio clock (`player.ts`)
+  - `card`: paints the greeting card
+- `src/components/journey/Journey.tsx`: the page. It reuses the Durga Puja layout and styles (captions, hints, header, farewell, sound toggle, and all the phone and landscape handling in `globals.css`).
+- `paint.ts`: a 2D camera that eases between shots, cached glow sprites for additive light, and flames.
+- `voices.ts`: synthesised instruments (tanpura, pad, bansuri, choir, bells, manjira, dhol and tasha strokes, claps, crackers, water and crowd). `rhythm.ts` steps through drum patterns.
+- Each festival lives in its own folder, `src/journeys/{id}/`, with `content.ts`, `scene.ts`, `score.ts`, `card.ts` and `kit.ts`. Diwali is the fullest example.
+
+To add a festival:
+
+1. Add its folder and register it in `types.ts` (`JourneyId`), `content.ts` and `kits.ts`.
+2. Add a route (`src/app/{path}/page.tsx`, rendering `<JourneyPage id=... />`), and set its `path` in `src/content/festivals.ts` so the home page links it.
+3. Add it to `JOURNEYS` in `scripts/share-images.mjs` and run `npm run share-images -- --only {id}`.
 
 # Trinayanī: Durga Puja
 
@@ -136,6 +157,7 @@ NEXT_PUBLIC_SITE_URL=https://parv.example
   - link preview for WhatsApp, Instagram DMs, X and iMessage: `og-{style}.jpg`, 1200×630
   - for posting: `instagram-story-{style}.jpg` (1080×1920) and `instagram-post-{style}.jpg` (1080×1350)
 - The Parv home page has its link preview in `public/share/og-parv.jpg` and its three Durga Puja doors in `public/parv/door-{style}.jpg`
+- Each festival journey has the same three images, named by its id: `og-diwali.jpg`, `instagram-story-diwali.jpg`, `instagram-post-diwali.jpg`
 
 All of these are rendered from the live scene, with the text taken from each page. Regenerate them whenever the art changes:
 
@@ -143,6 +165,7 @@ All of these are rendered from the live scene, with the text taken from each pag
 npm run dev                  # in one terminal
 npm run share-images         # in another; add -- --domain parv.example to print the domain on them
 npm run share-images -- --only parv   # just the Parv home page's images
+npm run share-images -- --only diwali # just one festival (bengal, madhubani, pachedi, durga-puja, diwali, chhath, holi, ganesh)
 ```
 
 WhatsApp and Instagram cache previews per URL. After changing the image, test by sharing a fresh URL (for example `?v=2`); the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) shows what Meta's crawler sees and can force a re-scrape.

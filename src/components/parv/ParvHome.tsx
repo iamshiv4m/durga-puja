@@ -4,8 +4,8 @@ import { DURGA_DOORS, FESTIVALS, type Festival, type FestivalArt } from "@/conte
 import { SITE, SITE_URL } from "@/lib/site";
 import styles from "./ParvHome.module.css";
 
-const OPEN = FESTIVALS.filter((f) => f.path);
-const LATER = FESTIVALS.filter((f) => !f.path);
+// Durga Puja leads, with a door for each region; every other festival follows with its own scene.
+const [FEATURED, ...REST] = FESTIVALS;
 
 export function ParvHome() {
   const jsonLd = {
@@ -41,7 +41,7 @@ export function ParvHome() {
       </header>
 
       <ol className={styles.festivals}>
-        {OPEN.map((festival) => (
+        {[FEATURED].map((festival) => (
           <li key={festival.id} className={styles.open}>
             <div className={styles.doors}>
               {DURGA_DOORS.map((door) => (
@@ -60,10 +60,16 @@ export function ParvHome() {
             <FestivalText festival={festival} status="open now" />
           </li>
         ))}
-        {LATER.map((festival, i) => (
+        {REST.map((festival) => (
           <li key={festival.id} className={styles.later}>
-            <Art id={festival.id} />
-            <FestivalText festival={festival} status={i === 0 ? "being painted" : "to come"} />
+            {festival.path ? (
+              <Link href={festival.path} className={styles.artLink} aria-label={`Enter ${festival.journey ?? festival.name}`}>
+                <Art id={festival.id} />
+              </Link>
+            ) : (
+              <Art id={festival.id} />
+            )}
+            <FestivalText festival={festival} status="to come" />
           </li>
         ))}
       </ol>

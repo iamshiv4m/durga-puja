@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { STORIES } from "@/content/chapters";
 import { STYLES, type PaintingStyle } from "@/lib/styles";
+import type { JourneyContent } from "@/journeys/types";
 
 /**
  * Absolute origin for canonical URLs and link-preview images.
@@ -31,7 +32,7 @@ export const SITE = {
   name: "Parv",
   title: "Parv — the festivals of India, one scroll at a time",
   description:
-    "Scroll-driven, hand-painted journeys through India's festivals. Durga Puja is open now; Diwali, Chhath, Holi and Ganesh Chaturthi are on their way.",
+    "Scroll-driven, hand-painted journeys through India's festivals: Durga Puja, Diwali, Chhath, Holi and Ganesh Chaturthi, each a single page with its own music.",
   keywords: [
     "Parv",
     "पर्व",
@@ -141,5 +142,33 @@ export function homeMetadata(): Metadata {
       images: [image],
     },
     twitter: { card: "summary_large_image", title: SITE.title, description: SITE.description, images: [image] },
+  };
+}
+
+/** Title, canonical URL and link preview for a festival journey (see src/journeys). */
+export function journeyMetadata(content: JourneyContent): Metadata {
+  const description = `${content.share} Scroll, with sound on.`;
+  const image = {
+    url: `/share/og-${content.id}.jpg`,
+    width: 1200,
+    height: 630,
+    alt: `${content.name}: ${content.share}`,
+    type: "image/jpeg",
+  };
+  return {
+    title: { absolute: content.pageTitle },
+    description: content.description,
+    keywords: content.keywords,
+    alternates: { canonical: content.path },
+    openGraph: {
+      type: "website",
+      url: content.path,
+      siteName: SITE.name,
+      title: content.pageTitle,
+      description,
+      locale: "en_IN",
+      images: [image],
+    },
+    twitter: { card: "summary_large_image", title: content.pageTitle, description, images: [image] },
   };
 }

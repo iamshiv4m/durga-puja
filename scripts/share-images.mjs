@@ -6,6 +6,7 @@
 //   npm run share-images             # in another
 //   npm run share-images -- --url https://parv.example --domain parv.example
 //   npm run share-images -- --only parv   # just the Parv home page's doors and link preview
+//   npm run share-images -- --only diwali,holi   # just these pages (also: bengal, durga-puja, chhath, ganesh)
 //
 // Re-run whenever the pratima art changes.
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -92,23 +93,20 @@ async function words(browser, path) {
   return result;
 }
 
-for (const { style, path } of only ? [] : REGIONS) {
-  const text = await words(browser, path);
-  const pageUrl = new URL(path, url).toString();
-  console.log(`${style}: ${text.native} · ${text.share}`);
-
+/** Link preview, Instagram story and Instagram post for one page, named `{key}`. */
+async function sharePack({ key, pageUrl, text, title, progress }) {
   // Link preview, 1200×630: the scene on the right, the title on the left.
-  const wide = await capture(browser, { url: pageUrl, width: 1200, height: 630, progress: 0.44 });
+  const wide = await capture(browser, { url: pageUrl, width: 1200, height: 630, progress });
   await compose(browser, {
     width: 1200,
     height: 630,
-    out: join(root, `public/share/og-${style}.jpg`),
+    out: join(root, `public/share/og-${key}.jpg`),
     html: `
       <div class="scene" style="left:200px; top:0; width:1200px; height:630px; background-image:url(${wide})"></div>
       <div style="position:absolute; inset:0; background:linear-gradient(90deg, #070304 22%, rgba(7,3,4,.85) 36%, rgba(7,3,4,0) 58%)"></div>
       <div style="position:absolute; left:72px; top:0; bottom:0; width:470px; display:flex; flex-direction:column; justify-content:center; gap:18px">
         <p class="bn" style="font-size:44px">${text.native}</p>
-        <h1 style="font-size:104px">Trinayanī</h1>
+        <h1 style="font-size:${title.length > 10 ? 84 : 104}px">${title}</h1>
         <div class="rule"></div>
         <p style="font-size:30px; font-style:italic; font-weight:300; line-height:1.3; color:rgba(242,233,214,.8)">${text.share}</p>
         <p class="sc" style="font-size:20px; margin-top:6px">${domain || "scroll · with sound on"}</p>
@@ -116,18 +114,18 @@ for (const { style, path } of only ? [] : REGIONS) {
   });
 
   // Instagram story, 1080×1920: the scene above, the words below.
-  const tall = await capture(browser, { url: pageUrl, width: 1080, height: 1350, progress: 0.44 });
+  const tall = await capture(browser, { url: pageUrl, width: 1080, height: 1350, progress });
   await compose(browser, {
     width: 1080,
     height: 1920,
-    out: join(root, `public/share/instagram-story-${style}.jpg`),
+    out: join(root, `public/share/instagram-story-${key}.jpg`),
     html: `
       <div class="scene" style="left:0; top:0; width:1080px; height:1350px; background-image:url(${tall})"></div>
       <div style="position:absolute; inset:0; background:linear-gradient(#070304 4%, rgba(7,3,4,0) 14%, rgba(7,3,4,0) 56%, #070304 70%)"></div>
       <p class="sc" style="position:absolute; top:120px; width:100%; text-align:center; font-size:30px">${text.label}</p>
       <div style="position:absolute; left:0; right:0; bottom:230px; display:flex; flex-direction:column; align-items:center; gap:26px; text-align:center">
         <p class="bn" style="font-size:66px">${text.native}</p>
-        <h1 style="font-size:150px">Trinayanī</h1>
+        <h1 style="font-size:${title.length > 10 ? 120 : 150}px">${title}</h1>
         <div class="rule" style="margin-top:34px"></div>
         <p style="font-size:44px; font-style:italic; font-weight:300; line-height:1.3; max-width:860px; color:rgba(242,233,214,.82)">${text.share}</p>
         <p class="sc" style="font-size:30px; margin-top:12px">${domain ? `${domain} · ` : ""}sound on</p>
@@ -135,25 +133,56 @@ for (const { style, path } of only ? [] : REGIONS) {
   });
 
   // Instagram post, 1080×1350 (4:5).
-  const square = await capture(browser, { url: pageUrl, width: 1080, height: 1080, progress: 0.44 });
+  const square = await capture(browser, { url: pageUrl, width: 1080, height: 1080, progress });
   await compose(browser, {
     width: 1080,
     height: 1350,
-    out: join(root, `public/share/instagram-post-${style}.jpg`),
+    out: join(root, `public/share/instagram-post-${key}.jpg`),
     html: `
       <div class="scene" style="left:0; top:0; width:1080px; height:1080px; background-image:url(${square})"></div>
       <div style="position:absolute; inset:0; background:linear-gradient(rgba(7,3,4,0) 62%, #070304 82%)"></div>
       <div style="position:absolute; left:0; right:0; bottom:90px; display:flex; flex-direction:column; align-items:center; gap:18px; text-align:center">
         <p class="bn" style="font-size:52px">${text.native}</p>
-        <h1 style="font-size:118px">Trinayanī</h1>
+        <h1 style="font-size:${title.length > 10 ? 96 : 118}px">${title}</h1>
         <p class="sc" style="font-size:26px; margin-top:8px">${domain ? `${domain} · ` : ""}${text.label}</p>
       </div>`,
   });
 }
 
+// The festival journeys, and the scroll point each one's pictures are taken at.
+const JOURNEYS = [
+  { key: "diwali", path: "/diwali", progress: 0.66 },
+  { key: "chhath", path: "/chhath", progress: 0.52 },
+  { key: "holi", path: "/holi", progress: 0.54 },
+  { key: "ganesh", path: "/ganesh-chaturthi", progress: 0.4 },
+];
+
+const wanted = (key) => !only || only.split(",").includes(key);
+
+for (const { style, path } of REGIONS) {
+  if (!wanted(style) && !wanted("durga-puja")) continue;
+  const text = await words(browser, path);
+  console.log(`${style}: ${text.native} · ${text.share}`);
+  await sharePack({ key: style, pageUrl: new URL(path, url).toString(), text, title: "Trinayanī", progress: 0.44 });
+}
+
+for (const { key, path, progress } of JOURNEYS) {
+  if (!wanted(key)) continue;
+  const text = await words(browser, path);
+  const title = await (async () => {
+    const page = await browser.newPage();
+    await page.goto(new URL(path, url).toString(), { waitUntil: "networkidle" });
+    const h1 = await page.evaluate(() => document.querySelector(".hero h1")?.textContent?.trim() ?? "");
+    await page.close();
+    return h1;
+  })();
+  console.log(`${key}: ${title} · ${text.share}`);
+  await sharePack({ key, pageUrl: new URL(path, url).toString(), text, title, progress });
+}
+
 // The Parv home page: a door into each region (the scene alone, no words), and its link preview.
 const doors = [];
-for (const { style, path } of REGIONS) {
+for (const { style, path } of wanted("parv") ? REGIONS : []) {
   const scene = await capture(browser, { url: new URL(path, url).toString(), width: 720, height: 1000, progress: 0.47 });
   doors.push(scene);
   await compose(browser, {
@@ -164,7 +193,7 @@ for (const { style, path } of REGIONS) {
     quality: 80,
   });
 }
-await compose(browser, {
+if (doors.length) await compose(browser, {
   width: 1200,
   height: 630,
   out: join(root, "public/share/og-parv.jpg"),

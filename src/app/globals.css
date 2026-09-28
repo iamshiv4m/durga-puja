@@ -90,7 +90,8 @@ body {
 }
 
 #gl,
-.fallback {
+.fallback,
+.scene-canvas {
   position: absolute !important;
   inset: 0;
   width: 100%;
@@ -276,6 +277,25 @@ body {
     left: -10rem;
     right: calc(-1.3 * var(--edge));
     background: linear-gradient(to right, rgba(7, 3, 4, 0), rgba(7, 3, 4, 0.8) 10rem);
+  }
+
+  /* Festival journeys put people and lamps near the edges; a lighter wash keeps captions readable. */
+  #stage[data-style="journey"] .chapter::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -60vh;
+    bottom: -60vh;
+    left: calc(-1.6 * var(--edge));
+    right: -8rem;
+    background: linear-gradient(to left, rgba(7, 3, 4, 0), rgba(7, 3, 4, 0.55) 10rem);
+    pointer-events: none;
+  }
+
+  #stage[data-style="journey"] .chapter.right::before {
+    left: -8rem;
+    right: calc(-1.8 * var(--edge));
+    background: linear-gradient(to right, rgba(7, 3, 4, 0), rgba(7, 3, 4, 0.55) 10rem);
   }
 }
 

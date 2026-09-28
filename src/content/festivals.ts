@@ -1,3 +1,4 @@
+import { JOURNEYS } from "@/journeys/content";
 import { STYLES, STYLE_ORDER } from "@/lib/styles";
 
 export type FestivalArt = "durga" | "diwali" | "chhath" | "holi" | "ganesh";
@@ -37,6 +38,8 @@ export const FESTIVALS: Festival[] = [
     tithi: "Kartik Amavasya",
     when: "8 November 2026",
     line: "The darkest night of the year, and a lamp in every doorway: for Ram coming home to Ayodhya, and for Lakshmi coming in.",
+    path: JOURNEYS.diwali.path,
+    journey: JOURNEYS.diwali.name,
   },
   {
     id: "chhath",
@@ -45,6 +48,8 @@ export const FESTIVALS: Festival[] = [
     tithi: "Kartik Shukla Shashthi",
     when: "November 2026",
     line: "Standing in the river at dusk and again at dawn, with a winnowing basket of offerings for the sun.",
+    path: JOURNEYS.chhath.path,
+    journey: JOURNEYS.chhath.name,
   },
   {
     id: "holi",
@@ -53,6 +58,8 @@ export const FESTIVALS: Festival[] = [
     tithi: "Phalgun Purnima",
     when: "March 2027",
     line: "Holika's fire on the full moon, and colour on everyone the morning after.",
+    path: JOURNEYS.holi.path,
+    journey: JOURNEYS.holi.name,
   },
   {
     id: "ganesh",
@@ -61,6 +68,8 @@ export const FESTIVALS: Festival[] = [
     tithi: "Bhadrapada Shukla Chaturthi",
     when: "September 2027",
     line: "Ten days of Bappa at home, then the walk to the sea. Ganpati Bappa Morya, pudhchya varshi lavkar ya.",
+    path: JOURNEYS.ganesh.path,
+    journey: JOURNEYS.ganesh.name,
   },
 ];
 
