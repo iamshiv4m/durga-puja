@@ -14,23 +14,67 @@ const RIVER_END = SANGAM + 26;
 /** How tall a person is who stands in the river at depth y. */
 export const wader = (y: number) => 0.62 * y + 0.2;
 
-type Bather = { x: number; y: number; look: Look; pose: Pose; facing: 1 | -1; dip?: boolean; arghya?: boolean; seed: number };
+type Bather = {
+  x: number;
+  y: number;
+  look: Look;
+  pose: Pose;
+  facing: 1 | -1;
+  dip?: boolean;
+  arghya?: boolean;
+  seed: number;
+};
 type Ring = { x: number; y: number; born: number; gold: boolean };
 
 const SARIS: [RGB, RGB][] = [
-  [[230, 120, 30], [200, 30, 40]],
-  [[210, 40, 60], [240, 190, 50]],
-  [[240, 196, 50], [200, 60, 30]],
-  [[120, 60, 150], [240, 180, 60]],
-  [[40, 130, 110], [240, 200, 80]],
-  [[240, 236, 226], [200, 40, 40]],
+  [
+    [230, 120, 30],
+    [200, 30, 40],
+  ],
+  [
+    [210, 40, 60],
+    [240, 190, 50],
+  ],
+  [
+    [240, 196, 50],
+    [200, 60, 30],
+  ],
+  [
+    [120, 60, 150],
+    [240, 180, 60],
+  ],
+  [
+    [40, 130, 110],
+    [240, 200, 80],
+  ],
+  [
+    [240, 236, 226],
+    [200, 40, 40],
+  ],
 ];
 
 export class Sangam {
   private readonly bathers: Bather[] = [];
-  private readonly boats: { x: number; y: number; seed: number; facing: 1 | -1 }[] = [];
-  private readonly gulls: { x: number; y: number; h: number; seed: number; sit: boolean }[] = [];
-  private readonly umbrellas: { x: number; y: number; r: number; seed: number; flag: RGB }[] = [];
+  private readonly boats: {
+    x: number;
+    y: number;
+    seed: number;
+    facing: 1 | -1;
+  }[] = [];
+  private readonly gulls: {
+    x: number;
+    y: number;
+    h: number;
+    seed: number;
+    sit: boolean;
+  }[] = [];
+  private readonly umbrellas: {
+    x: number;
+    y: number;
+    r: number;
+    seed: number;
+    flag: RGB;
+  }[] = [];
   private readonly glitter: { t: number; x: number; seed: number }[] = [];
   private readonly ripples: { x: number; y: number; seed: number }[] = [];
   private readonly mela: { x: number; w: number; h: number; kind: number }[] = [];
@@ -44,14 +88,61 @@ export class Sangam {
     const look = (woman: boolean): Look => {
       const [cloth, border] = SARIS[Math.floor(random() * SARIS.length)];
       return woman
-        ? { h: 1, skin: SKINS[Math.floor(random() * SKINS.length)], top: mix(cloth, [0, 0, 0], 0.2), bottom: cloth, border, dress: "sari", head: random() < 0.6 ? "pallu" : "bun", bindi: true }
-        : { h: 1, skin: SKINS[Math.floor(random() * SKINS.length)], top: [0, 0, 0], bottom: [238, 232, 216], border: [200, 60, 40], dress: "bare", head: random() < 0.3 ? "topi" : "bare", headColor: [150, 40, 40] };
+        ? {
+            h: 1,
+            skin: SKINS[Math.floor(random() * SKINS.length)],
+            top: mix(cloth, [0, 0, 0], 0.2),
+            bottom: cloth,
+            border,
+            dress: "sari",
+            head: random() < 0.6 ? "pallu" : "bun",
+            bindi: true,
+          }
+        : {
+            h: 1,
+            skin: SKINS[Math.floor(random() * SKINS.length)],
+            top: [0, 0, 0],
+            bottom: [238, 232, 216],
+            border: [200, 60, 40],
+            dress: "bare",
+            head: random() < 0.3 ? "topi" : "bare",
+            headColor: [150, 40, 40],
+          };
     };
     const namaskar: Pose = { la: 0.9, lf: 2.3, ra: 0.3, rf: 2.5 };
     // The one in front, pouring his arghya to the sun; his wife beside him, hands joined.
-    this.bathers.push({ x: SANGAM - 3.1, y: 3.55, look: { ...look(false), head: "bare" }, pose: { la: 2.5, lf: 2.9, ra: 2.35, rf: 2.8, hold: "lota", tip: -2.2 }, facing: -1, arghya: true, seed: 1 });
-    this.bathers.push({ x: SANGAM - 1.6, y: 3.3, look: { ...look(true), head: "pallu", bottom: SARIS[0][0], border: SARIS[0][1], top: [170, 70, 20] }, pose: namaskar, facing: -1, seed: 2 });
-    this.bathers.push({ x: SANGAM - 5.6, y: 2.7, look: look(false), pose: namaskar, facing: -1, dip: true, seed: 3 });
+    this.bathers.push({
+      x: SANGAM - 3.1,
+      y: 3.55,
+      look: { ...look(false), head: "bare" },
+      pose: { la: 2.5, lf: 2.9, ra: 2.35, rf: 2.8, hold: "lota", tip: -2.2 },
+      facing: -1,
+      arghya: true,
+      seed: 1,
+    });
+    this.bathers.push({
+      x: SANGAM - 1.6,
+      y: 3.3,
+      look: {
+        ...look(true),
+        head: "pallu",
+        bottom: SARIS[0][0],
+        border: SARIS[0][1],
+        top: [170, 70, 20],
+      },
+      pose: namaskar,
+      facing: -1,
+      seed: 2,
+    });
+    this.bathers.push({
+      x: SANGAM - 5.6,
+      y: 2.7,
+      look: look(false),
+      pose: namaskar,
+      facing: -1,
+      dip: true,
+      seed: 3,
+    });
     for (let i = 0; i < 26; i++) {
       const x = SANGAM - 16 + random() * 34;
       const y = 0.9 + random() ** 0.9 * 3.4;
@@ -59,7 +150,15 @@ export class Sangam {
       const woman = random() < 0.45;
       const arms = random();
       const pose: Pose = arms < 0.4 ? namaskar : arms < 0.7 ? { la: 2.2, lf: 2.8, ra: 2.3, rf: 2.9 } : { la: 0.3, lf: 0.6, ra: 0.4, rf: 0.8 };
-      this.bathers.push({ x, y, look: look(woman), pose, facing: random() < 0.75 ? -1 : 1, seed: random() * 10, dip: random() < 0.15 });
+      this.bathers.push({
+        x,
+        y,
+        look: look(woman),
+        pose,
+        facing: random() < 0.75 ? -1 : 1,
+        seed: random() * 10,
+        dip: random() < 0.15,
+      });
     }
     this.bathers.sort((a, b) => a.y - b.y);
 
@@ -72,7 +171,13 @@ export class Sangam {
       this.boats.push({ x: SANGAM + x, y, seed: random() * 10, facing });
     for (let i = 0; i < 40; i++) {
       const sit = random() < 0.3;
-      this.gulls.push({ x: SANGAM - 14 + random() * 32, y: 0.8 + random() * 3, h: sit ? 0 : 0.4 + random() * 2.4, seed: random() * 10, sit });
+      this.gulls.push({
+        x: SANGAM - 14 + random() * 32,
+        y: 0.8 + random() * 3,
+        h: sit ? 0 : 0.4 + random() * 2.4,
+        seed: random() * 10,
+        sit,
+      });
     }
     const flags: RGB[] = [
       [230, 90, 30],
@@ -89,15 +194,41 @@ export class Sangam {
       [-13.4, 1.3],
       [-16.6, 1.4],
     ])
-      this.umbrellas.push({ x: SANGAM + x, y: SHORE + 0.7 + random() * 0.3, r, seed: random() * 10, flag: flags[Math.floor(random() * flags.length)] });
-    for (let i = 0; i < 120; i++) this.glitter.push({ t: random(), x: random() - 0.5, seed: random() * 10 });
-    for (let i = 0; i < 160; i++) this.ripples.push({ x: SANGAM - 30 + random() * 56, y: 0.06 + random() ** 1.4 * (SHORE - 0.2), seed: random() * 10 });
+      this.umbrellas.push({
+        x: SANGAM + x,
+        y: SHORE + 0.7 + random() * 0.3,
+        r,
+        seed: random() * 10,
+        flag: flags[Math.floor(random() * flags.length)],
+      });
+    for (let i = 0; i < 120; i++)
+      this.glitter.push({
+        t: random(),
+        x: random() - 0.5,
+        seed: random() * 10,
+      });
+    for (let i = 0; i < 160; i++)
+      this.ripples.push({
+        x: SANGAM - 30 + random() * 56,
+        y: 0.06 + random() ** 1.4 * (SHORE - 0.2),
+        seed: random() * 10,
+      });
     // The tent city on the far sands: rows of tents, pandals, poles with flags and lights.
     for (let x = SANGAM - 40; x < RIVER_END + 4; x += 0.12 + random() * 0.3) {
       const kind = random();
-      this.mela.push({ x, w: 0.1 + random() * 0.22, h: 0.06 + random() * 0.12, kind: kind < 0.1 ? 2 : kind < 0.2 ? 1 : 0 });
+      this.mela.push({
+        x,
+        w: 0.1 + random() * 0.22,
+        h: 0.06 + random() * 0.12,
+        kind: kind < 0.1 ? 2 : kind < 0.2 ? 1 : 0,
+      });
     }
-    for (let i = 0; i < 14; i++) this.donas.push({ x: SANGAM - 9 + random() * 14, y: SHORE - 0.2 - random() * 1.4, seed: random() * 10 });
+    for (let i = 0; i < 14; i++)
+      this.donas.push({
+        x: SANGAM - 9 + random() * 14,
+        y: SHORE - 0.2 - random() * 1.4,
+        seed: random() * 10,
+      });
     for (let i = 0; i < 14; i++) this.smoke.push({ t: i / 14, seed: random() * 10 });
   }
 
@@ -217,7 +348,13 @@ export class Sangam {
         const f = 0.6 + 0.4 * Math.sin(seconds * 2 + t.x * 9);
         ctx.fillStyle = `rgba(255, 210, 140, ${lit * f})`;
         ctx.fillRect(t.x, t.kind === 2 ? -0.64 : -t.h * 1.4, 0.03, 0.03);
-        lights.push({ x: t.x, y: t.kind === 2 ? -0.62 : -t.h, r: 0.35, a: 0.25 * lit * f, color: LAMP });
+        lights.push({
+          x: t.x,
+          y: t.kind === 2 ? -0.62 : -t.h,
+          r: 0.35,
+          a: 0.25 * lit * f,
+          color: LAMP,
+        });
       }
     }
     // The pontoon bridge: iron floats in a line, with the road over them.
@@ -319,10 +456,44 @@ export class Sangam {
       [230, 226, 214],
     ];
     sitters.forEach((c, i) => {
-      drawFigure(ctx, x + (i - 1) * L * 0.2, y - L * 0.08, { h: L * 0.34, skin: SKINS[i], top: c, bottom: c, dress: "kurta", head: i === 1 ? "pallu" : "topi", shawl: c, headColor: [90, 40, 30] }, { la: 0.3, lf: 0.8, ra: 0.3, rf: 0.8, sit: true }, shade, b.facing);
+      drawFigure(
+        ctx,
+        x + (i - 1) * L * 0.2,
+        y - L * 0.08,
+        {
+          h: L * 0.34,
+          skin: SKINS[i],
+          top: c,
+          bottom: c,
+          dress: "kurta",
+          head: i === 1 ? "pallu" : "topi",
+          shawl: c,
+          headColor: [90, 40, 30],
+        },
+        { la: 0.3, lf: 0.8, ra: 0.3, rf: 0.8, sit: true },
+        shade,
+        b.facing,
+      );
     });
     const bx = x - b.facing * L * 0.4;
-    drawFigure(ctx, bx, y - L * 0.08, { h: L * 0.42, skin: SKINS[2], top: [120, 110, 100], bottom: [220, 214, 200], dress: "kurta", head: "topi", headColor: [60, 50, 50], shawl: [110, 96, 80] }, { la: 1.2, lf: 1.9, ra: 1.0, rf: 1.6, lean: 0.1 * b.facing }, shade, b.facing);
+    drawFigure(
+      ctx,
+      bx,
+      y - L * 0.08,
+      {
+        h: L * 0.42,
+        skin: SKINS[2],
+        top: [120, 110, 100],
+        bottom: [220, 214, 200],
+        dress: "kurta",
+        head: "topi",
+        headColor: [60, 50, 50],
+        shawl: [110, 96, 80],
+      },
+      { la: 1.2, lf: 1.9, ra: 1.0, rf: 1.6, lean: 0.1 * b.facing },
+      shade,
+      b.facing,
+    );
     ctx.strokeStyle = paint([110, 80, 50], env);
     ctx.lineWidth = L * 0.018;
     ctx.beginPath();
@@ -369,7 +540,14 @@ export class Sangam {
         ctx.ellipse(rg.x, rg.y, rx, rx * 0.22, 0, 0, TAU);
         ctx.stroke();
       }
-      if (rg.gold) lights.push({ x: rg.x, y: rg.y, r: 0.5 + age * 0.2, a: 0.4 * (1 - age / 3.2), color: "255, 200, 120" });
+      if (rg.gold)
+        lights.push({
+          x: rg.x,
+          y: rg.y,
+          r: 0.5 + age * 0.2,
+          a: 0.4 * (1 - age / 3.2),
+          color: "255, 200, 120",
+        });
     }
     // Leaf donas with a lamp in each, set on the water before dawn.
     const lamps = 1 - rise(p, 0.12, 0.2);
@@ -392,7 +570,13 @@ export class Sangam {
         ctx.globalAlpha = lamps;
         flame(ctx, x, y - s * 0.2, s * 0.9, seconds, d.seed);
         ctx.restore();
-        lights.push({ x, y: y - s * 0.5, r: s * 6, a: 0.45 * lamps * flicker(seconds, d.seed), color: LAMP });
+        lights.push({
+          x,
+          y: y - s * 0.5,
+          r: s * 6,
+          a: 0.45 * lamps * flicker(seconds, d.seed),
+          color: LAMP,
+        });
       }
     }
 
@@ -464,7 +648,13 @@ export class Sangam {
     ctx.beginPath();
     ctx.ellipse(x + b.facing * H * 0.1, b.y, H * 0.06 * (1 + 0.2 * Math.sin(seconds * 6)), H * 0.012, 0, 0, TAU);
     ctx.fill();
-    lights.push({ x: x + b.facing * H * 0.05, y: lerp(y, b.y, 0.5), r: H * 0.4, a: 0.25 * sunA, color: "255, 210, 150" });
+    lights.push({
+      x: x + b.facing * H * 0.05,
+      y: lerp(y, b.y, 0.5),
+      r: H * 0.4,
+      a: 0.25 * sunA,
+      color: "255, 210, 150",
+    });
   }
 
   /** The near sands: the pandas' umbrellas and flags, and the sadhus at their fire. */
@@ -547,7 +737,23 @@ export class Sangam {
     ctx.fillRect(u.x + u.r * 0.6, u.y - 0.24, 0.06, 0.24);
     ctx.fillStyle = paint([240, 234, 220], env);
     ctx.fillRect(u.x - u.r * 0.68, u.y - 0.38, u.r * 1.36, 0.05);
-    drawFigure(ctx, u.x - 0.2, u.y - 0.36, { h: 1.35, skin: SKINS[0], top: [236, 190, 60], bottom: [240, 234, 222], dress: "kurta", head: "bare", shawl: [236, 170, 60] }, { la: 0.4, lf: 0.9, ra: 0.6, rf: 1.3, sit: true }, shade, -1);
+    drawFigure(
+      ctx,
+      u.x - 0.2,
+      u.y - 0.36,
+      {
+        h: 1.35,
+        skin: SKINS[0],
+        top: [236, 190, 60],
+        bottom: [240, 234, 222],
+        dress: "kurta",
+        head: "bare",
+        shawl: [236, 170, 60],
+      },
+      { la: 0.4, lf: 0.9, ra: 0.6, rf: 1.3, sit: true },
+      shade,
+      -1,
+    );
     // His brass lota and a tray of sindoor and flowers.
     ctx.fillStyle = paint([214, 160, 70], env);
     ctx.beginPath();
@@ -604,8 +810,42 @@ export class Sangam {
       ctx.arc(sx, sy, r, 0, TAU);
       ctx.fill();
     }
-    drawFigure(ctx, x - 1.05, y + 0.05, { h: 1.7, skin: [150, 140, 128], top: [0, 0, 0], bottom: [226, 110, 30], dress: "sadhu", head: "jata", beard: [120, 116, 110] }, { la: 0.5, lf: 1.4, ra: 0.9, rf: 1.8, sit: true, hold: "trishul" }, lit, 1);
-    drawFigure(ctx, x + 1.0, y + 0.15, { h: 1.9, skin: [140, 110, 90], top: [230, 120, 30], bottom: [230, 120, 30], dress: "kurta", head: "pagdi", headColor: [230, 120, 30], shawl: [214, 96, 30], beard: [60, 50, 40] }, { la: 1.3, lf: 1.6, ra: 1.1, rf: 1.5, lean: -0.1 }, lit, -1);
+    drawFigure(
+      ctx,
+      x - 1.05,
+      y + 0.05,
+      {
+        h: 1.7,
+        skin: [150, 140, 128],
+        top: [0, 0, 0],
+        bottom: [226, 110, 30],
+        dress: "sadhu",
+        head: "jata",
+        beard: [120, 116, 110],
+      },
+      { la: 0.5, lf: 1.4, ra: 0.9, rf: 1.8, sit: true, hold: "trishul" },
+      lit,
+      1,
+    );
+    drawFigure(
+      ctx,
+      x + 1.0,
+      y + 0.15,
+      {
+        h: 1.9,
+        skin: [140, 110, 90],
+        top: [230, 120, 30],
+        bottom: [230, 120, 30],
+        dress: "kurta",
+        head: "pagdi",
+        headColor: [230, 120, 30],
+        shawl: [214, 96, 30],
+        beard: [60, 50, 40],
+      },
+      { la: 1.3, lf: 1.6, ra: 1.1, rf: 1.5, lean: -0.1 },
+      lit,
+      -1,
+    );
     // The ring of stones and the logs, and a pair of iron tongs, the chimta, stuck in the ash.
     ctx.fillStyle = shade([150, 146, 140]);
     ctx.beginPath();
@@ -638,7 +878,13 @@ export class Sangam {
     ctx.restore();
     const f = flicker(seconds, 3);
     lights.push({ x, y: y - 0.25, r: 0.9, a: 0.55 * fire * f, color: FIRE });
-    lights.push({ x, y: y - 0.3, r: 3.2, a: (0.2 + 0.25 * (1 - env.amb)) * fire * f, color: FIRE });
+    lights.push({
+      x,
+      y: y - 0.3,
+      r: 3.2,
+      a: (0.2 + 0.25 * (1 - env.amb)) * fire * f,
+      color: FIRE,
+    });
   }
 
   /** A touch on the water: a ripple, gold once the sun is up. */

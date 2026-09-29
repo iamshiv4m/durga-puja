@@ -13,7 +13,8 @@ export function tone(base: RGB, env: Env, lift = 0): RGB {
   return mix(dark, day, clamp(env.amb + lift));
 }
 
-export const paint = (base: RGB, env: Env, lift = 0, alpha = 1) => rgb(tone(base, env, lift), alpha);
+export const paint = (base: RGB, env: Env, lift = 0, alpha = 1) =>
+  rgb(tone(base, env, lift), alpha);
 
 export const SKIN: RGB[] = [
   [150, 98, 66],
@@ -46,15 +47,36 @@ export type Look = {
   flowers?: boolean;
 };
 
-export type Hold = "drum" | "ladle" | "cane" | "plate" | "aarti" | "mat" | "rope" | "tiffin" | "stick";
+export type Hold =
+  | "drum"
+  | "ladle"
+  | "cane"
+  | "plate"
+  | "aarti"
+  | "mat"
+  | "rope"
+  | "tiffin"
+  | "stick";
 
 /**
  * Arm angles are measured from hanging straight down, positive swinging towards the way the figure
  * faces: 0 is at the side, π/2 straight out in front, π straight up.
  */
-export type Pose = { la: number; lf: number; ra: number; rf: number; lean?: number; bob?: number; hold?: Hold; step?: number };
+export type Pose = {
+  la: number;
+  lf: number;
+  ra: number;
+  rf: number;
+  lean?: number;
+  bob?: number;
+  hold?: Hold;
+  step?: number;
+};
 
-export type Hands = { left: { x: number; y: number }; right: { x: number; y: number } };
+export type Hands = {
+  left: { x: number; y: number };
+  right: { x: number; y: number };
+};
 
 const SHOULDER = { y: -0.785, x: 0.085 };
 const UPPER = 0.165;
@@ -69,7 +91,17 @@ export const JOINED: Pose = { la: 0.5, lf: 2.3, ra: 0.5, rf: 2.3 };
 export const STANDING: Pose = { la: 0.1, lf: 0.25, ra: 0.12, rf: 0.3 };
 
 /** Draws a person standing on (x, y) facing `facing`; returns where the hands are, in world units. */
-export function drawPerson(ctx: Ctx, x: number, y: number, look: Look, pose: Pose, env: Env, lift = 0, facing: 1 | -1 = 1, seconds = 0): Hands {
+export function drawPerson(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  look: Look,
+  pose: Pose,
+  env: Env,
+  lift = 0,
+  facing: 1 | -1 = 1,
+  seconds = 0,
+): Hands {
   const { h, kind } = look;
   const bob = pose.bob ?? 0;
   const lean = pose.lean ?? 0;
@@ -359,7 +391,10 @@ export function drawPerson(ctx: Ctx, x: number, y: number, look: Look, pose: Pos
     const cos = Math.cos(lean);
     const sin = Math.sin(lean);
     const ly = hy - HIP;
-    const world = { x: x + facing * h * (hx * cos - ly * sin), y: y + h * (HIP + bob + hx * sin + ly * cos) };
+    const world = {
+      x: x + facing * h * (hx * cos - ly * sin),
+      y: y + h * (HIP + bob + hx * sin + ly * cos),
+    };
     return { local: { x: hx, y: hy }, world };
   };
   const left = arm(-1, pose.la, pose.lf);
@@ -372,7 +407,15 @@ export function drawPerson(ctx: Ctx, x: number, y: number, look: Look, pose: Pos
 }
 
 /** Things held, drawn in the figure's own units. */
-function holding(ctx: Ctx, hold: Hold | undefined, l: { x: number; y: number }, r: { x: number; y: number }, env: Env, lift: number, seconds: number) {
+function holding(
+  ctx: Ctx,
+  hold: Hold | undefined,
+  l: { x: number; y: number },
+  r: { x: number; y: number },
+  env: Env,
+  lift: number,
+  seconds: number,
+) {
   if (!hold) return;
   const c = (base: RGB, extra = 0) => paint(base, env, lift + extra);
   ctx.lineCap = "round";
@@ -413,8 +456,14 @@ function holding(ctx: Ctx, hold: Hold | undefined, l: { x: number; y: number }, 
     for (let i = 0; i < 5; i++) {
       const t = i / 5;
       ctx.beginPath();
-      ctx.moveTo(lerp(r.x, r.x + 0.02, t) - 0.02, lerp(r.y + 0.12, r.y - 0.4, t));
-      ctx.lineTo(lerp(r.x, r.x + 0.02, t) + 0.02, lerp(r.y + 0.12, r.y - 0.4, t));
+      ctx.moveTo(
+        lerp(r.x, r.x + 0.02, t) - 0.02,
+        lerp(r.y + 0.12, r.y - 0.4, t),
+      );
+      ctx.lineTo(
+        lerp(r.x, r.x + 0.02, t) + 0.02,
+        lerp(r.y + 0.12, r.y - 0.4, t),
+      );
       ctx.lineWidth = 0.008;
       ctx.stroke();
     }
@@ -488,7 +537,18 @@ function holding(ctx: Ctx, hold: Hold | undefined, l: { x: number; y: number }, 
  * Someone bent low from the hips, seen side on, one hand down at `reach` (world units): a woman
  * drawing the kolam, or a young man touching an elder's feet. Feet on (x, y), facing `facing`.
  */
-export function drawBending(ctx: Ctx, x: number, y: number, look: Look, reach: { x: number; y: number }, env: Env, lift = 0, facing: 1 | -1 = -1, bowl = false, bend = 1.25) {
+export function drawBending(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  look: Look,
+  reach: { x: number; y: number },
+  env: Env,
+  lift = 0,
+  facing: 1 | -1 = -1,
+  bowl = false,
+  bend = 1.25,
+) {
   const { h } = look;
   const c = (base: RGB, extra = 0) => paint(base, env, lift + extra);
   ctx.save();
@@ -505,7 +565,12 @@ export function drawBending(ctx: Ctx, x: number, y: number, look: Look, reach: {
 
   // The far arm, holding a bowl of rice flour against her hip, or reaching too.
   const target = { x: ((reach.x - x) / h) * facing, y: (reach.y - y) / h };
-  const limb = (from: { x: number; y: number }, to: { x: number; y: number }, width: number, colour: string) => {
+  const limb = (
+    from: { x: number; y: number },
+    to: { x: number; y: number },
+    width: number,
+    colour: string,
+  ) => {
     const dx = to.x - from.x;
     const dy = to.y - from.y;
     const d = Math.min(Math.hypot(dx, dy), UPPER + FOREARM - 0.001);
@@ -513,7 +578,10 @@ export function drawBending(ctx: Ctx, x: number, y: number, look: Look, reach: {
     // Two bones: the elbow bends out behind.
     const cosA = (UPPER * UPPER + d * d - FOREARM * FOREARM) / (2 * UPPER * d);
     const elbowAngle = a - Math.acos(clamp(cosA, -1, 1));
-    const elbow = { x: from.x + Math.cos(elbowAngle) * UPPER, y: from.y + Math.sin(elbowAngle) * UPPER };
+    const elbow = {
+      x: from.x + Math.cos(elbowAngle) * UPPER,
+      y: from.y + Math.sin(elbowAngle) * UPPER,
+    };
     const hand = { x: from.x + Math.cos(a) * d, y: from.y + Math.sin(a) * d };
     ctx.strokeStyle = colour;
     ctx.lineWidth = width;
@@ -525,7 +593,13 @@ export function drawBending(ctx: Ctx, x: number, y: number, look: Look, reach: {
     return { elbow, hand };
   };
   const skin = c(look.skin);
-  if (!bowl) limb({ x: shoulder.x - 0.02, y: shoulder.y }, { x: target.x - 0.05, y: target.y }, 0.04, c(mix(look.skin, [0, 0, 0], 0.2)));
+  if (!bowl)
+    limb(
+      { x: shoulder.x - 0.02, y: shoulder.y },
+      { x: target.x - 0.05, y: target.y },
+      0.04,
+      c(mix(look.skin, [0, 0, 0], 0.2)),
+    );
 
   // Legs: straight, under the sari or veshti.
   ctx.fillStyle = c(look.cloth);
@@ -582,16 +656,35 @@ export function drawBending(ctx: Ctx, x: number, y: number, look: Look, reach: {
   ctx.beginPath();
   ctx.ellipse(head.x, head.y, 0.068, 0.058, bend - Math.PI / 2, 0, TAU);
   ctx.fill();
-  ctx.fillStyle = rgb(tone(look.kind === "thatha" || look.kind === "paati" ? GREY : HAIR, env, lift));
+  ctx.fillStyle = rgb(
+    tone(
+      look.kind === "thatha" || look.kind === "paati" ? GREY : HAIR,
+      env,
+      lift,
+    ),
+  );
   ctx.beginPath();
-  ctx.ellipse(head.x - dir.x * 0.012, head.y - 0.024, 0.066, 0.042, bend - Math.PI / 2, Math.PI * 0.95, Math.PI * 2.05);
+  ctx.ellipse(
+    head.x - dir.x * 0.012,
+    head.y - 0.024,
+    0.066,
+    0.042,
+    bend - Math.PI / 2,
+    Math.PI * 0.95,
+    Math.PI * 2.05,
+  );
   ctx.fill();
   if (woman) {
     ctx.strokeStyle = rgb(tone(HAIR, env, lift));
     ctx.lineWidth = 0.034;
     ctx.beginPath();
     ctx.moveTo(head.x - 0.04, head.y - 0.03);
-    ctx.quadraticCurveTo(head.x - 0.02, head.y + 0.12, head.x + 0.02, head.y + 0.24);
+    ctx.quadraticCurveTo(
+      head.x - 0.02,
+      head.y + 0.12,
+      head.x + 0.02,
+      head.y + 0.24,
+    );
     ctx.stroke();
     if (look.flowers) {
       ctx.strokeStyle = c([250, 248, 236], 0.15);
@@ -599,34 +692,58 @@ export function drawBending(ctx: Ctx, x: number, y: number, look: Look, reach: {
       ctx.setLineDash([0.012, 0.01]);
       ctx.beginPath();
       ctx.moveTo(head.x - 0.05, head.y - 0.02);
-      ctx.quadraticCurveTo(head.x - 0.04, head.y + 0.08, head.x - 0.015, head.y + 0.15);
+      ctx.quadraticCurveTo(
+        head.x - 0.04,
+        head.y + 0.08,
+        head.x - 0.015,
+        head.y + 0.15,
+      );
       ctx.stroke();
       ctx.setLineDash([]);
     }
   }
 
   // The near arm, down to the ground where the line is going.
-  const near = limb({ x: shoulder.x, y: shoulder.y + 0.01 }, target, 0.044, skin);
+  const near = limb(
+    { x: shoulder.x, y: shoulder.y + 0.01 },
+    target,
+    0.044,
+    skin,
+  );
   if (look.top && woman) {
     ctx.strokeStyle = c(look.top);
     ctx.lineWidth = 0.052;
     ctx.beginPath();
     ctx.moveTo(shoulder.x, shoulder.y + 0.01);
-    ctx.lineTo(lerp(shoulder.x, near.elbow.x, 0.5), lerp(shoulder.y + 0.01, near.elbow.y, 0.5));
+    ctx.lineTo(
+      lerp(shoulder.x, near.elbow.x, 0.5),
+      lerp(shoulder.y + 0.01, near.elbow.y, 0.5),
+    );
     ctx.stroke();
   }
   if (woman) {
     ctx.strokeStyle = c([210, 40, 60], 0.15);
     ctx.lineWidth = 0.05;
     ctx.beginPath();
-    ctx.moveTo(lerp(near.elbow.x, near.hand.x, 0.72), lerp(near.elbow.y, near.hand.y, 0.72));
-    ctx.lineTo(lerp(near.elbow.x, near.hand.x, 0.8), lerp(near.elbow.y, near.hand.y, 0.8));
+    ctx.moveTo(
+      lerp(near.elbow.x, near.hand.x, 0.72),
+      lerp(near.elbow.y, near.hand.y, 0.72),
+    );
+    ctx.lineTo(
+      lerp(near.elbow.x, near.hand.x, 0.8),
+      lerp(near.elbow.y, near.hand.y, 0.8),
+    );
     ctx.stroke();
   }
   if (bowl) {
     // Her other hand holds the bowl of kolam maavu at her side.
     const b = { x: hip.x + 0.1, y: hip.y + 0.06 };
-    limb({ x: shoulder.x - 0.03, y: shoulder.y }, b, 0.04, c(mix(look.skin, [0, 0, 0], 0.15)));
+    limb(
+      { x: shoulder.x - 0.03, y: shoulder.y },
+      b,
+      0.04,
+      c(mix(look.skin, [0, 0, 0], 0.15)),
+    );
     ctx.fillStyle = c([140, 96, 60]);
     ctx.beginPath();
     ctx.ellipse(b.x + 0.02, b.y + 0.02, 0.06, 0.035, 0, 0, Math.PI);
@@ -640,7 +757,17 @@ export function drawBending(ctx: Ctx, x: number, y: number, look: Look, reach: {
 }
 
 /** Sitting cross-legged on a mat, seen from the front; `eat` lifts a hand to the mouth now and then. */
-export function drawSitting(ctx: Ctx, x: number, y: number, look: Look, env: Env, lift = 0, facing: 1 | -1 = 1, eat = 0) {
+export function drawSitting(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  look: Look,
+  env: Env,
+  lift = 0,
+  facing: 1 | -1 = 1,
+  eat = 0,
+  pose?: Pose,
+) {
   const { h } = look;
   const c = (base: RGB, extra = 0) => paint(base, env, lift + extra);
   ctx.save();
@@ -664,14 +791,25 @@ export function drawSitting(ctx: Ctx, x: number, y: number, look: Look, env: Env
   ctx.stroke();
   ctx.restore();
   // Everything above the waist, as if standing, lowered onto the legs.
-  const hand = eat > 0.5 ? { la: 0.3, lf: 0.5, ra: 0.6, rf: 2.8 } : { la: 0.5, lf: 1.3, ra: 0.5, rf: 1.4 };
+  const hand =
+    pose ??
+    (eat > 0.5
+      ? { la: 0.3, lf: 0.5, ra: 0.6, rf: 2.8 }
+      : { la: 0.5, lf: 1.3, ra: 0.5, rf: 1.4 });
   ctx.translate(0, -0.02 * h);
   drawUpper(ctx, look, hand, env, lift, facing);
   ctx.restore();
 }
 
 /** The body above the waist of a figure whose waist is at (0, -0.52h), for sitting figures. */
-function drawUpper(ctx: Ctx, look: Look, pose: Pose, env: Env, lift: number, facing: 1 | -1) {
+function drawUpper(
+  ctx: Ctx,
+  look: Look,
+  pose: Pose,
+  env: Env,
+  lift: number,
+  facing: 1 | -1,
+) {
   ctx.save();
   // Clip away the legs, then draw the whole figure: what is left is the torso on the lap.
   ctx.beginPath();
@@ -697,7 +835,21 @@ export type Cattle = {
  * A zebu, bullock or cow, side on, feet on (x, y), `size` tall at the hump. `dressed` (0..1)
  * brings on the painted horns, brass caps, bells and garland; `shake` tosses the head.
  */
-export function drawCattle(ctx: Ctx, x: number, y: number, size: number, look: Cattle, env: Env, lift: number, facing: 1 | -1, seconds: number, seed: number, dressed: number, shake: number, graze = 0) {
+export function drawCattle(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  size: number,
+  look: Cattle,
+  env: Env,
+  lift: number,
+  facing: 1 | -1,
+  seconds: number,
+  seed: number,
+  dressed: number,
+  shake: number,
+  graze = 0,
+) {
   const c = (base: RGB, extra = 0) => paint(base, env, lift + extra);
   ctx.save();
   ctx.translate(x, y);
@@ -725,7 +877,9 @@ export function drawCattle(ctx: Ctx, x: number, y: number, size: number, look: C
   };
   leg(-0.5, 0.03, far);
   leg(0.58, -0.02, far);
-  const swish = Math.sin(seconds * 1.3 + seed) * 0.12 + Math.sin(seconds * 3.1 + seed) * 0.04;
+  const swish =
+    Math.sin(seconds * 1.3 + seed) * 0.12 +
+    Math.sin(seconds * 3.1 + seed) * 0.04;
   ctx.strokeStyle = body;
   ctx.lineWidth = 0.04;
   ctx.beginPath();
@@ -793,7 +947,10 @@ export function drawCattle(ctx: Ctx, x: number, y: number, size: number, look: C
   leg(0.68, 0.04, body);
 
   // Head and neck, nodding a little, tossed when the bells are rung.
-  const nod = Math.sin(seconds * 0.9 + seed) * 0.04 + Math.sin(shake * 18) * shake * 0.18 + graze * 0.9;
+  const nod =
+    Math.sin(seconds * 0.9 + seed) * 0.04 +
+    Math.sin(shake * 18) * shake * 0.18 +
+    graze * 0.9;
   ctx.save();
   ctx.translate(0.9, -1.2);
   ctx.rotate(nod);
@@ -807,7 +964,8 @@ export function drawCattle(ctx: Ctx, x: number, y: number, size: number, look: C
   };
   for (const side of [-1, 1]) {
     const { base, mid, tip } = hornPath(side);
-    const colour = side < 0 ? c(mix([150, 130, 110], [0, 0, 0], 0.25)) : c([170, 150, 126]);
+    const colour =
+      side < 0 ? c(mix([150, 130, 110], [0, 0, 0], 0.25)) : c([170, 150, 126]);
     ctx.strokeStyle = colour;
     ctx.lineWidth = 0.06;
     ctx.beginPath();
@@ -819,13 +977,24 @@ export function drawCattle(ctx: Ctx, x: number, y: number, size: number, look: C
       look.paints.forEach((p, i) => {
         const t0 = i / look.paints.length;
         const t1 = (i + 0.8) / look.paints.length;
-        ctx.strokeStyle = paint(p, env, lift + 0.15, dressed * (side < 0 ? 0.8 : 1));
+        ctx.strokeStyle = paint(
+          p,
+          env,
+          lift + 0.15,
+          dressed * (side < 0 ? 0.8 : 1),
+        );
         ctx.lineWidth = 0.062;
         ctx.beginPath();
         for (let k = 0; k <= 6; k++) {
           const t = lerp(t0, t1, k / 6) * 0.86;
-          const qx = (1 - t) * (1 - t) * base.x + 2 * (1 - t) * t * (mid.x + 0.1) + t * t * tip.x;
-          const qy = (1 - t) * (1 - t) * base.y + 2 * (1 - t) * t * mid.y + t * t * tip.y;
+          const qx =
+            (1 - t) * (1 - t) * base.x +
+            2 * (1 - t) * t * (mid.x + 0.1) +
+            t * t * tip.x;
+          const qy =
+            (1 - t) * (1 - t) * base.y +
+            2 * (1 - t) * t * mid.y +
+            t * t * tip.y;
           if (k === 0) ctx.moveTo(qx, qy);
           else ctx.lineTo(qx, qy);
         }
@@ -887,7 +1056,14 @@ export function drawCattle(ctx: Ctx, x: number, y: number, size: number, look: C
       const t = i / 12;
       const gx = lerp(0.62, 1.0, t);
       const gy = lerp(-1.32, -1.0, t) + Math.sin(t * Math.PI) * 0.24;
-      ctx.fillStyle = c(i % 3 === 2 ? [250, 246, 230] : i % 3 === 1 ? [250, 200, 40] : [242, 120, 20], 0.25);
+      ctx.fillStyle = c(
+        i % 3 === 2
+          ? [250, 246, 230]
+          : i % 3 === 1
+            ? [250, 200, 40]
+            : [242, 120, 20],
+        0.25,
+      );
       ctx.beginPath();
       ctx.arc(gx, gy, 0.045, 0, TAU);
       ctx.fill();
@@ -899,7 +1075,9 @@ export function drawCattle(ctx: Ctx, x: number, y: number, size: number, look: C
     ctx.moveTo(0.7, -1.3);
     ctx.quadraticCurveTo(0.78, -0.96, 0.96, -0.92);
     ctx.stroke();
-    const swing = Math.sin(seconds * 2.2 + seed) * 0.08 + Math.sin(shake * 22) * shake * 0.5;
+    const swing =
+      Math.sin(seconds * 2.2 + seed) * 0.08 +
+      Math.sin(shake * 22) * shake * 0.5;
     ctx.save();
     ctx.translate(0.86, -0.93);
     ctx.rotate(swing);

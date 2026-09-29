@@ -3,7 +3,17 @@
 // Nishan Sahib and langar under a shamiana, and the Vaisakhi mela with its wooden jhoola.
 //
 // World units, y down. House fronts stand on y = 0; the courtyard and the road run towards the viewer.
-import { TAU, flicker, lerp, mix, mulberry32, rgb, type Ctx, type RGB, type View } from "../paint";
+import {
+  TAU,
+  flicker,
+  lerp,
+  mix,
+  mulberry32,
+  rgb,
+  type Ctx,
+  type RGB,
+  type View,
+} from "../paint";
 
 export const FIRE = { x: 0.6, y: 3.1, w: 1.25, h: 1.7 };
 export const DOOR = { x: -11.4, w: 1.05, h: 1.95 };
@@ -11,12 +21,12 @@ export const HAVELI = { x: -4.6, w: 10.4, h: 4.8 };
 export const VILLAGE = { x0: -17.6, x1: 8.2 };
 export const TUBEWELL = { x: 12.6, y: -1.3 };
 export const CART = { x: 34.2, y: 1.6 };
-export const GURDWARA = { x: 46.4, y: -0.9 };
-export const NISHAN = { x: 40.6, y: 0.5, h: 9.6 };
-export const LANGAR = { x0: 51.2, x1: 57.2, y0: 1.0, y1: 5.0 };
+export const GURDWARA = { x: 44.4, y: -0.9 };
+export const NISHAN = { x: 51.4, y: 0.2, h: 9.6 };
+export const LANGAR = { x0: 53.2, x1: 57.8, y0: -0.4, y1: 1.4 };
 export const MELA = { x0: 57.6, x1: 80 };
 export const JHOOLA = { x: 72, y: 0.4, r: 3.3 };
-export const KABADDI = { x: 64.4, y: 4.9, rx: 2.0, ry: 0.7 };
+export const KABADDI = { x: 61.4, y: 3.9, rx: 1.9, ry: 0.62 };
 export const JALEBI = { x: 60.2, y: 0.9 };
 
 // ─── The village ────────────────────────────────────────────────────────────
@@ -62,7 +72,18 @@ export function makeHouses(): House[] {
     const windows: House["windows"] = [];
     const wx = doorX < x + w / 2 ? x + w * 0.72 : x + w * 0.16;
     windows.push({ x: wx, y: -1.7, w: 0.5, h: 0.55 });
-    houses.push({ x, w, h, wall, trim: mix(wall, [255, 255, 255], 0.35), door: doors[Math.floor(random() * doors.length)], brick, windows, doorX, roof: random() < 0.35 ? "stack" : random() < 0.6 ? "parapet" : "plain" });
+    houses.push({
+      x,
+      w,
+      h,
+      wall,
+      trim: mix(wall, [255, 255, 255], 0.35),
+      door: doors[Math.floor(random() * doors.length)],
+      brick,
+      windows,
+      doorX,
+      roof: random() < 0.35 ? "stack" : random() < 0.6 ? "parapet" : "plain",
+    });
     x += w;
   }
   // The neighbour's door where the children sing.
@@ -70,7 +91,18 @@ export function makeHouses(): House[] {
   if (lane) lane.doorX = DOOR.x;
   // After the haveli, a last low house and the wall to the fields.
   x = HAVELI.x + HAVELI.w;
-  houses.push({ x, w: VILLAGE.x1 - x, h: 2.4, wall: walls[1], trim: mix(walls[1], [255, 255, 255], 0.35), door: doors[1], brick: false, windows: [], doorX: x + 1.0, roof: "stack" });
+  houses.push({
+    x,
+    w: VILLAGE.x1 - x,
+    h: 2.4,
+    wall: walls[1],
+    trim: mix(walls[1], [255, 255, 255], 0.35),
+    door: doors[1],
+    brick: false,
+    windows: [],
+    doorX: x + 1.0,
+    roof: "stack",
+  });
   return houses;
 }
 
@@ -115,7 +147,8 @@ export function drawHouse(g: Ctx, v: View, b: House) {
   g.fillRect(b.x - 0.04, -b.h - 0.12, b.w + 0.1, 0.14);
   if (b.roof === "parapet") {
     g.fillStyle = rgb(mix(b.wall, [255, 255, 255], 0.2));
-    for (let x = b.x + 0.1; x < b.x + b.w - 0.2; x += 0.45) g.fillRect(x, -b.h - 0.34, 0.26, 0.22);
+    for (let x = b.x + 0.1; x < b.x + b.w - 0.2; x += 0.45)
+      g.fillRect(x, -b.h - 0.34, 0.26, 0.22);
   } else if (b.roof === "stack") {
     // Firewood and paathiyan stacked on the roof for the winter.
     g.fillStyle = "#6a4a30";
@@ -123,7 +156,15 @@ export function drawHouse(g: Ctx, v: View, b: House) {
     g.fillStyle = "#8a6a48";
     for (let i = 0; i < 6; i++) {
       g.beginPath();
-      g.ellipse(b.x + b.w * 0.62 + (i % 3) * 0.2, -b.h - 0.2 - Math.floor(i / 3) * 0.13, 0.1, 0.07, 0, 0, TAU);
+      g.ellipse(
+        b.x + b.w * 0.62 + (i % 3) * 0.2,
+        -b.h - 0.2 - Math.floor(i / 3) * 0.13,
+        0.1,
+        0.07,
+        0,
+        0,
+        TAU,
+      );
       g.fill();
     }
   }
@@ -173,7 +214,8 @@ export function drawHouse(g: Ctx, v: View, b: House) {
 /** The haveli: two storeys of lime-washed brick, a great arched darwaza, a jharokha above it. */
 export function drawHaveli(g: Ctx, v: View) {
   const { x, w, h } = HAVELI;
-  if (x > v.x + v.width / 2 / v.scale || x + w < v.x - v.width / 2 / v.scale) return;
+  if (x > v.x + v.width / 2 / v.scale || x + w < v.x - v.width / 2 / v.scale)
+    return;
   const wall: RGB = [232, 216, 180];
   const trim: RGB = [150, 60, 44];
   g.fillStyle = rgb(wall);
@@ -241,7 +283,9 @@ export function drawHaveli(g: Ctx, v: View) {
   g.fillStyle = "#4a2a16";
   g.fillRect(gx + 0.62, -1.8, 0.43, 1.8);
   g.fillStyle = "rgba(230, 196, 120, 0.85)";
-  for (let i = 0; i < 5; i++) for (let j = 0; j < 3; j++) g.fillRect(gx - 0.95 + j * 0.34, -1.65 + i * 0.36, 0.05, 0.05);
+  for (let i = 0; i < 5; i++)
+    for (let j = 0; j < 3; j++)
+      g.fillRect(gx - 0.95 + j * 0.34, -1.65 + i * 0.36, 0.05, 0.05);
   // A lower window each side, and a niche for the lamp.
   for (const wx of [x + 1.3, x + w - 1.3]) {
     g.fillStyle = "#20160f";
@@ -257,13 +301,30 @@ export function drawHaveli(g: Ctx, v: View) {
   }
 }
 
-function arch(g: Ctx, cx: number, base: number, halfW: number, height: number, fill: string) {
+function arch(
+  g: Ctx,
+  cx: number,
+  base: number,
+  halfW: number,
+  height: number,
+  fill: string,
+) {
   g.fillStyle = fill;
   g.beginPath();
   g.moveTo(cx - halfW, base);
   g.lineTo(cx - halfW, base - height + halfW);
-  g.quadraticCurveTo(cx - halfW, base - height, cx, base - height - halfW * 0.25);
-  g.quadraticCurveTo(cx + halfW, base - height, cx + halfW, base - height + halfW);
+  g.quadraticCurveTo(
+    cx - halfW,
+    base - height,
+    cx,
+    base - height - halfW * 0.25,
+  );
+  g.quadraticCurveTo(
+    cx + halfW,
+    base - height,
+    cx + halfW,
+    base - height + halfW,
+  );
   g.lineTo(cx + halfW, base);
   g.closePath();
   g.fill();
@@ -272,9 +333,13 @@ function arch(g: Ctx, cx: number, base: number, halfW: number, height: number, f
 /** Every lit window in the village, for the glow at night. */
 export function villageWindows(houses: House[]) {
   const list: { x: number; y: number; r: number }[] = [];
-  for (const b of houses) for (const w of b.windows) list.push({ x: w.x + w.w / 2, y: w.y + w.h / 2, r: 0.9 });
+  for (const b of houses)
+    for (const w of b.windows)
+      list.push({ x: w.x + w.w / 2, y: w.y + w.h / 2, r: 0.9 });
   const { x, w } = HAVELI;
-  for (let i = 0; i < 4; i++) if (i !== 2) list.push({ x: x + 1.2 + i * 2.4 + (i >= 2 ? 0.6 : 0), y: -3.6, r: 1.0 });
+  for (let i = 0; i < 4; i++)
+    if (i !== 2)
+      list.push({ x: x + 1.2 + i * 2.4 + (i >= 2 ? 0.6 : 0), y: -3.6, r: 1.0 });
   list.push({ x: x + w / 2, y: -3.5, r: 1.2 });
   list.push({ x: x + w / 2, y: -1.2, r: 1.5 });
   return list;
@@ -326,7 +391,15 @@ export function drawGohara(g: Ctx, x: number, y: number, size: number) {
   const random = mulberry32(Math.round(x * 100));
   for (let i = 0; i < 16; i++) {
     g.beginPath();
-    g.ellipse(x + (random() - 0.5) * 1.1 * size, y - random() * 1.0 * size, 0.1 * size, 0.07 * size, 0, 0, TAU);
+    g.ellipse(
+      x + (random() - 0.5) * 1.1 * size,
+      y - random() * 1.0 * size,
+      0.1 * size,
+      0.07 * size,
+      0,
+      0,
+      TAU,
+    );
     g.fill();
   }
   g.fillStyle = "#a88a50";
@@ -348,7 +421,8 @@ export function paintPyre(px: number, charred: boolean) {
   g.scale(px, px);
   g.translate(w / 2, h - 0.15);
   const random = mulberry32(charred ? 8 : 7);
-  const shade = (c: RGB) => (charred ? rgb(mix(c, [24, 14, 10], 0.75)) : rgb(c));
+  const shade = (c: RGB) =>
+    charred ? rgb(mix(c, [24, 14, 10], 0.75)) : rgb(c);
   // Logs, leaning in to the top.
   for (let i = 0; i < 26; i++) {
     const t = i / 25;
@@ -382,15 +456,32 @@ export function paintPyre(px: number, charred: boolean) {
   if (charred) {
     // Embers glowing in the cracks.
     g.fillStyle = "rgba(255, 110, 30, 0.8)";
-    for (let i = 0; i < 40; i++) g.fillRect((random() - 0.5) * FIRE.w * 1.8, -random() * FIRE.h * 0.7, 0.04, 0.02);
+    for (let i = 0; i < 40; i++)
+      g.fillRect(
+        (random() - 0.5) * FIRE.w * 1.8,
+        -random() * FIRE.h * 0.7,
+        0.04,
+        0.02,
+      );
   }
   return { canvas, width: w, height: h };
 }
 
 /** One tongue of flame, `height` tall, standing on (x, y). */
-export function tongue(g: Ctx, x: number, y: number, height: number, width: number, seconds: number, seed: number, heat: number) {
+export function tongue(
+  g: Ctx,
+  x: number,
+  y: number,
+  height: number,
+  width: number,
+  seconds: number,
+  seed: number,
+  heat: number,
+) {
   const h = height * flicker(seconds * 1.4, seed);
-  const lean = Math.sin(seconds * 3.1 + seed * 5) * width * 0.35 + Math.sin(seconds * 7.3 + seed) * width * 0.1;
+  const lean =
+    Math.sin(seconds * 3.1 + seed * 5) * width * 0.35 +
+    Math.sin(seconds * 7.3 + seed) * width * 0.1;
   const tip = { x: x + lean, y: y - h };
   const grad = g.createLinearGradient(x, y, x, tip.y);
   grad.addColorStop(0, `rgba(255, 236, 170, ${0.95 * heat})`);
@@ -400,8 +491,35 @@ export function tongue(g: Ctx, x: number, y: number, height: number, width: numb
   g.fillStyle = grad;
   g.beginPath();
   g.moveTo(x - width / 2, y);
-  g.bezierCurveTo(x - width * 0.6, y - h * 0.4, tip.x - width * 0.1, tip.y + h * 0.35, tip.x, tip.y);
-  g.bezierCurveTo(tip.x + width * 0.1, tip.y + h * 0.35, x + width * 0.6, y - h * 0.4, x + width / 2, y);
+  g.bezierCurveTo(
+    x - width * 0.62,
+    y - h * 0.3,
+    tip.x - width * 0.05 - lean * 0.3,
+    tip.y + h * 0.45,
+    tip.x,
+    tip.y,
+  );
+  g.bezierCurveTo(
+    tip.x + width * 0.05 - lean * 0.3,
+    tip.y + h * 0.45,
+    x + width * 0.62,
+    y - h * 0.3,
+    x + width / 2,
+    y,
+  );
+  g.closePath();
+  g.fill();
+  // A brighter core.
+  g.fillStyle = `rgba(255, 240, 190, ${0.55 * heat})`;
+  g.beginPath();
+  g.moveTo(x - width * 0.2, y);
+  g.quadraticCurveTo(x + lean * 0.3, y - h * 0.3, x + lean * 0.5, y - h * 0.5);
+  g.quadraticCurveTo(
+    x + lean * 0.3 + width * 0.05,
+    y - h * 0.25,
+    x + width * 0.2,
+    y,
+  );
   g.closePath();
   g.fill();
 }
@@ -415,12 +533,26 @@ export function drawAsh(g: Ctx, embers: number) {
   g.fillStyle = "rgba(50, 40, 36, 0.9)";
   for (let i = 0; i < 9; i++) {
     g.beginPath();
-    g.ellipse(FIRE.x - 0.9 + i * 0.22, FIRE.y - 0.12 - (i % 3) * 0.05, 0.16, 0.05, 0.2 * (i % 2), 0, TAU);
+    g.ellipse(
+      FIRE.x - 0.9 + i * 0.22,
+      FIRE.y - 0.12 - (i % 3) * 0.05,
+      0.16,
+      0.05,
+      0.2 * (i % 2),
+      0,
+      TAU,
+    );
     g.fill();
   }
   if (embers > 0.01) {
     g.fillStyle = `rgba(255, 110, 30, ${0.8 * embers})`;
-    for (let i = 0; i < 16; i++) g.fillRect(FIRE.x - 0.8 + ((i * 37) % 16) * 0.1, FIRE.y - 0.1 - ((i * 13) % 5) * 0.04, 0.05, 0.03);
+    for (let i = 0; i < 16; i++)
+      g.fillRect(
+        FIRE.x - 0.8 + ((i * 37) % 16) * 0.1,
+        FIRE.y - 0.1 - ((i * 13) % 5) * 0.04,
+        0.05,
+        0.03,
+      );
   }
 }
 
@@ -447,7 +579,11 @@ export function drawTubewell(g: Ctx, seconds: number, flowing: number) {
     g.lineWidth = 0.08;
     g.beginPath();
     g.moveTo(x + 1.1, y - 0.74);
-    for (let i = 0; i <= 6; i++) g.lineTo(x + 1.1 + i * 0.03 + Math.sin(seconds * 20 + i) * 0.01, y - 0.74 + i * 0.07);
+    for (let i = 0; i <= 6; i++)
+      g.lineTo(
+        x + 1.1 + i * 0.03 + Math.sin(seconds * 20 + i) * 0.01,
+        y - 0.74 + i * 0.07,
+      );
     g.stroke();
   }
 }
@@ -467,7 +603,12 @@ export function drawCart(g: Ctx, load: number) {
     g.fillStyle = "#d8b060";
     g.beginPath();
     g.moveTo(x - 1.6, y - 1.15);
-    g.quadraticCurveTo(x - 1.4, y - 1.15 - 1.3 * load, x - 0.2, y - 1.2 - 1.5 * load);
+    g.quadraticCurveTo(
+      x - 1.4,
+      y - 1.15 - 1.3 * load,
+      x - 0.2,
+      y - 1.2 - 1.5 * load,
+    );
     g.quadraticCurveTo(x + 1.0, y - 1.15 - 1.3 * load, x + 1.2, y - 1.15);
     g.fill();
     g.strokeStyle = "rgba(160, 120, 50, 0.7)";
@@ -476,7 +617,10 @@ export function drawCart(g: Ctx, load: number) {
     for (let i = 0; i < 12; i++) {
       const t = i / 11;
       g.moveTo(lerp(x - 1.4, x + 1.0, t), y - 1.15);
-      g.lineTo(lerp(x - 1.2, x + 0.8, t) + 0.1, y - 1.2 - 1.3 * load * Math.sin(t * Math.PI));
+      g.lineTo(
+        lerp(x - 1.2, x + 0.8, t) + 0.1,
+        y - 1.2 - 1.3 * load * Math.sin(t * Math.PI),
+      );
     }
     g.stroke();
   }
@@ -496,29 +640,77 @@ export function drawCart(g: Ctx, load: number) {
   g.stroke();
 }
 
-/** Sheaves, tied and stood up in a little stook to dry. */
-export function drawStook(g: Ctx, x: number, y: number, size: number, colour: RGB) {
-  for (let i = -2; i <= 2; i++) {
-    const lean = i * 0.14;
-    g.fillStyle = rgb(mix(colour, [120, 90, 40], 0.1 + Math.abs(i) * 0.08));
+/** A stook: sheaves stood up leaning together to dry, tied at the waist, ears fanned at the top. */
+export function drawStook(
+  g: Ctx,
+  x: number,
+  y: number,
+  size: number,
+  colour: RGB,
+) {
+  if (size < 0.01) return;
+  const h = size;
+  g.fillStyle = "rgba(70, 46, 20, 0.25)";
+  g.beginPath();
+  g.ellipse(x + 0.12 * size, y, 0.5 * size, 0.07 * size, 0, 0, TAU);
+  g.fill();
+  // The sheaves: tapered bundles leaning in, darker on the shaded side.
+  for (let i = -3; i <= 3; i++) {
+    const foot = x + i * 0.1 * size;
+    const top = x + i * 0.025 * size;
+    g.fillStyle = rgb(
+      mix(
+        colour,
+        [104, 74, 34],
+        0.08 + Math.abs(i) * 0.05 + (i < 0 ? 0.12 : 0),
+      ),
+    );
     g.beginPath();
-    g.moveTo(x + i * 0.12 * size - 0.12 * size, y);
-    g.lineTo(x + i * 0.12 * size + 0.12 * size, y);
-    g.lineTo(x + Math.sin(lean) * 0.9 * size + 0.14 * size, y - 0.9 * size);
-    g.lineTo(x + Math.sin(lean) * 0.9 * size - 0.14 * size, y - 0.9 * size);
+    g.moveTo(foot - 0.075 * size, y);
+    g.lineTo(foot + 0.075 * size, y);
+    g.lineTo(top + 0.045 * size, y - h * 0.7);
+    g.lineTo(top - 0.045 * size, y - h * 0.7);
     g.closePath();
     g.fill();
-    g.fillStyle = rgb(mix(colour, [255, 230, 150], 0.3));
-    g.beginPath();
-    g.ellipse(x + Math.sin(lean) * 0.95 * size, y - 1.0 * size, 0.16 * size, 0.14 * size, lean, 0, TAU);
-    g.fill();
   }
-  g.fillStyle = "#7a5a2a";
-  g.fillRect(x - 0.3 * size, y - 0.5 * size, 0.6 * size, 0.06 * size);
+  g.strokeStyle = rgb(mix(colour, [90, 60, 20], 0.4), 0.55);
+  g.lineWidth = 0.012 * size;
+  g.beginPath();
+  for (let i = 0; i < 12; i++) {
+    const t = i / 11 - 0.5;
+    g.moveTo(x + t * 0.7 * size, y);
+    g.lineTo(x + t * 0.2 * size, y - h * 0.66);
+  }
+  g.stroke();
+  // The band of twisted straw that ties it.
+  g.fillStyle = rgb(mix(colour, [80, 50, 20], 0.45));
+  g.fillRect(x - 0.2 * size, y - h * 0.46, 0.4 * size, 0.05 * size);
+  // Ears, fanned out over the top.
+  g.lineCap = "round";
+  for (let i = 0; i < 17; i++) {
+    const a = -Math.PI / 2 + (i / 16 - 0.5) * 1.9;
+    const r = (0.2 + ((i * 7) % 5) * 0.025) * size;
+    const bx = x + (i / 16 - 0.5) * 0.12 * size;
+    const by = y - h * 0.68;
+    g.strokeStyle = rgb(mix(colour, [255, 232, 160], 0.2 + (i % 3) * 0.08));
+    g.lineWidth = 0.04 * size;
+    g.beginPath();
+    g.moveTo(bx + Math.cos(a) * r * 0.45, by + Math.sin(a) * r * 0.45);
+    g.lineTo(bx + Math.cos(a) * r, by + Math.sin(a) * r);
+    g.stroke();
+  }
 }
 
 /** A patang, a paper kite, with its tail; flown for Basant in Magh. */
-export function drawKite(g: Ctx, x: number, y: number, size: number, colour: RGB, seconds: number, seed: number) {
+export function drawKite(
+  g: Ctx,
+  x: number,
+  y: number,
+  size: number,
+  colour: RGB,
+  seconds: number,
+  seed: number,
+) {
   const tilt = Math.sin(seconds * 1.3 + seed) * 0.2;
   g.save();
   g.translate(x, y);
@@ -605,7 +797,11 @@ export function drawKhanda(g: Ctx, s: number, colour: string) {
 /** The gurdwara: white on its plinth, five arches, chhatris at the corners, a gilded dome. */
 export function drawGurdwara(g: Ctx, v: View, day: RGB) {
   const { x, y } = GURDWARA;
-  if (x + 6 < v.x - v.width / 2 / v.scale || x - 6 > v.x + v.width / 2 / v.scale) return;
+  if (
+    x + 6 < v.x - v.width / 2 / v.scale ||
+    x - 6 > v.x + v.width / 2 / v.scale
+  )
+    return;
   const white = rgb(mix([246, 244, 238], day, 0.1));
   const shade = rgb(mix([214, 210, 204], day, 0.1));
   const deep = "#b8a890";
@@ -620,7 +816,8 @@ export function drawGurdwara(g: Ctx, v: View, day: RGB) {
   g.fillStyle = shade;
   g.fillRect(x - 5.2, y - 0.6, 10.4, 0.6);
   g.fillStyle = white;
-  for (let i = 0; i < 3; i++) g.fillRect(x - 1.4 - i * 0.2, y - 0.2 * (i + 1), 2.8 + i * 0.4, 0.2);
+  for (let i = 0; i < 3; i++)
+    g.fillRect(x - 1.4 - i * 0.2, y - 0.2 * (i + 1), 2.8 + i * 0.4, 0.2);
   // The hall.
   g.fillStyle = white;
   g.fillRect(x - 4.4, y - 3.9, 8.8, 3.3);
@@ -630,8 +827,22 @@ export function drawGurdwara(g: Ctx, v: View, day: RGB) {
   // Five cusped arches along the front, the middle one the door.
   for (let i = -2; i <= 2; i++) {
     const cx = x + i * 1.6;
-    cuspedArch(g, cx, y - 0.6, i === 0 ? 0.62 : 0.52, i === 0 ? 2.3 : 2.0, deep);
-    cuspedArch(g, cx, y - 0.6, i === 0 ? 0.5 : 0.42, i === 0 ? 2.15 : 1.85, i === 0 ? "#e8c070" : "#c8b8a0");
+    cuspedArch(
+      g,
+      cx,
+      y - 0.6,
+      i === 0 ? 0.62 : 0.52,
+      i === 0 ? 2.3 : 2.0,
+      deep,
+    );
+    cuspedArch(
+      g,
+      cx,
+      y - 0.6,
+      i === 0 ? 0.5 : 0.42,
+      i === 0 ? 2.15 : 1.85,
+      i === 0 ? "#e8c070" : "#c8b8a0",
+    );
   }
   // Cornice, and a jaali parapet.
   g.fillStyle = shade;
@@ -639,7 +850,8 @@ export function drawGurdwara(g: Ctx, v: View, day: RGB) {
   g.fillStyle = white;
   g.fillRect(x - 4.4, y - 4.45, 8.8, 0.4);
   g.fillStyle = shade;
-  for (let px = x - 4.2; px < x + 4.2; px += 0.3) g.fillRect(px, y - 4.4, 0.12, 0.3);
+  for (let px = x - 4.2; px < x + 4.2; px += 0.3)
+    g.fillRect(px, y - 4.4, 0.12, 0.3);
   // Chhatris: little pavilions on the corners, each with a gilded dome.
   for (const cx of [x - 3.9, x + 3.9, x - 2.3, x + 2.3]) {
     const small = Math.abs(cx - x) < 3;
@@ -652,15 +864,30 @@ export function drawGurdwara(g: Ctx, v: View, day: RGB) {
     g.fillStyle = gold(base - 1.9 * s, base - 1.1 * s);
     g.beginPath();
     g.moveTo(cx - 0.5 * s, base - 1.12 * s);
-    g.bezierCurveTo(cx - 0.6 * s, base - 1.6 * s, cx - 0.1 * s, base - 1.75 * s, cx, base - 2.0 * s);
-    g.bezierCurveTo(cx + 0.1 * s, base - 1.75 * s, cx + 0.6 * s, base - 1.6 * s, cx + 0.5 * s, base - 1.12 * s);
+    g.bezierCurveTo(
+      cx - 0.6 * s,
+      base - 1.6 * s,
+      cx - 0.1 * s,
+      base - 1.75 * s,
+      cx,
+      base - 2.0 * s,
+    );
+    g.bezierCurveTo(
+      cx + 0.1 * s,
+      base - 1.75 * s,
+      cx + 0.6 * s,
+      base - 1.6 * s,
+      cx + 0.5 * s,
+      base - 1.12 * s,
+    );
     g.fill();
   }
   // The drum, then the great fluted dome on a ring of lotus petals.
   const drumTop = y - 5.5;
   g.fillStyle = white;
   g.fillRect(x - 1.7, drumTop, 3.4, 1.05);
-  for (let i = -2; i <= 2; i++) cuspedArch(g, x + i * 0.62, y - 4.55, 0.18, 0.7, shade);
+  for (let i = -2; i <= 2; i++)
+    cuspedArch(g, x + i * 0.62, y - 4.55, 0.18, 0.7, shade);
   g.fillStyle = gold(drumTop - 0.3, drumTop);
   for (let i = 0; i < 9; i++) {
     const px = x - 1.8 + i * 0.45;
@@ -675,7 +902,14 @@ export function drawGurdwara(g: Ctx, v: View, day: RGB) {
   g.beginPath();
   g.moveTo(x - 1.6, domeBase);
   g.bezierCurveTo(x - 2.1, domeBase - 1.4, x - 0.6, domeBase - 2.0, x, domeTop);
-  g.bezierCurveTo(x + 0.6, domeBase - 2.0, x + 2.1, domeBase - 1.4, x + 1.6, domeBase);
+  g.bezierCurveTo(
+    x + 0.6,
+    domeBase - 2.0,
+    x + 2.1,
+    domeBase - 1.4,
+    x + 1.6,
+    domeBase,
+  );
   g.closePath();
   g.fill();
   g.strokeStyle = "rgba(140, 90, 20, 0.45)";
@@ -704,16 +938,43 @@ export function drawGurdwara(g: Ctx, v: View, day: RGB) {
   g.restore();
 }
 
-function cuspedArch(g: Ctx, cx: number, base: number, halfW: number, height: number, fill: string) {
+function cuspedArch(
+  g: Ctx,
+  cx: number,
+  base: number,
+  halfW: number,
+  height: number,
+  fill: string,
+) {
   g.fillStyle = fill;
   g.beginPath();
   g.moveTo(cx - halfW, base);
   g.lineTo(cx - halfW, base - height + halfW * 1.1);
   // Three lobes, then a point.
-  g.quadraticCurveTo(cx - halfW, base - height + halfW * 0.5, cx - halfW * 0.55, base - height + halfW * 0.5);
-  g.quadraticCurveTo(cx - halfW * 0.55, base - height + halfW * 0.05, cx, base - height - halfW * 0.1);
-  g.quadraticCurveTo(cx + halfW * 0.55, base - height + halfW * 0.05, cx + halfW * 0.55, base - height + halfW * 0.5);
-  g.quadraticCurveTo(cx + halfW, base - height + halfW * 0.5, cx + halfW, base - height + halfW * 1.1);
+  g.quadraticCurveTo(
+    cx - halfW,
+    base - height + halfW * 0.5,
+    cx - halfW * 0.55,
+    base - height + halfW * 0.5,
+  );
+  g.quadraticCurveTo(
+    cx - halfW * 0.55,
+    base - height + halfW * 0.05,
+    cx,
+    base - height - halfW * 0.1,
+  );
+  g.quadraticCurveTo(
+    cx + halfW * 0.55,
+    base - height + halfW * 0.05,
+    cx + halfW * 0.55,
+    base - height + halfW * 0.5,
+  );
+  g.quadraticCurveTo(
+    cx + halfW,
+    base - height + halfW * 0.5,
+    cx + halfW,
+    base - height + halfW * 1.1,
+  );
   g.lineTo(cx + halfW, base);
   g.closePath();
   g.fill();
@@ -723,7 +984,15 @@ function cuspedArch(g: Ctx, cx: number, base: number, halfW: number, height: num
  * A Nishan Sahib: a tall pole wrapped in its saffron chola, a steel khanda at the top, and the
  * triangular flag with the Khanda on it, flying. `fresh` is the new chola going up for Vaisakhi.
  */
-export function drawNishan(g: Ctx, x: number, y: number, h: number, seconds: number, wind: number, big = true) {
+export function drawNishan(
+  g: Ctx,
+  x: number,
+  y: number,
+  h: number,
+  seconds: number,
+  wind: number,
+  big = true,
+) {
   const top = y - h;
   if (big) {
     // The platform it stands on.
@@ -737,12 +1006,18 @@ export function drawNishan(g: Ctx, x: number, y: number, h: number, seconds: num
   pole.addColorStop(0.5, "#f29a2a");
   pole.addColorStop(1, "#b0560a");
   g.fillStyle = pole;
-  g.fillRect(x - (big ? 0.09 : 0.03), top, big ? 0.18 : 0.06, h - (big ? 0.45 : 0));
+  g.fillRect(
+    x - (big ? 0.09 : 0.03),
+    top,
+    big ? 0.18 : 0.06,
+    h - (big ? 0.45 : 0),
+  );
   // The flag: a long triangle rippling out from the pole.
   const len = big ? 2.4 : 0.9;
   const tall = big ? 1.5 : 0.55;
   const fy = top + (big ? 0.5 : 0.18);
-  const wave = (t: number) => Math.sin(seconds * 3.2 - t * 5) * tall * 0.12 * wind * t;
+  const wave = (t: number) =>
+    Math.sin(seconds * 3.2 - t * 5) * tall * 0.12 * wind * t;
   g.fillStyle = "#f28a14";
   g.beginPath();
   g.moveTo(x, fy);
@@ -782,11 +1057,11 @@ export function drawNishan(g: Ctx, x: number, y: number, h: number, seconds: num
 
 /** The shamiana for the langar: a patterned canopy on poles over long durries. */
 export function drawShamiana(g: Ctx, front: boolean) {
-  const { x0, x1, y0, y1 } = LANGAR;
+  const { x0, x1, y0 } = LANGAR;
   if (!front) {
     // The durries in rows on the ground.
-    for (let i = 0; i < 3; i++) {
-      const y = y0 + 0.9 + i * 1.3;
+    for (let i = 0; i < 2; i++) {
+      const y = y0 + 0.62 + i * 0.95;
       g.fillStyle = i % 2 ? "#7a2a3a" : "#2a4a7a";
       g.fillRect(x0 + 0.3, y - 0.2, x1 - x0 - 0.6, 0.4);
       g.strokeStyle = "rgba(240, 220, 180, 0.5)";
@@ -889,15 +1164,51 @@ export function drawJhoola(g: Ctx, angle: number, riders: RGB[]) {
   }
 }
 
-export type Stall = { x: number; w: number; kind: "jalebi" | "bangles" | "parandi" | "toys" | "pakora"; awning: RGB; stripe: RGB };
+export type Stall = {
+  x: number;
+  w: number;
+  kind: "jalebi" | "bangles" | "parandi" | "toys" | "pakora";
+  awning: RGB;
+  stripe: RGB;
+};
 
 export function makeStalls(): Stall[] {
   return [
-    { x: JALEBI.x - 1.4, w: 2.8, kind: "jalebi", awning: [214, 60, 40], stripe: [250, 220, 150] },
-    { x: 62.9, w: 2.4, kind: "bangles", awning: [40, 110, 170], stripe: [240, 240, 230] },
-    { x: 65.6, w: 2.4, kind: "parandi", awning: [200, 40, 120], stripe: [250, 200, 60] },
-    { x: 76.2, w: 2.4, kind: "toys", awning: [30, 140, 100], stripe: [250, 240, 200] },
-    { x: 78.8, w: 2.4, kind: "pakora", awning: [230, 140, 30], stripe: [250, 240, 220] },
+    {
+      x: JALEBI.x - 1.4,
+      w: 2.8,
+      kind: "jalebi",
+      awning: [214, 60, 40],
+      stripe: [250, 220, 150],
+    },
+    {
+      x: 62.9,
+      w: 2.4,
+      kind: "bangles",
+      awning: [40, 110, 170],
+      stripe: [240, 240, 230],
+    },
+    {
+      x: 65.6,
+      w: 2.4,
+      kind: "parandi",
+      awning: [200, 40, 120],
+      stripe: [250, 200, 60],
+    },
+    {
+      x: 76.2,
+      w: 2.4,
+      kind: "toys",
+      awning: [30, 140, 100],
+      stripe: [250, 240, 200],
+    },
+    {
+      x: 78.8,
+      w: 2.4,
+      kind: "pakora",
+      awning: [230, 140, 30],
+      stripe: [250, 240, 220],
+    },
   ];
 }
 
@@ -939,21 +1250,41 @@ export function drawStall(g: Ctx, s: Stall, seconds: number) {
       g.lineWidth = 0.035;
       for (let i = 0; i < 3; i++) {
         g.beginPath();
-        g.arc(cx - 0.7 + i * 0.25, y - 1.33, 0.07, seconds + i, seconds + i + TAU * 0.9);
+        g.arc(
+          cx - 0.7 + i * 0.25,
+          y - 1.33,
+          0.07,
+          seconds + i,
+          seconds + i + TAU * 0.9,
+        );
         g.stroke();
       }
       g.fillStyle = "#c8a860";
       g.fillRect(cx + 0.2, y - 1.0, 0.8, 0.08);
       for (let i = 0; i < 7; i++) {
         g.beginPath();
-        g.arc(cx + 0.3 + (i % 4) * 0.2, y - 1.08 - Math.floor(i / 4) * 0.1, 0.08, 0, TAU);
+        g.arc(
+          cx + 0.3 + (i % 4) * 0.2,
+          y - 1.08 - Math.floor(i / 4) * 0.1,
+          0.08,
+          0,
+          TAU,
+        );
         g.stroke();
       }
       break;
     }
     case "bangles": {
       // Glass bangles stacked on upright sticks, every colour there is.
-      const colours = ["#d62640", "#2270c0", "#f2c030", "#1c9070", "#c02880", "#f06a28", "#7a3aa8"];
+      const colours = [
+        "#d62640",
+        "#2270c0",
+        "#f2c030",
+        "#1c9070",
+        "#c02880",
+        "#f06a28",
+        "#7a3aa8",
+      ];
       for (let i = 0; i < 7; i++) {
         const bx = s.x + 0.25 + i * 0.3;
         g.fillStyle = "#6a4a2a";
@@ -970,7 +1301,16 @@ export function drawStall(g: Ctx, s: Stall, seconds: number) {
     }
     case "parandi": {
       // Parandis hanging from a line: silk plaits ending in tassels, bright as the bangles.
-      const colours = ["#f2c030", "#d62640", "#1c9070", "#c02880", "#2270c0", "#f06a28", "#f2c030", "#d62640"];
+      const colours = [
+        "#f2c030",
+        "#d62640",
+        "#1c9070",
+        "#c02880",
+        "#2270c0",
+        "#f06a28",
+        "#f2c030",
+        "#d62640",
+      ];
       g.strokeStyle = "#3a2a1a";
       g.lineWidth = 0.02;
       g.beginPath();
@@ -1010,7 +1350,10 @@ export function drawStall(g: Ctx, s: Stall, seconds: number) {
           g.beginPath();
           g.moveTo(px, py);
           g.lineTo(px + Math.cos(a) * 0.18, py + Math.sin(a) * 0.18);
-          g.lineTo(px + Math.cos(a + 0.8) * 0.12, py + Math.sin(a + 0.8) * 0.12);
+          g.lineTo(
+            px + Math.cos(a + 0.8) * 0.12,
+            py + Math.sin(a + 0.8) * 0.12,
+          );
           g.fill();
         }
       }
@@ -1035,15 +1378,28 @@ export function drawStall(g: Ctx, s: Stall, seconds: number) {
 /** The bulbs strung over the stalls and round the jhoola, lit as the sun goes. */
 export function melaBulbs() {
   const bulbs: { x: number; y: number; c: string }[] = [];
-  const colours = ["255, 200, 90", "255, 120, 90", "140, 220, 255", "255, 240, 180"];
+  const colours = [
+    "255, 200, 90",
+    "255, 120, 90",
+    "140, 220, 255",
+    "255, 240, 180",
+  ];
   let k = 0;
   for (let x = 58; x < 81.5; x += 0.45) {
     const sag = Math.sin(((x - 58) / 2.6) * Math.PI);
-    bulbs.push({ x, y: STALL_Y - 2.6 + Math.abs(sag) * 0.3, c: colours[k++ % colours.length] });
+    bulbs.push({
+      x,
+      y: STALL_Y - 2.6 + Math.abs(sag) * 0.3,
+      c: colours[k++ % colours.length],
+    });
   }
   for (let i = 0; i < 24; i++) {
     const a = (i / 24) * TAU;
-    bulbs.push({ x: JHOOLA.x + Math.cos(a) * JHOOLA.r, y: JHOOLA.y - JHOOLA.r - 0.9 + Math.sin(a) * JHOOLA.r, c: colours[i % colours.length] });
+    bulbs.push({
+      x: JHOOLA.x + Math.cos(a) * JHOOLA.r,
+      y: JHOOLA.y - JHOOLA.r - 0.9 + Math.sin(a) * JHOOLA.r,
+      c: colours[i % colours.length],
+    });
   }
   return bulbs;
 }
@@ -1066,7 +1422,15 @@ export function drawKabaddi(g: Ctx) {
 
 /** A balloon seller's bunch, bobbing on its stick. */
 export function drawBalloons(g: Ctx, x: number, y: number, seconds: number) {
-  const colours = ["#e8243c", "#f2c030", "#2a80d0", "#20a070", "#d02a90", "#f07028", "#8a4ac0"];
+  const colours = [
+    "#e8243c",
+    "#f2c030",
+    "#2a80d0",
+    "#20a070",
+    "#d02a90",
+    "#f07028",
+    "#8a4ac0",
+  ];
   for (let i = 0; i < 12; i++) {
     const a = (i / 12) * TAU;
     const bx = x + Math.cos(a) * 0.35 + Math.sin(seconds + i) * 0.03;

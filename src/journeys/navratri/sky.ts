@@ -54,7 +54,13 @@ export class Sky {
 
   constructor() {
     const random = mulberry32(909);
-    for (let i = 0; i < 220; i++) this.stars.push({ x: random(), y: random() ** 1.3, r: 0.6 + random() * 1.3, seed: random() * 10 });
+    for (let i = 0; i < 220; i++)
+      this.stars.push({
+        x: random(),
+        y: random() ** 1.3,
+        r: 0.6 + random() * 1.3,
+        seed: random() * 10,
+      });
   }
 
   /** Fills the screen with the sky; `horizon` is the screen y where the far town stands. */
@@ -159,7 +165,12 @@ export function paintSkyline(from: number, to: number, ppu: number) {
       g.fillRect(x + w * 0.35, -h - 0.3, 0.08, 0.3);
       g.fillRect(x + w * 0.3 + 0.55, -h - 0.3, 0.08, 0.3);
     }
-    for (let i = 0; i < 3; i++) if (random() < 0.5) lights.push({ x: x + 0.3 + random() * (w - 0.6), y: -0.5 - random() * (h - 1) });
+    for (let i = 0; i < 3; i++)
+      if (random() < 0.5)
+        lights.push({
+          x: x + 0.3 + random() * (w - 0.6),
+          y: -0.5 - random() * (h - 1),
+        });
     x += w;
   }
   // Temple spires with their flags.

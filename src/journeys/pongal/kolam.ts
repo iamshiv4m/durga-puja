@@ -12,8 +12,23 @@
 import { mulberry32 } from "@/lib/math";
 
 export type Piece =
-  | { kind: "line"; x0: number; y0: number; x1: number; y1: number; length: number }
-  | { kind: "arc"; cx: number; cy: number; r: number; a0: number; a1: number; length: number };
+  | {
+      kind: "line";
+      x0: number;
+      y0: number;
+      x1: number;
+      y1: number;
+      length: number;
+    }
+  | {
+      kind: "arc";
+      cx: number;
+      cy: number;
+      r: number;
+      a0: number;
+      a1: number;
+      length: number;
+    };
 
 export type Loop = { pieces: Piece[]; length: number };
 
@@ -33,7 +48,9 @@ const R = Math.SQRT1_2 / 2;
 /** The dots of a diamond, rows of 1, 3, 5 ... 5, 3, 1, `size` from the middle to the tip. */
 export function diamond(size: number) {
   const cells = new Set<string>();
-  for (let i = -size; i <= size; i++) for (let j = -size; j <= size; j++) if (Math.abs(i) + Math.abs(j) <= size) cells.add(key(i, j));
+  for (let i = -size; i <= size; i++)
+    for (let j = -size; j <= size; j++)
+      if (Math.abs(i) + Math.abs(j) <= size) cells.add(key(i, j));
   return cells;
 }
 
@@ -81,7 +98,8 @@ export function trace(cells: Set<string>, mirrors: Set<string>): Loop[] {
   const turns = (X: number, Y: number) => {
     if (mirrors.has(key(X, Y))) return true;
     // A side on the edge of the grid.
-    if (X % 2 !== 0) return !inside((X - 1) / 2, Y / 2) || !inside((X + 1) / 2, Y / 2);
+    if (X % 2 !== 0)
+      return !inside((X - 1) / 2, Y / 2) || !inside((X + 1) / 2, Y / 2);
     return !inside(X / 2, (Y - 1) / 2) || !inside(X / 2, (Y + 1) / 2);
   };
   const done = new Set<string>();
@@ -90,12 +108,23 @@ export function trace(cells: Set<string>, mirrors: Set<string>): Loop[] {
   for (const c of cells) {
     const [i, j] = c.split(",").map(Number);
     // Each cell's four stretches, from its west side-middle and its east one.
-    starts.push([2 * i - 1, 2 * j, 1, -1], [2 * i - 1, 2 * j, 1, 1], [2 * i + 1, 2 * j, -1, -1], [2 * i + 1, 2 * j, -1, 1]);
+    starts.push(
+      [2 * i - 1, 2 * j, 1, -1],
+      [2 * i - 1, 2 * j, 1, 1],
+      [2 * i + 1, 2 * j, -1, -1],
+      [2 * i + 1, 2 * j, -1, 1],
+    );
   }
   starts.sort((a, b) => a[1] - b[1] || a[0] - b[0]);
   for (const [sx, sy, sdx, sdy] of starts) {
     if (done.has(key(2 * sx + sdx, 2 * sy + sdy))) continue;
-    const points: { x: number; y: number; turn: boolean; cx: number; cy: number }[] = [];
+    const points: {
+      x: number;
+      y: number;
+      turn: boolean;
+      cx: number;
+      cy: number;
+    }[] = [];
     let X = sx;
     let Y = sy;
     let dx = sdx;
@@ -128,7 +157,9 @@ export function trace(cells: Set<string>, mirrors: Set<string>): Loop[] {
  * Turns the side-middles a loop passes into pieces to draw: a straight run through each crossing
  * and a quarter circle round the dot at each turn, each from the middle of one stretch to the next.
  */
-function toPieces(points: { x: number; y: number; turn: boolean; cx: number; cy: number }[]): Loop {
+function toPieces(
+  points: { x: number; y: number; turn: boolean; cx: number; cy: number }[],
+): Loop {
   const n = points.length;
   const pieces: Piece[] = [];
   let length = 0;
@@ -167,7 +198,8 @@ export function makeKolam(size: number, seed: number, density = 0.42): Kolam {
   const random = mulberry32(seed);
   // Of the sets that make one line, the one with nearest `density` of the sides turned.
   const target = density * groups.length;
-  let best: { mirrors: Set<string>; loops: Loop[]; score: number } | null = null;
+  let best: { mirrors: Set<string>; loops: Loop[]; score: number } | null =
+    null;
   for (let attempt = 0; attempt < 400; attempt++) {
     const mirrors = new Set<string>();
     let turned = 0;
@@ -186,9 +218,19 @@ export function makeKolam(size: number, seed: number, density = 0.42): Kolam {
     return { x, y };
   });
   // Nearest the middle first, the way the pulli are set out.
-  dots.sort((a, b) => Math.abs(a.x) + Math.abs(a.y) - (Math.abs(b.x) + Math.abs(b.y)) || Math.atan2(a.y, a.x) - Math.atan2(b.y, b.x));
+  dots.sort(
+    (a, b) =>
+      Math.abs(a.x) + Math.abs(a.y) - (Math.abs(b.x) + Math.abs(b.y)) ||
+      Math.atan2(a.y, a.x) - Math.atan2(b.y, b.x),
+  );
   const loops = best!.loops;
-  return { dots, mirrors: best!.mirrors, loops, length: loops.reduce((s, l) => s + l.length, 0), radius: size + 0.5 };
+  return {
+    dots,
+    mirrors: best!.mirrors,
+    loops,
+    length: loops.reduce((s, l) => s + l.length, 0),
+    radius: size + 0.5,
+  };
 }
 
 /** Moves the mirrors at the side-middle nearest (x, y) (in dot units), all eight ways round; returns where they are. */
@@ -205,9 +247,16 @@ export function twist(kolam: Kolam, size: number, x: number, y: number) {
     if (Math.abs(fx) > Math.abs(fy)) bx += Math.sign(fx) || 1;
     else by += Math.sign(fy) || 1;
   }
-  const between = bx % 2 !== 0 ? cells.has(key((bx - 1) / 2, by / 2)) && cells.has(key((bx + 1) / 2, by / 2)) : cells.has(key(bx / 2, (by - 1) / 2)) && cells.has(key(bx / 2, (by + 1) / 2));
+  const between =
+    bx % 2 !== 0
+      ? cells.has(key((bx - 1) / 2, by / 2)) &&
+        cells.has(key((bx + 1) / 2, by / 2))
+      : cells.has(key(bx / 2, (by - 1) / 2)) &&
+        cells.has(key(bx / 2, (by + 1) / 2));
   if (!between) return null;
-  const group = orbits(cells).find((g) => g.some(([a, b]) => a === bx && b === by));
+  const group = orbits(cells).find((g) =>
+    g.some(([a, b]) => a === bx && b === by),
+  );
   if (!group) return null;
   const on = kolam.mirrors.has(key(bx, by));
   for (const [a, b] of group) {
@@ -219,7 +268,18 @@ export function twist(kolam: Kolam, size: number, x: number, y: number) {
   return group.map(([a, b]) => ({ x: a / 2, y: b / 2 }));
 }
 
-type Path = { moveTo(x: number, y: number): void; lineTo(x: number, y: number): void; arc(x: number, y: number, r: number, a0: number, a1: number, ccw?: boolean): void };
+type Path = {
+  moveTo(x: number, y: number): void;
+  lineTo(x: number, y: number): void;
+  arc(
+    x: number,
+    y: number,
+    r: number,
+    a0: number,
+    a1: number,
+    ccw?: boolean,
+  ): void;
+};
 
 /**
  * Adds the first `drawn` (0..kolam.length) of the line to `path`, in dot units; returns where the
@@ -237,13 +297,23 @@ export function strokeKolam(path: Path, kolam: Kolam, drawn: number) {
       left -= piece.length;
       if (piece.kind === "line") {
         if (first) path.moveTo(piece.x0, piece.y0);
-        tip = { x: piece.x0 + (piece.x1 - piece.x0) * t, y: piece.y0 + (piece.y1 - piece.y0) * t };
+        tip = {
+          x: piece.x0 + (piece.x1 - piece.x0) * t,
+          y: piece.y0 + (piece.y1 - piece.y0) * t,
+        };
         path.lineTo(tip.x, tip.y);
       } else {
         const a = piece.a0 + (piece.a1 - piece.a0) * t;
-        if (first) path.moveTo(piece.cx + Math.cos(piece.a0) * piece.r, piece.cy + Math.sin(piece.a0) * piece.r);
+        if (first)
+          path.moveTo(
+            piece.cx + Math.cos(piece.a0) * piece.r,
+            piece.cy + Math.sin(piece.a0) * piece.r,
+          );
         path.arc(piece.cx, piece.cy, piece.r, piece.a0, a, piece.a1 < piece.a0);
-        tip = { x: piece.cx + Math.cos(a) * piece.r, y: piece.cy + Math.sin(a) * piece.r };
+        tip = {
+          x: piece.cx + Math.cos(a) * piece.r,
+          y: piece.cy + Math.sin(a) * piece.r,
+        };
       }
       first = false;
     }

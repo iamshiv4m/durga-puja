@@ -92,7 +92,7 @@ function thatch(g: Ctx, left: number, right: number, eave: number, ridgeLeft: nu
 
 /** The namghar, the village prayer hall of Sankardev's faith: long, low and thatched. */
 export function namghar() {
-  return sprite("namghar", -4.8, -4.2, 9.6, 4.3, 90, (g) => {
+  return sprite("namghar", -4.8, -4.2, 9.6, 4.3, 140, (g) => {
     // Plinth.
     g.fillStyle = rgb([200, 176, 136]);
     g.fillRect(-4.3, -0.3, 8.6, 0.3);
@@ -143,7 +143,7 @@ export function namghar() {
 
 /** The batsora: the namghar's gatehouse, two posts under its own little thatch. */
 export function batsora() {
-  return sprite("batsora", -1.1, -2.5, 2.2, 2.55, 90, (g) => {
+  return sprite("batsora", -1.1, -2.5, 2.2, 2.55, 140, (g) => {
     g.fillStyle = rgb(WOOD);
     g.fillRect(-0.72, -1.5, 0.12, 1.5);
     g.fillRect(0.6, -1.5, 0.12, 1.5);
@@ -156,7 +156,7 @@ export function batsora() {
 
 /** A homestead: ikora reed walls plastered with mud, a thatched roof and a verandah in front. */
 export function house() {
-  return sprite("house", -4.2, -4.3, 8.4, 4.4, 90, (g) => {
+  return sprite("house", -4.2, -4.3, 8.4, 4.4, 170, (g) => {
     g.fillStyle = rgb([196, 170, 126]);
     g.fillRect(-3.6, -0.34, 7.2, 0.34);
     g.fillStyle = rgb([168, 140, 100]);
@@ -232,7 +232,7 @@ export function house() {
 
 /** The bhoral, the granary, up on its stilts out of the damp. */
 export function bhoral() {
-  return sprite("bhoral", -1.3, -3.2, 2.6, 3.25, 90, (g) => {
+  return sprite("bhoral", -1.3, -3.2, 2.6, 3.25, 140, (g) => {
     g.fillStyle = rgb(WOOD);
     for (const px of [-0.8, -0.27, 0.27, 0.8]) g.fillRect(px - 0.05, -0.75, 0.1, 0.75);
     g.fillStyle = rgb(mix(PLASTER, [180, 150, 110], 0.3));
@@ -253,7 +253,7 @@ export function bhoral() {
 
 /** The tatxal, the family loom, with a gamosa half woven on it. */
 export function loom() {
-  return sprite("loom", -1.0, -1.5, 2.0, 1.55, 110, (g) => {
+  return sprite("loom", -1.0, -1.5, 2.0, 1.55, 170, (g) => {
     g.strokeStyle = rgb(WOOD);
     g.lineWidth = 0.07;
     g.lineCap = "round";
@@ -310,7 +310,7 @@ export function loom() {
 
 /** The tulsi on its clay pedestal in the middle of the courtyard. */
 export function tulsi() {
-  return sprite("tulsi", -0.5, -1.35, 1.0, 1.4, 120, (g) => {
+  return sprite("tulsi", -0.5, -1.35, 1.0, 1.4, 170, (g) => {
     g.fillStyle = rgb([210, 184, 150]);
     g.beginPath();
     g.moveTo(-0.3, 0);
@@ -369,7 +369,7 @@ const COPPER: RGB[] = [
 export function mangoTree(key: string, size: number, seed: number) {
   const w = 12 * size;
   const h = 9.5 * size;
-  return sprite(key, -w / 2, -h, w, h + 0.05, 60, (g) => {
+  return sprite(key, -w / 2, -h, w, h + 0.05, 100, (g) => {
     const random = mulberry32(seed);
     g.scale(size, size);
     // Trunk and the big limbs.
@@ -466,17 +466,27 @@ export function shadeTree(seed: number) {
       [1.1, -5.5, 1.0],
       [0, -5.8, 1.2],
     ])
-      foliage(g, x, y, rx, 0.4, 60, random, [
-        [60, 100, 50],
-        [96, 140, 64],
-        [140, 176, 90],
-      ], 0.14);
+      foliage(
+        g,
+        x,
+        y,
+        rx,
+        0.4,
+        60,
+        random,
+        [
+          [60, 100, 50],
+          [96, 140, 64],
+          [140, 176, 90],
+        ],
+        0.14,
+      );
   });
 }
 
 /** A clump of bamboo: culms arching out from the root, feathery leaves at their tips. */
 export function bamboo(seed: number) {
-  return sprite(`bamboo-${seed}`, -3.2, -9.4, 6.4, 9.45, 60, (g) => {
+  return sprite(`bamboo-${seed}`, -3.2, -9.4, 6.4, 9.45, 80, (g) => {
     const random = mulberry32(seed);
     const tips: [number, number][] = [];
     for (let i = 0; i < 22; i++) {
@@ -517,7 +527,7 @@ export function bamboo(seed: number) {
 
 /** A tamul, an areca palm, straight as a rod, a betel vine climbing it. */
 export function areca(seed: number, height = 7) {
-  return sprite(`areca-${seed}-${height}`, -1.4, -height - 1.2, 2.8, height + 1.25, 60, (g) => {
+  return sprite(`areca-${seed}-${height}`, -1.4, -height - 1.2, 2.8, height + 1.25, 90, (g) => {
     const random = mulberry32(seed);
     const lean = (random() - 0.5) * 0.4;
     g.strokeStyle = "rgb(150, 144, 124)";
@@ -583,7 +593,7 @@ export function areca(seed: number, height = 7) {
 
 /** A banana plant, its broad leaves torn by the wind. */
 export function banana(seed: number) {
-  return sprite(`banana-${seed}`, -1.6, -3.2, 3.2, 3.25, 70, (g) => {
+  return sprite(`banana-${seed}`, -1.6, -3.2, 3.2, 3.25, 110, (g) => {
     const random = mulberry32(seed);
     g.fillStyle = "rgb(120, 140, 70)";
     g.beginPath();

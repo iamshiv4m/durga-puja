@@ -9,7 +9,7 @@ export const bihu: JourneyContent = {
   lang: "as",
   script: "bangla",
   tagline: "spring, and the new year, in Assam",
-  greeting: "ৰঙালী বিহুৰ শুভেচ্ছা",
+  greeting: "শুভ বিহু",
   pageTitle: "Rongālī Bihu — spring, and the new year, in Assam",
   description:
     "Scroll through Rongali Bihu in the Brahmaputra valley: the kopou orchid in flower at the end of Chot, the cattle bathed at the pond on Goru Bihu, a gamosa for every elder on the new year, the husori singing from house to house, and the Bihu dance under the trees until the fireflies come out.",

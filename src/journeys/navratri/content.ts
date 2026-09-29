@@ -59,7 +59,7 @@ export const navratri: JourneyContent = {
       tithi: "Pratipada to Navami · nine nights",
       title: "Navadurga",
       native: "નવદુર્ગા",
-      body: "One form of the goddess for each night: Shailaputri, daughter of the mountain, first; Chandraghanta with the bell-shaped moon; Kalaratri, as dark as the night; and last Siddhidatri, who grants every power. One more lamp is lit over the chowk each night.",
+      body: "One form of the goddess for each night, from Shailaputri, daughter of the mountain, to Siddhidatri, who grants every power, and one more lantern lit over the chowk each night. On Ashtami little girls are seated on the otla and fed puri, chana and sheero as the goddess herself: the kanya pujan.",
       window: [0.34, 0.36, 0.43, 0.46],
       side: "left",
     },
@@ -88,14 +88,27 @@ export const navratri: JourneyContent = {
       side: "right",
     },
   ],
-  finale: { native: "જય માતાજી", english: "till the garbo is lit again", window: [0.9, 0.92, 0.975, 0.998] },
+  finale: {
+    native: "જય માતાજી",
+    english: "till the garbo is lit again",
+    window: [0.9, 0.92, 0.975, 0.998],
+  },
   hints: {
     scroll: "scroll to sow the jawara",
     touch: [
-      { text: "touch the next lamp to light it", window: [0.36, 0.38, 0.45, 0.47] },
-      { text: "tap the chowk to join the garba", window: [0.5, 0.52, 0.59, 0.61] },
+      {
+        text: "touch the next lamp to light it",
+        window: [0.36, 0.38, 0.45, 0.47],
+      },
+      {
+        text: "tap the chowk to join the garba",
+        window: [0.5, 0.52, 0.59, 0.61],
+      },
       { text: "tap to strike the dandiya", window: [0.63, 0.65, 0.71, 0.73] },
-      { text: "touch Ravana to loose the arrow", window: [0.78, 0.8, 0.84, 0.86] },
+      {
+        text: "touch Ravana to loose Ram's arrow",
+        window: [0.772, 0.781, 0.8, 0.806],
+      },
     ],
   },
   verse: {

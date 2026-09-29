@@ -37,7 +37,7 @@ export function strokePeriod(p: number, boost: number) {
 export function melamBeat(p: number) {
   const t = smoothstep(MOMENTS.melam[0], MOMENTS.melam[1] - 0.004, p);
   // Kalams halve the beat; within each, a gentle push.
-  const stages = [0.56, 0.4, 0.28, 0.2, 0.15];
+  const stages = [0.44, 0.34, 0.26, 0.2, 0.155];
   const k = Math.min(stages.length - 1, Math.floor(t * stages.length));
   return stages[k] * (1 - 0.06 * ((t * stages.length) % 1));
 }
@@ -55,7 +55,10 @@ export function phaseOf(beats: Beat[], now: number, period: number) {
   }
   if (last < 0 || now - beats[last].t > period * 2) return null;
   const next = beats[last + 1]?.t ?? beats[last].t + period;
-  return { phase: Math.min(1, (now - beats[last].t) / Math.max(0.05, next - beats[last].t)), n: beats[last].n };
+  return {
+    phase: Math.min(1, (now - beats[last].t) / Math.max(0.05, next - beats[last].t)),
+    n: beats[last].n,
+  };
 }
 
 /** Keeps the last few beats. */

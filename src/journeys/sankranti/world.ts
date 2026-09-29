@@ -36,27 +36,168 @@ export function tone(base: RGB, env: Env, lift = 0): RGB {
   return mix(dark, day, clamp(env.amb + lift));
 }
 
-export const paint = (base: RGB, env: Env, lift = 0, alpha = 1) => rgb(tone(base, env, lift), alpha);
+// The same few hundred colours are painted every frame; each is worked out once per light.
+let cacheEnv: Env | null = null;
+const cache = new Map<number, string>();
 
-export type Light = { x: number; y: number; r: number; a: number; color: string };
+export function paint(base: RGB, env: Env, lift = 0, alpha = 1) {
+  if (env !== cacheEnv) {
+    cache.clear();
+    cacheEnv = env;
+  }
+  const key = ((base[0] * 256 + base[1]) * 256 + base[2]) * 4096 + Math.round(clamp(lift) * 63) * 64 + Math.round(clamp(alpha) * 63);
+  let color = cache.get(key);
+  if (color === undefined) {
+    color = rgb(tone(base, env, lift), alpha);
+    cache.set(key, color);
+  }
+  return color;
+}
 
-export type Hour = { top: RGB; low: RGB; amb: number; tint: RGB; stars: number; mist: number };
+export type Light = {
+  x: number;
+  y: number;
+  r: number;
+  a: number;
+  color: string;
+};
+
+export type Hour = {
+  top: RGB;
+  low: RGB;
+  amb: number;
+  tint: RGB;
+  stars: number;
+  mist: number;
+};
 
 const HOURS: (Hour & { at: number })[] = [
-  { at: 0, top: [10, 16, 40], low: [44, 50, 92], amb: 0.12, tint: [150, 160, 220], stars: 1, mist: 0.9 },
-  { at: 0.05, top: [22, 30, 68], low: [150, 104, 120], amb: 0.24, tint: [190, 170, 210], stars: 0.6, mist: 1 },
-  { at: 0.095, top: [52, 70, 124], low: [252, 164, 110], amb: 0.48, tint: [255, 184, 140], stars: 0.1, mist: 0.9 },
-  { at: 0.15, top: [86, 124, 180], low: [250, 206, 160], amb: 0.78, tint: [255, 214, 170], stars: 0, mist: 0.6 },
-  { at: 0.2, top: [98, 146, 202], low: [236, 224, 204], amb: 0.95, tint: [255, 236, 206], stars: 0, mist: 0.25 },
-  { at: 0.3, top: [92, 148, 210], low: [232, 230, 216], amb: 1, tint: [255, 244, 222], stars: 0, mist: 0.15 },
-  { at: 0.42, top: [84, 144, 212], low: [240, 228, 200], amb: 1, tint: [255, 238, 210], stars: 0, mist: 0.1 },
-  { at: 0.56, top: [82, 140, 208], low: [244, 224, 190], amb: 0.98, tint: [255, 232, 198], stars: 0, mist: 0.1 },
-  { at: 0.65, top: [96, 128, 190], low: [255, 200, 140], amb: 0.86, tint: [255, 214, 160], stars: 0, mist: 0.2 },
-  { at: 0.72, top: [80, 86, 150], low: [255, 150, 84], amb: 0.62, tint: [255, 170, 110], stars: 0, mist: 0.35 },
-  { at: 0.765, top: [50, 46, 104], low: [240, 100, 62], amb: 0.4, tint: [240, 130, 100], stars: 0.1, mist: 0.4 },
-  { at: 0.8, top: [16, 18, 52], low: [84, 50, 80], amb: 0.14, tint: [170, 140, 190], stars: 0.6, mist: 0.2 },
-  { at: 0.84, top: [5, 8, 26], low: [22, 22, 54], amb: 0.06, tint: [140, 150, 210], stars: 1, mist: 0.1 },
-  { at: 1, top: [4, 6, 22], low: [18, 18, 46], amb: 0.05, tint: [140, 150, 210], stars: 1, mist: 0.1 },
+  {
+    at: 0,
+    top: [10, 16, 40],
+    low: [44, 50, 92],
+    amb: 0.12,
+    tint: [150, 160, 220],
+    stars: 1,
+    mist: 0.9,
+  },
+  {
+    at: 0.05,
+    top: [22, 30, 68],
+    low: [150, 104, 120],
+    amb: 0.24,
+    tint: [190, 170, 210],
+    stars: 0.6,
+    mist: 1,
+  },
+  {
+    at: 0.095,
+    top: [52, 70, 124],
+    low: [252, 164, 110],
+    amb: 0.48,
+    tint: [255, 184, 140],
+    stars: 0.1,
+    mist: 0.9,
+  },
+  {
+    at: 0.15,
+    top: [86, 124, 180],
+    low: [250, 206, 160],
+    amb: 0.78,
+    tint: [255, 214, 170],
+    stars: 0,
+    mist: 0.6,
+  },
+  {
+    at: 0.2,
+    top: [98, 146, 202],
+    low: [236, 224, 204],
+    amb: 0.95,
+    tint: [255, 236, 206],
+    stars: 0,
+    mist: 0.25,
+  },
+  {
+    at: 0.3,
+    top: [92, 148, 210],
+    low: [232, 230, 216],
+    amb: 1,
+    tint: [255, 244, 222],
+    stars: 0,
+    mist: 0.15,
+  },
+  {
+    at: 0.42,
+    top: [84, 144, 212],
+    low: [240, 228, 200],
+    amb: 1,
+    tint: [255, 238, 210],
+    stars: 0,
+    mist: 0.1,
+  },
+  {
+    at: 0.56,
+    top: [82, 140, 208],
+    low: [244, 224, 190],
+    amb: 0.98,
+    tint: [255, 232, 198],
+    stars: 0,
+    mist: 0.1,
+  },
+  {
+    at: 0.65,
+    top: [96, 128, 190],
+    low: [255, 200, 140],
+    amb: 0.86,
+    tint: [255, 214, 160],
+    stars: 0,
+    mist: 0.2,
+  },
+  {
+    at: 0.72,
+    top: [80, 86, 150],
+    low: [255, 150, 84],
+    amb: 0.62,
+    tint: [255, 170, 110],
+    stars: 0,
+    mist: 0.35,
+  },
+  {
+    at: 0.765,
+    top: [50, 46, 104],
+    low: [240, 100, 62],
+    amb: 0.4,
+    tint: [240, 130, 100],
+    stars: 0.1,
+    mist: 0.4,
+  },
+  {
+    at: 0.8,
+    top: [16, 18, 52],
+    low: [84, 50, 80],
+    amb: 0.14,
+    tint: [170, 140, 190],
+    stars: 0.6,
+    mist: 0.2,
+  },
+  {
+    at: 0.84,
+    top: [5, 8, 26],
+    low: [22, 22, 54],
+    amb: 0.06,
+    tint: [140, 150, 210],
+    stars: 1,
+    mist: 0.1,
+  },
+  {
+    at: 1,
+    top: [4, 6, 22],
+    low: [18, 18, 46],
+    amb: 0.05,
+    tint: [140, 150, 210],
+    stars: 1,
+    mist: 0.1,
+  },
 ];
 
 export function hourAt(p: number): Hour {

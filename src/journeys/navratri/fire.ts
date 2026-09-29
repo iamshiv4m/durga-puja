@@ -43,24 +43,85 @@ export class Particles {
   }
 
   flame(x: number, z: number, h: number, size: number) {
-    this.add({ kind: "flame", x, z, h, vx: (Math.random() - 0.5) * 0.6, vz: 0, vh: 1.6 + Math.random() * 2.2, age: 0, life: 0.5 + Math.random() * 0.7, size, color: FIRE });
+    this.add({
+      kind: "flame",
+      x,
+      z,
+      h,
+      vx: (Math.random() - 0.5) * 0.6,
+      vz: 0,
+      vh: 1.6 + Math.random() * 2.2,
+      age: 0,
+      life: 0.5 + Math.random() * 0.7,
+      size,
+      color: FIRE,
+    });
   }
 
   ember(x: number, z: number, h: number) {
-    this.add({ kind: "ember", x, z, h, vx: (Math.random() - 0.5) * 2.5, vz: (Math.random() - 0.5) * 1, vh: 2 + Math.random() * 5, age: 0, life: 1.2 + Math.random() * 2, size: 0.05, color: HOT });
+    this.add({
+      kind: "ember",
+      x,
+      z,
+      h,
+      vx: (Math.random() - 0.5) * 2.5,
+      vz: (Math.random() - 0.5) * 1,
+      vh: 2 + Math.random() * 5,
+      age: 0,
+      life: 1.2 + Math.random() * 2,
+      size: 0.05,
+      color: HOT,
+    });
   }
 
   smoke(x: number, z: number, h: number) {
-    this.add({ kind: "smoke", x, z, h, vx: 0.3 + Math.random() * 0.4, vz: 0, vh: 1 + Math.random() * 0.8, age: 0, life: 4 + Math.random() * 3, size: 1 + Math.random(), color: SMOKE });
+    this.add({
+      kind: "smoke",
+      x,
+      z,
+      h,
+      vx: 0.3 + Math.random() * 0.4,
+      vz: 0,
+      vh: 1 + Math.random() * 0.8,
+      age: 0,
+      life: 4 + Math.random() * 3,
+      size: 1 + Math.random(),
+      color: SMOKE,
+    });
   }
 
   flash(x: number, z: number, h: number) {
-    this.add({ kind: "flash", x, z, h, vx: 0, vz: 0, vh: 0, age: 0, life: 0.14, size: 1.2 + Math.random(), color: "255, 250, 230" });
+    this.add({
+      kind: "flash",
+      x,
+      z,
+      h,
+      vx: 0,
+      vz: 0,
+      vh: 0,
+      age: 0,
+      life: 0.14,
+      size: 1.2 + Math.random(),
+      color: "255, 250, 230",
+    });
     for (let i = 0; i < 10; i++) this.ember(x, z, h);
   }
 
   rocket(x: number, z: number, h: number, color: string) {
-    this.add({ kind: "rocket", x, z, h, vx: (Math.random() - 0.5) * 2, vz: 0, vh: 13 + Math.random() * 5, age: 0, life: 0.9 + Math.random() * 0.4, size: 0.1, color: HOT, burst: color });
+    this.add({
+      kind: "rocket",
+      x,
+      z,
+      h,
+      vx: (Math.random() - 0.5) * 2,
+      vz: 0,
+      vh: 13 + Math.random() * 5,
+      age: 0,
+      life: 0.9 + Math.random() * 0.4,
+      size: 0.1,
+      color: HOT,
+      burst: color,
+    });
   }
 
   /** A ring of sparks thrown out from a point, for fireworks and struck sticks. */
@@ -134,8 +195,8 @@ export class Particles {
       const y = p.z * t.s - p.h * t.c;
       if (p.kind === "flame") {
         const size = p.size * (1 - k * 0.6);
-        glow(g, glowSprite(FIRE), x, y, size * 1.6, 0.55 * (1 - k));
-        glow(g, glowSprite(HOT), x, y, size * 0.6, 0.7 * (1 - k));
+        glow(g, glowSprite(FIRE), x, y, size * 1.5, 0.4 * (1 - k));
+        glow(g, glowSprite(HOT), x, y, size * 0.5, 0.5 * (1 - k));
       } else if (p.kind === "flash") {
         glow(g, glowSprite(p.color), x, y, p.size * 2.5, 1 - k);
       } else if (p.kind === "rocket") {

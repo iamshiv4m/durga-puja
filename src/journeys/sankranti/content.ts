@@ -3,7 +3,7 @@ import type { JourneyContent } from "../types";
 export const sankranti: JourneyContent = {
   id: "sankranti",
   path: "/makar-sankranti",
-  name: "Makar Saṅkrānti",
+  name: "Saṅkrānti",
   festival: "Makar Sankranti",
   native: "मकर संक्रांति",
   lang: "hi",
@@ -62,7 +62,7 @@ export const sankranti: JourneyContent = {
       tithi: "Maharashtra · the afternoon",
       title: "Tilgul",
       native: "तिळगूळ घ्या, गोड गोड बोला",
-      body: "“Tilgul ghya, goḍ goḍ bola”: take sesame and jaggery, and speak sweetly. Women wear black, the one day of the year for it, since black holds the winter sun, and a new bride wears jewellery of sugared sesame. At haldi-kunku they touch turmeric and kumkum to each other's foreheads and give vaan from the sugad, little clay pots of carrots, ber and sugarcane.",
+      body: "“Tilgul ghya, goḍ goḍ bola”: take sesame and jaggery, and speak sweetly. Women wear black, the one festival day for it, since black holds the winter sun, and a new bride wears jewellery of sugared sesame. At haldi-kunku they touch turmeric and kumkum to each other's foreheads and give vaan from the sugad, little clay pots of carrots, ber and sugarcane.",
       window: [0.325, 0.34, 0.4, 0.425],
       side: "right",
     },
@@ -99,24 +99,39 @@ export const sankranti: JourneyContent = {
       side: "right",
     },
   ],
-  finale: { native: "शुभ मकर संक्रांति", english: "the sun turns north, and the days grow long", window: [0.91, 0.93, 0.975, 0.998] },
+  finale: {
+    native: "शुभ मकर संक्रांति",
+    english: "the sun turns north, and the days grow long",
+    window: [0.91, 0.93, 0.975, 0.998],
+  },
   hints: {
     scroll: "scroll to the river before dawn",
     touch: [
-      { text: "touch the river to offer arghya", window: [0.09, 0.105, 0.15, 0.165] },
+      {
+        text: "touch the river to offer arghya",
+        window: [0.09, 0.105, 0.15, 0.165],
+      },
       { text: "drag to fly your kite", window: [0.465, 0.48, 0.545, 0.56] },
-      { text: "cross another string to cut its kite", window: [0.58, 0.595, 0.77, 0.785] },
-      { text: "touch the dark to send up a tukkal", window: [0.81, 0.825, 0.9, 0.915] },
+      {
+        text: "cross another string to cut its kite",
+        window: [0.58, 0.595, 0.77, 0.785],
+      },
+      {
+        text: "touch the dark to send up a tukkal",
+        window: [0.81, 0.825, 0.9, 0.915],
+      },
     ],
   },
   verse: {
-    lines: ["चित्रं देवानामुदगादनीकं", "चक्षुर्मित्रस्य वरुणस्याग्नेः ।", "आप्रा द्यावापृथिवी अन्तरिक्षं", "सूर्य आत्मा जगतस्तस्थुषश्च ॥"],
+    lines: ["तत्सवितुर्वरेण्यं", "भर्गो देवस्य धीमहि ।", "धियो यो नः प्रचोदयात् ॥"],
     lang: "sa",
-    english:
-      "The bright face of the gods has risen, the eye of Mitra, Varuṇa and Agni. He has filled the sky, the earth and the air between: Sūrya, the soul of all that moves and all that stands still.",
-    source: "Ṛgveda 1.115.1",
+    english: "Let us hold in mind the lovely radiance of Savitṛ, the god who is the sun: may he set our thoughts in motion.",
+    source: "Ṛgveda 3.62.10, the Gāyatrī mantra of Viśvāmitra",
   },
-  card: { native: "मकर संक्रांति की शुभकामनाएँ", english: "Happy Makar Sankranti" },
+  card: {
+    native: "मकर संक्रांति की शुभकामनाएँ",
+    english: "Happy Makar Sankranti",
+  },
   returnLink: "back to the river at dawn",
   soundLabel: "shehnai and tanpura at dawn, bansuri, dholki, dhol and a brass band on the rooftops, and bells for the lanterns",
   about: {

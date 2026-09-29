@@ -26,7 +26,11 @@ const DESIGNS: Design[] = ["half", "top", "chand", "band", "corner", "eyes", "pl
 
 const css = ([r, g, b]: RGB) => `rgb(${r}, ${g}, ${b})`;
 
-export type KiteSprite = { paper: HTMLCanvasElement; shadow: HTMLCanvasElement; main: RGB };
+export type KiteSprite = {
+  paper: HTMLCanvasElement;
+  shadow: HTMLCanvasElement;
+  main: RGB;
+};
 
 const sprites: KiteSprite[] = [];
 

@@ -23,6 +23,7 @@ import {
   type View,
 } from "../paint";
 import type { Emit, Frame, Scene } from "../types";
+import { janmashtami } from "./content";
 import { DIVINE, Fort, VASUDEVA, type Light } from "./fort";
 import { Ghat } from "./ghat";
 import { Gokul } from "./gokul";
@@ -51,7 +52,14 @@ export { MOMENTS };
 const BASKET_FLOOR = { x: 1.42, y: FORT.floor + 0.02 };
 
 /** A shallow basket of woven bamboo with the child in it: yellow cloth, and two small feet. */
-export function drawBasket(ctx: Ctx, x: number, y: number, w: number, warm: number, child: number) {
+export function drawBasket(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  w: number,
+  warm: number,
+  child: number,
+) {
   const h = w * 0.36;
   const cane = mix([120, 84, 44], [240, 200, 120], warm);
   // The child, swaddled in pitambar, yellow silk.
@@ -99,6 +107,9 @@ export function drawBasket(ctx: Ctx, x: number, y: number, w: number, warm: numb
   ctx.stroke();
 }
 
+/** How much each chapter's caption side is dimmed: little in the dark night, more in daylight and lamplight. */
+const SCRIM = [0.3, 0.5, 0.35, 0.55, 0.5, 0.86, 0.5];
+
 class Janmashtami implements Scene {
   private readonly emit: Emit;
   private readonly weather = new Weather();
@@ -126,12 +137,19 @@ class Janmashtami implements Scene {
     const later = shot(portrait ? PORTRAIT_LATER : LATER, p);
     const V = vasudeva(p);
     // Following Vasudeva: he is kept clear of each caption's side, and the camera lifts as the river does.
-    const side = portrait ? 0 : lerp(lerp(2.3, -2.6, rise(p, 0.255, 0.29)), 2.6, rise(p, 0.405, 0.44));
-    const surge = rise(p, MOMENTS.surge[0], MOMENTS.touch) * (1 - rise(p, MOMENTS.part[1], MOMENTS.bank));
+    const side = portrait
+      ? 0
+      : lerp(lerp(2.3, -2.6, rise(p, 0.255, 0.29)), 2.6, rise(p, 0.405, 0.44));
+    const surge =
+      rise(p, MOMENTS.surge[0], MOMENTS.touch) *
+      (1 - rise(p, MOMENTS.part[1], MOMENTS.bank));
     const follow = {
       x: V.x + side,
       y: lerp(-1.7, -1.9, surge) - (portrait ? 0.2 : 0),
-      zoom: (portrait ? 1.25 : 1.02) * lerp(1, 0.86, surge) * lerp(1, 1.08, rise(p, 0.3, 0.32)),
+      zoom:
+        (portrait ? 1.25 : 1.02) *
+        lerp(1, 0.86, surge) *
+        lerp(1, 1.08, rise(p, 0.3, 0.32)),
     };
     const into = rise(p, 0.238, 0.262);
     const out = rise(p, 0.425, 0.445);
@@ -145,7 +163,12 @@ class Janmashtami implements Scene {
     // Up through the cloud between places.
     const flights = [MOMENTS.flight1, MOMENTS.flight2, MOMENTS.flight3];
     const up = Math.max(...flights.map((w) => hop(p, w)));
-    return { x: cam.x, y: cam.y - up * 11, zoom: cam.zoom / (1 + 2.4 * up), up };
+    return {
+      x: cam.x,
+      y: cam.y - up * 11,
+      zoom: cam.zoom / (1 + 2.4 * up),
+      up,
+    };
   }
 
   draw(ctx: Ctx, f: Frame) {
@@ -160,19 +183,30 @@ class Janmashtami implements Scene {
 
     // The storm's own lightning, not during the hush before midnight.
     const hushed = p > MOMENTS.hush[0] - 0.004 && p < 0.222;
-    if (!f.reduced && p > 0.004 && p < 0.415 && !hushed && seconds > this.nextStrike) {
+    if (
+      !f.reduced &&
+      p > 0.004 &&
+      p < 0.415 &&
+      !hushed &&
+      seconds > this.nextStrike
+    ) {
       const near = p > MOMENTS.surge[0] && p < MOMENTS.touch + 0.01;
-      this.nextStrike = seconds + (near ? 1.2 : 2.6) + this.random() * (near ? 2 : 4.5);
+      this.nextStrike =
+        seconds + (near ? 1.2 : 2.6) + this.random() * (near ? 2 : 4.5);
       const x = v.x + (this.random() - 0.5) * (v.width / v.scale) * 0.9;
       this.weather.strike(x, -1 - this.random() * 2, seconds);
       this.emit(near || this.random() < 0.4 ? "thunder-near" : "thunder");
     }
-    if (p !== this.lastP && Math.abs(p - this.lastP) < 0.02) this.cues(p, this.lastP);
+    if (p !== this.lastP && Math.abs(p - this.lastP) < 0.02)
+      this.cues(p, this.lastP);
     this.lastP = p;
 
     const born = rise(p, MOMENTS.birth, MOMENTS.birth + 0.006);
-    const moon = born * (1 - rise(p, 0.28, 0.31)) * 0.9 + rise(p, 0.585, 0.6) * (1 - rise(p, 0.652, 0.665));
-    const sun = rise(p, 0.45, 0.48) * (1 - rise(p, 0.53, 0.55)) + rise(p, 0.86, 0.9);
+    const moon =
+      born * (1 - rise(p, 0.28, 0.31)) * 0.9 +
+      rise(p, 0.585, 0.6) * (1 - rise(p, 0.652, 0.665));
+    const sun =
+      rise(p, 0.45, 0.48) * (1 - rise(p, 0.53, 0.55)) + rise(p, 0.86, 0.9);
     const stars = rise(p, 0.575, 0.59) * (1 - rise(p, 0.652, 0.665));
     this.weather.sky(ctx, v, p, seconds, moon, sun, stars);
 
@@ -190,7 +224,13 @@ class Janmashtami implements Scene {
     this.river.drawBack(ctx, v, riverState);
     this.fort.drawGround(ctx, v, fortState, 6);
     this.gokul.drawGround(ctx, v, p);
-    this.river.drawBanks(ctx, v, riverState, [30, 30, 38], mix([30, 30, 38], [150, 120, 80], rise(p, 0.44, 0.48)));
+    this.river.drawBanks(
+      ctx,
+      v,
+      riverState,
+      [30, 30, 38],
+      mix([30, 30, 38], [150, 120, 80], rise(p, 0.44, 0.48)),
+    );
     const devaki = this.fort.drawBack(ctx, v, fortState);
     const child = this.childAt(p, devaki);
     fortState.child = child.pos;
@@ -220,13 +260,21 @@ class Janmashtami implements Scene {
     ctx.save();
     apply(ctx, v);
     ctx.globalCompositeOperation = "lighter";
-    for (const l of this.lights) glow(ctx, glowSprite(l.color), l.x, l.y, l.r, l.a);
+    for (const l of this.lights)
+      glow(ctx, glowSprite(l.color), l.x, l.y, l.r, l.a);
     this.drawRays(ctx, seconds);
     ctx.globalCompositeOperation = "source-over";
     ctx.restore();
 
     this.weather.rain(ctx, width, height, rain, seconds, f.reduced);
-    this.weather.mist(ctx, width, height, p, clamp(cam.up * 1.5 - 0.35), seconds);
+    this.weather.mist(
+      ctx,
+      width,
+      height,
+      p,
+      clamp(cam.up * 1.5 - 0.35),
+      seconds,
+    );
     if (flash > 0.01) {
       ctx.globalCompositeOperation = "lighter";
       ctx.fillStyle = `rgba(120, 135, 190, ${flash * 0.16})`;
@@ -234,11 +282,46 @@ class Janmashtami implements Scene {
       ctx.globalCompositeOperation = "source-over";
     }
 
-    const vignette = ctx.createRadialGradient(width / 2, height * 0.5, Math.min(width, height) * 0.3, width / 2, height * 0.5, Math.max(width, height) * 0.8);
+    const vignette = ctx.createRadialGradient(
+      width / 2,
+      height * 0.5,
+      Math.min(width, height) * 0.3,
+      width / 2,
+      height * 0.5,
+      Math.max(width, height) * 0.8,
+    );
     vignette.addColorStop(0, "rgba(2, 3, 8, 0)");
-    vignette.addColorStop(1, `rgba(2, 3, 8, ${0.62 - 0.3 * rise(p, 0.46, 0.5) * (1 - rise(p, 0.56, 0.58)) - 0.3 * rise(p, 0.68, 0.7) * (1 - rise(p, 0.83, 0.85))})`);
+    vignette.addColorStop(
+      1,
+      `rgba(2, 3, 8, ${0.62 - 0.3 * rise(p, 0.46, 0.5) * (1 - rise(p, 0.56, 0.58)) - 0.3 * rise(p, 0.68, 0.7) * (1 - rise(p, 0.83, 0.85))})`,
+    );
     ctx.fillStyle = vignette;
     ctx.fillRect(0, 0, width, height);
+    if (!f.portrait) this.scrim(ctx, width, height, p);
+  }
+
+  /** Dusk on the caption's side of the frame while a chapter is being read, so the text stays legible. */
+  private scrim(ctx: Ctx, width: number, height: number, p: number) {
+    for (const [i, c] of janmashtami.chapters.entries()) {
+      const [a, b, , e] = c.window;
+      // Leads and trails the caption slightly: the scene's progress is eased, the caption's is not.
+      const on = rise(p, a - 0.015, b - 0.005) * (1 - rise(p, e, e + 0.02));
+      if (on < 0.01) continue;
+      const a0 = on * SCRIM[i];
+      const left = c.side === "left";
+      const g = ctx.createLinearGradient(
+        left ? 0 : width,
+        0,
+        left ? width * 0.5 : width * 0.5,
+        0,
+      );
+      g.addColorStop(0, `rgba(10, 8, 18, ${a0})`);
+      g.addColorStop(0.5, `rgba(10, 8, 18, ${a0})`);
+      g.addColorStop(0.7, `rgba(10, 8, 18, ${a0 * 0.85})`);
+      g.addColorStop(1, "rgba(10, 8, 18, 0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, width, height);
+    }
   }
 
   /** Rays of the midnight light, turning slowly, out through the bars into the rain. */
@@ -256,8 +339,14 @@ class Janmashtami implements Scene {
       const a = (i / 18) * TAU + seconds * 0.04 + Math.sin(i * 2.3) * 0.08;
       const w = 0.035 + (i % 3) * 0.02;
       ctx.moveTo(r.x, r.y);
-      ctx.lineTo(r.x + Math.cos(a - w) * length, r.y + Math.sin(a - w) * length);
-      ctx.lineTo(r.x + Math.cos(a + w) * length, r.y + Math.sin(a + w) * length);
+      ctx.lineTo(
+        r.x + Math.cos(a - w) * length,
+        r.y + Math.sin(a - w) * length,
+      );
+      ctx.lineTo(
+        r.x + Math.cos(a + w) * length,
+        r.y + Math.sin(a + w) * length,
+      );
       ctx.closePath();
     }
     ctx.fill();
@@ -271,7 +360,9 @@ class Janmashtami implements Scene {
   }
 
   private fortState(p: number, seconds: number, flash: number) {
-    const blaze = rise(p, MOMENTS.birth, MOMENTS.birth + 0.004) * (1 - rise(p, MOMENTS.birth + 0.006, 0.23));
+    const blaze =
+      rise(p, MOMENTS.birth, MOMENTS.birth + 0.004) *
+      (1 - rise(p, MOMENTS.birth + 0.006, 0.23));
     return {
       p,
       seconds,
@@ -287,16 +378,26 @@ class Janmashtami implements Scene {
     };
   }
 
-  private riverState(p: number, seconds: number, flash: number, rain: number, vx: number): RiverState {
+  private riverState(
+    p: number,
+    seconds: number,
+    flash: number,
+    rain: number,
+    vx: number,
+  ): RiverState {
     return {
       p,
       seconds,
       flash,
       storm: rain,
       vx,
-      surge: rise(p, MOMENTS.surge[0], MOMENTS.touch) * (1 - rise(p, MOMENTS.touch + 0.001, MOMENTS.part[0] + 0.008)),
+      surge:
+        rise(p, MOMENTS.surge[0], MOMENTS.touch) *
+        (1 - rise(p, MOMENTS.touch + 0.001, MOMENTS.part[0] + 0.008)),
       part: rise(p, MOMENTS.part[0], MOMENTS.part[1]),
-      shesh: rise(p, MOMENTS.shesh[0], MOMENTS.shesh[1]) * (1 - rise(p, 0.405, 0.425)),
+      shesh:
+        rise(p, MOMENTS.shesh[0], MOMENTS.shesh[1]) *
+        (1 - rise(p, 0.405, 0.425)),
       calm: 0,
       lights: [],
     };
@@ -307,7 +408,16 @@ class Janmashtami implements Scene {
     if (p < MOMENTS.birth) return { pos: null, stage: 0 };
     const arms = devaki ?? { x: -0.5, y: -0.8 };
     const t = rise(p, 0.238, 0.244);
-    if (t < 1) return { pos: { x: lerp(arms.x, BASKET_FLOOR.x, t), y: lerp(arms.y, BASKET_FLOOR.y - 0.12, t) - Math.sin(t * Math.PI) * 0.4 }, stage: 1 };
+    if (t < 1)
+      return {
+        pos: {
+          x: lerp(arms.x, BASKET_FLOOR.x, t),
+          y:
+            lerp(arms.y, BASKET_FLOOR.y - 0.12, t) -
+            Math.sin(t * Math.PI) * 0.4,
+        },
+        stage: 1,
+      };
     return { pos: null, stage: 2 };
   }
 
@@ -325,10 +435,14 @@ class Janmashtami implements Scene {
     const up = V.carry;
     const facing: 1 | -1 = up > 0 || p > 0.25 ? 1 : -1;
     const inRiver = V.x > 6.5 && V.x < 21.8;
-    const head = { x: V.x + 0.01, y: V.y - look.h * 1.0 + V.walking * Math.abs(Math.sin(V.x * 5.5)) * -0.02 };
+    const head = {
+      x: V.x + 0.01,
+      y: V.y - look.h * 1.0 + V.walking * Math.abs(Math.sin(V.x * 5.5)) * -0.02,
+    };
     if (p > 0.43) river.shesh = 0;
     // Sheshnaag rises behind him, his hoods over the basket.
-    if (up >= 0.99 && river.shesh > 0.01) this.river.drawSerpent(ctx, river, head);
+    if (up >= 0.99 && river.shesh > 0.01)
+      this.river.drawSerpent(ctx, river, head);
     ctx.globalAlpha = V.alpha;
     drawPerson(
       ctx,
@@ -356,17 +470,63 @@ class Janmashtami implements Scene {
     ctx.globalAlpha = 1;
     if (inBasket) {
       const flicker = 0.92 + 0.08 * Math.sin(seconds * 3.1);
-      const touch = rise(p, MOMENTS.touch - 0.004, MOMENTS.touch) * (1 - rise(p, MOMENTS.touch + 0.002, MOMENTS.part[1]));
+      const touch =
+        rise(p, MOMENTS.touch - 0.004, MOMENTS.touch) *
+        (1 - rise(p, MOMENTS.touch + 0.002, MOMENTS.part[1]));
       const a = V.alpha * flicker;
-      this.lights.push({ x: bx, y: by - 0.25, r: 1.1, a: 0.8 * a, color: DIVINE });
-      this.lights.push({ x: bx, y: by - 0.2, r: 4.2, a: (0.28 + touch * 0.25) * a, color: DIVINE });
-      if (touch > 0) this.lights.push({ x: bx + 0.25, y: by - 0.05, r: 1.5, a: 0.6 * touch, color: "255, 250, 230" });
-      if (inRiver) this.lights.push({ x: bx, y: river.vx ? this.river.surface(bx, river) : by, r: 2.5, a: 0.25 * a, color: DIVINE });
+      this.lights.push({
+        x: bx,
+        y: by - 0.25,
+        r: 1.1,
+        a: 0.8 * a,
+        color: DIVINE,
+      });
+      this.lights.push({
+        x: bx,
+        y: by - 0.2,
+        r: 4.2,
+        a: (0.28 + touch * 0.25) * a,
+        color: DIVINE,
+      });
+      if (touch > 0)
+        this.lights.push({
+          x: bx + 0.25,
+          y: by - 0.05,
+          r: 1.5,
+          a: 0.6 * touch,
+          color: "255, 250, 230",
+        });
+      if (inRiver)
+        this.lights.push({
+          x: bx,
+          y: river.vx ? this.river.surface(bx, river) : by,
+          r: 2.5,
+          a: 0.25 * a,
+          color: DIVINE,
+        });
     }
     if (child.pos) {
-      this.lights.push({ x: child.pos.x, y: child.pos.y, r: 0.8, a: 0.75, color: "255, 246, 220" });
-      this.lights.push({ x: child.pos.x, y: child.pos.y, r: 3.2, a: 0.45, color: DIVINE });
-      this.lights.push({ x: child.pos.x, y: child.pos.y, r: 8, a: 0.22 * warm, color: DIVINE });
+      this.lights.push({
+        x: child.pos.x,
+        y: child.pos.y,
+        r: 0.8,
+        a: 0.75,
+        color: "255, 246, 220",
+      });
+      this.lights.push({
+        x: child.pos.x,
+        y: child.pos.y,
+        r: 3.2,
+        a: 0.45,
+        color: DIVINE,
+      });
+      this.lights.push({
+        x: child.pos.x,
+        y: child.pos.y,
+        r: 8,
+        a: 0.22 * warm,
+        color: DIVINE,
+      });
       this.rays = { ...child.pos, a: warm * (1 - rise(p, 0.236, 0.244)) };
     }
   }

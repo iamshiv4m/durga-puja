@@ -155,13 +155,13 @@ const JOURNEYS = [
   { key: "chhath", path: "/chhath", progress: 0.52 },
   { key: "holi", path: "/holi", progress: 0.54 },
   { key: "ganesh", path: "/ganesh-chaturthi", progress: 0.4 },
-  { key: "navratri", path: "/navratri", progress: 0.5 },
-  { key: "lohri", path: "/lohri-baisakhi", progress: 0.5 },
-  { key: "sankranti", path: "/makar-sankranti", progress: 0.5 },
-  { key: "pongal", path: "/pongal", progress: 0.5 },
-  { key: "bihu", path: "/bihu", progress: 0.5 },
-  { key: "onam", path: "/onam", progress: 0.5 },
-  { key: "janmashtami", path: "/janmashtami", progress: 0.5 },
+  { key: "navratri", path: "/navratri", progress: 0.56 },
+  { key: "lohri", path: "/lohri-baisakhi", progress: 0.3 },
+  { key: "sankranti", path: "/makar-sankranti", progress: 0.56 },
+  { key: "pongal", path: "/pongal", progress: 0.44 },
+  { key: "bihu", path: "/bihu", progress: 0.785 },
+  { key: "onam", path: "/onam", progress: 0.835 },
+  { key: "janmashtami", path: "/janmashtami", progress: 0.33 },
 ];
 
 const wanted = (key) => !only || only.split(",").includes(key);
@@ -213,7 +213,7 @@ if (doors.length) await compose(browser, {
       <h1 style="font-size:150px">Parv</h1>
       <div class="rule"></div>
       <p style="font-size:32px; font-style:italic; font-weight:300; line-height:1.3; color:rgba(242,233,214,.8)">The festivals of India, one scroll at a time.</p>
-      <p class="sc" style="font-size:20px; margin-top:6px">durga puja · navratri · diwali · chhath · lohri · pongal · holi · bihu · onam · janmashtami · ganesh</p>
+      <p class="sc" style="font-size:20px; line-height:1.6; margin-top:6px">durga puja · navratri · diwali · chhath<br>lohri · sankranti · pongal · holi · bihu<br>onam · janmashtami · ganesh</p>
     </div>`,
 });
 

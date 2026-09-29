@@ -316,14 +316,20 @@ export function drawChabutro(g: Ctx, x: number, z: number, t: Tilt, seconds: num
 
 // ─── The ground ──────────────────────────────────────────────────────────────
 
-export type Ground = { canvas: HTMLCanvasElement; x: number; z: number; w: number; d: number };
+export type Ground = {
+  canvas: HTMLCanvasElement;
+  x: number;
+  z: number;
+  w: number;
+  d: number;
+};
 
 /** Stone paving in the chowk, worn in a ring where the garba goes round, and marigold petals. */
 export function paintChowk(): Ground {
   const x = -18;
   const z = -8;
   const w = 46;
-  const d = 22;
+  const d = 30;
   const ppu = 26;
   const canvas = document.createElement("canvas");
   canvas.width = w * ppu;
@@ -425,8 +431,8 @@ function paintSathiya(g: Ctx, cx: number, cz: number, r: number) {
 export function paintMaidan(): Ground {
   const x = 26;
   const z = -10;
-  const w = 36;
-  const d = 24;
+  const w = 40;
+  const d = 32;
   const ppu = 16;
   const canvas = document.createElement("canvas");
   canvas.width = w * ppu;

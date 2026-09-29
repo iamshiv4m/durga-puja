@@ -1,16 +1,10 @@
 import type { Kit } from "../types";
+import { paintCard } from "./card";
+import { createScene } from "./scene";
+import { PongalScore } from "./score";
 
-// Placeholder until the Pongal scene, score and card are written.
 export const kit: Kit = {
-  scene: () => ({
-    draw(ctx, { width, height }) {
-      ctx.fillStyle = "#07050a";
-      ctx.fillRect(0, 0, width, height);
-    },
-  }),
-  score: () => ({ start() {}, schedule() {}, update() {} }),
-  card: (ctx, { width, height }) => {
-    ctx.fillStyle = "#07050a";
-    ctx.fillRect(0, 0, width, height);
-  },
+  scene: createScene,
+  score: () => new PongalScore(),
+  card: paintCard,
 };

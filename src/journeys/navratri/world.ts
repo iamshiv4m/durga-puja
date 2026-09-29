@@ -37,9 +37,13 @@ export const PLACES = {
   backRow: -8,
   maidan: 40,
   ravana: { x: 40, z: -1.5, h: 11 },
-  ram: { x: 34.2, z: 2.4 },
-  shami: { x: 30.5, z: -3.2 },
-  stall: { x: 48.5, z: 1.5 },
+  kumbha: { x: 32.6, z: -2.6, h: 8.4 },
+  meghnad: { x: 47.4, z: -2.6, h: 8.4 },
+  /** The Ramlila stage, and where Ram stands on it. */
+  stage: { x: 35.4, z: 3.1, w: 3.4, d: 1.6, h: 0.85 },
+  ram: { x: 35.9, z: 3.1 },
+  shami: { x: 27.2, z: -2.4 },
+  stall: { x: 51.2, z: 1.8 },
   chabutro: { x: -7.2, z: -4.4 },
   band: { x: -7.4, z: -0.6 },
   /** The garba's rings, inner to outer; the reader's dancers join the last. */
@@ -47,24 +51,30 @@ export const PLACES = {
 } as const;
 
 /** How a camera looks: its focus on the ground and above it, zoom, and how far down it tilts. */
-export type Cam = { x: number; z: number; h: number; zoom: number; pitch: number };
+export type Cam = {
+  x: number;
+  z: number;
+  h: number;
+  zoom: number;
+  pitch: number;
+};
 export type CamShot = Cam & { at: number };
 
 export const SHOTS: CamShot[] = [
-  { at: 0.0, x: 0, z: 0, h: 2.4, zoom: 0.6, pitch: 0.3 },
-  { at: 0.065, x: 0, z: 0.3, h: 1.5, zoom: 0.85, pitch: 0.32 },
+  { at: 0.0, x: 0, z: 0, h: 3.3, zoom: 0.43, pitch: 0.28 },
+  { at: 0.065, x: 0, z: 0.3, h: 2.2, zoom: 0.62, pitch: 0.3 },
   { at: 0.115, x: 0.15, z: 0.62, h: 0.62, zoom: 2.9, pitch: 0.38 },
   { at: 0.19, x: 0.15, z: 0.62, h: 0.7, zoom: 2.55, pitch: 0.36 },
   { at: 0.245, x: 4, z: 1.4, h: 1.25, zoom: 1.0, pitch: 0.3 },
   { at: 0.298, x: 0.1, z: 0.1, h: 1.25, zoom: 1.75, pitch: 0.3 },
   { at: 0.33, x: 0.1, z: 0.1, h: 1.35, zoom: 1.6, pitch: 0.3 },
-  { at: 0.38, x: 0, z: -1.2, h: 4.4, zoom: 0.8, pitch: 0.2 },
-  { at: 0.448, x: 0.3, z: -1.2, h: 4.2, zoom: 0.84, pitch: 0.22 },
+  { at: 0.38, x: 0, z: -1.2, h: 4.4, zoom: 0.72, pitch: 0.2 },
+  { at: 0.448, x: 0.3, z: -1.2, h: 4.2, zoom: 0.76, pitch: 0.22 },
   { at: 0.5, x: 0, z: 0.4, h: 1.0, zoom: 0.66, pitch: 0.42 },
   { at: 0.56, x: 0, z: 0, h: 0.4, zoom: 0.72, pitch: 1.2 },
   { at: 0.6, x: 0, z: 0, h: 0.4, zoom: 0.74, pitch: 1.24 },
-  { at: 0.645, x: -1.2, z: 2.6, h: 1.0, zoom: 1.25, pitch: 0.42 },
-  { at: 0.712, x: -0.8, z: 2.4, h: 1.0, zoom: 1.15, pitch: 0.4 },
+  { at: 0.645, x: -0.9, z: 1.8, h: 0.7, zoom: 1.08, pitch: 0.6 },
+  { at: 0.712, x: -0.6, z: 1.6, h: 0.7, zoom: 1.0, pitch: 0.56 },
   { at: 0.748, x: 20, z: 0, h: 7, zoom: 0.34, pitch: 0.16 },
   { at: 0.778, x: 40, z: 0, h: 5.2, zoom: 0.52, pitch: 0.18 },
   { at: 0.862, x: 40.2, z: 0, h: 5.0, zoom: 0.5, pitch: 0.2 },
@@ -75,8 +85,8 @@ export const SHOTS: CamShot[] = [
 
 /** Phones hold the same story in a narrow frame above the captions: wide shots pull back. */
 export const PORTRAIT_SHOTS: CamShot[] = [
-  { at: 0.0, x: 0, z: 0, h: 2.6, zoom: 0.46, pitch: 0.3 },
-  { at: 0.065, x: 0, z: 0.3, h: 1.6, zoom: 0.7, pitch: 0.32 },
+  { at: 0.0, x: 0, z: 0, h: 3.6, zoom: 0.4, pitch: 0.28 },
+  { at: 0.065, x: 0, z: 0.3, h: 2.2, zoom: 0.55, pitch: 0.3 },
   { at: 0.115, x: 0.1, z: 0.62, h: 0.7, zoom: 2.2, pitch: 0.38 },
   { at: 0.19, x: 0.1, z: 0.62, h: 0.78, zoom: 2.0, pitch: 0.36 },
   { at: 0.245, x: 3.2, z: 1.4, h: 1.3, zoom: 0.85, pitch: 0.3 },
@@ -87,8 +97,8 @@ export const PORTRAIT_SHOTS: CamShot[] = [
   { at: 0.5, x: 0, z: 0.4, h: 1.4, zoom: 0.42, pitch: 0.42 },
   { at: 0.56, x: 0, z: 0, h: 0.4, zoom: 0.5, pitch: 1.2 },
   { at: 0.6, x: 0, z: 0, h: 0.4, zoom: 0.52, pitch: 1.24 },
-  { at: 0.645, x: -0.6, z: 2.6, h: 1.1, zoom: 0.9, pitch: 0.42 },
-  { at: 0.712, x: -0.4, z: 2.4, h: 1.1, zoom: 0.85, pitch: 0.4 },
+  { at: 0.645, x: -0.4, z: 1.8, h: 0.9, zoom: 0.8, pitch: 0.6 },
+  { at: 0.712, x: -0.3, z: 1.6, h: 0.9, zoom: 0.75, pitch: 0.56 },
   { at: 0.748, x: 20, z: 0, h: 7, zoom: 0.24, pitch: 0.16 },
   { at: 0.778, x: 39.2, z: 0, h: 5.6, zoom: 0.36, pitch: 0.18 },
   { at: 0.862, x: 39.4, z: 0, h: 5.4, zoom: 0.35, pitch: 0.2 },

@@ -1,11 +1,32 @@
 // Gokul, the cowherds' village across the river: mud houses washed with lime and ochre, Nand baba's
 // house with a toran over its door, a cowshed and its cows, kadamba trees, and Govardhan low on the
 // horizon. Vasudeva reaches the door in the dark; at dawn the village comes out for Nandotsav.
-import { TAU, clamp, flame, flicker, lerp, mix, mulberry32, onScreen, rgb, rise, type Ctx, type RGB, type View } from "../paint";
+import {
+  TAU,
+  clamp,
+  flame,
+  flicker,
+  lerp,
+  mix,
+  mulberry32,
+  onScreen,
+  rgb,
+  rise,
+  type Ctx,
+  type RGB,
+  type View,
+} from "../paint";
 import { DIVINE, TORCH, type Light } from "./fort";
-import { SKIN, drawCow, drawPerson, type Cow, type Look, type Pose } from "./people";
+import {
+  SKIN,
+  drawCow,
+  drawPerson,
+  type Cow,
+  type Look,
+  type Pose,
+} from "./people";
 import { shoreRight } from "./river";
-import { GOKUL, HORIZON, MOMENTS } from "./world";
+import { GOKUL, HORIZON, MOMENTS, cut } from "./world";
 
 const WALL: RGB = [184, 128, 80];
 const LIME: RGB = [228, 216, 192];
@@ -14,7 +35,13 @@ const THATCH: RGB = [150, 112, 62];
 const TILE: RGB = [150, 70, 46];
 const WOOD: RGB = [88, 54, 32];
 
-type House = { x: number; w: number; h: number; roof: "thatch" | "tile"; door: number | null };
+type House = {
+  x: number;
+  w: number;
+  h: number;
+  roof: "thatch" | "tile";
+  door: number | null;
+};
 
 const YASHODA: Look = {
   h: 1.6,
@@ -39,7 +66,14 @@ const NAND: Look = {
   shawl: [200, 60, 40],
 };
 
-type Villager = { x: number; y: number; look: Look; kind: "dholak" | "manjira" | "dance" | "throw" | "pot" | "child" | "clap"; facing: 1 | -1; seed: number };
+type Villager = {
+  x: number;
+  y: number;
+  look: Look;
+  kind: "dholak" | "manjira" | "dance" | "throw" | "pot" | "child" | "clap";
+  facing: 1 | -1;
+  seed: number;
+};
 
 export class Gokul {
   private readonly houses: House[] = [
@@ -48,7 +82,13 @@ export class Gokul {
     { x: 34.2, w: 1.9, h: 2.0, roof: "thatch", door: 35.2 },
   ];
   private readonly villagers: Villager[] = [];
-  private readonly cows: { x: number; y: number; cow: Cow; facing: 1 | -1; graze: number }[] = [];
+  private readonly cows: {
+    x: number;
+    y: number;
+    cow: Cow;
+    facing: 1 | -1;
+    graze: number;
+  }[] = [];
   private readonly fields: { x: number; w: number; tone: number }[] = [];
 
   constructor() {
@@ -65,10 +105,37 @@ export class Gokul {
       const c = colours[i % colours.length];
       const d = colours[(i + 2) % colours.length];
       return woman
-        ? { h: 1.55 + random() * 0.1, skin: SKIN[i % SKIN.length], top: d, bottom: c, wrap: colours[(i + 4) % colours.length], head: "odhni", dress: "lehenga", woman, border: [240, 196, 90] }
-        : { h: 1.7 + random() * 0.12, skin: SKIN[(i + 2) % SKIN.length], top: [236, 228, 208], bottom: [238, 232, 216], wrap: c, head: "pagri", dress: "dhoti", shawl: d };
+        ? {
+            h: 1.55 + random() * 0.1,
+            skin: SKIN[i % SKIN.length],
+            top: d,
+            bottom: c,
+            wrap: colours[(i + 4) % colours.length],
+            head: "odhni",
+            dress: "lehenga",
+            woman,
+            border: [240, 196, 90],
+          }
+        : {
+            h: 1.7 + random() * 0.12,
+            skin: SKIN[(i + 2) % SKIN.length],
+            top: [236, 228, 208],
+            bottom: [238, 232, 216],
+            wrap: c,
+            head: "pagri",
+            dress: "dhoti",
+            shawl: d,
+          };
     };
-    const put = (x: number, y: number, kind: Villager["kind"], woman: boolean, facing: 1 | -1, i: number, h?: number) => {
+    const put = (
+      x: number,
+      y: number,
+      kind: Villager["kind"],
+      woman: boolean,
+      facing: 1 | -1,
+      i: number,
+      h?: number,
+    ) => {
       const l = look(woman, i);
       if (h) l.h = h;
       this.villagers.push({ x, y, look: l, kind, facing, seed: random() * 10 });
@@ -84,10 +151,46 @@ export class Gokul {
     put(26.9, 1.5, "clap", true, 1, 5);
     put(31.6, 1.55, "dance", false, 1, 2);
     const coat = (): RGB => mix([236, 230, 220], [200, 180, 150], random());
-    this.cows.push({ x: 33.9, y: 0.45, cow: { coat: [240, 234, 222], horns: [200, 40, 40], size: 1.35, seed: 1, bell: true }, facing: -1, graze: 0.1 });
-    this.cows.push({ x: 37.7, y: 0.35, cow: { coat: coat(), horns: [40, 110, 200], size: 1.3, seed: 2, bell: true }, facing: 1, graze: 0.9 });
-    this.cows.push({ x: 39.6, y: 0.55, cow: { coat: [150, 100, 70], horns: [230, 170, 40], size: 1.35, seed: 3 }, facing: -1, graze: 0.2 });
-    this.cows.push({ x: 38.6, y: 0.8, cow: { coat: coat(), horns: [0, 0, 0], size: 0.85, seed: 4, calf: true }, facing: 1, graze: 0.4 });
+    this.cows.push({
+      x: 33.9,
+      y: 0.45,
+      cow: {
+        coat: [240, 234, 222],
+        horns: [200, 40, 40],
+        size: 1.35,
+        seed: 1,
+        bell: true,
+      },
+      facing: -1,
+      graze: 0.1,
+    });
+    this.cows.push({
+      x: 37.7,
+      y: 0.35,
+      cow: {
+        coat: coat(),
+        horns: [40, 110, 200],
+        size: 1.3,
+        seed: 2,
+        bell: true,
+      },
+      facing: 1,
+      graze: 0.9,
+    });
+    this.cows.push({
+      x: 39.6,
+      y: 0.55,
+      cow: { coat: [150, 100, 70], horns: [230, 170, 40], size: 1.35, seed: 3 },
+      facing: -1,
+      graze: 0.2,
+    });
+    this.cows.push({
+      x: 38.6,
+      y: 0.8,
+      cow: { coat: coat(), horns: [0, 0, 0], size: 0.85, seed: 4, calf: true },
+      facing: 1,
+      graze: 0.4,
+    });
     let x = 22;
     for (let guard = 0; x < 48 && guard < 100; guard++) {
       const w = 1 + random() * 2.4;
@@ -102,7 +205,7 @@ export class Gokul {
 
   /** Far fields and Govardhan on the horizon, behind the river bank. */
   drawGround(ctx: Ctx, v: View, p: number) {
-    if (!this.seen(v) || p < 0.3) return;
+    if (!this.seen(v) || p < 0.3 || p >= cut(MOMENTS.flight1)) return;
     const day = rise(p, 0.44, 0.48);
     // Govardhan, a long low hill.
     ctx.fillStyle = rgb(mix([30, 30, 50], [150, 130, 150], day));
@@ -114,7 +217,7 @@ export class Gokul {
   }
 
   drawBack(ctx: Ctx, v: View, p: number, seconds: number, lights: Light[]) {
-    if (!this.seen(v) || p < 0.3) return;
+    if (!this.seen(v) || p < 0.3 || p >= cut(MOMENTS.flight1)) return;
     const day = rise(p, 0.44, 0.48);
     // A band of fields between the bank and the houses.
     for (const f of this.fields) {
@@ -140,7 +243,7 @@ export class Gokul {
   }
 
   drawFront(ctx: Ctx, v: View, p: number, seconds: number, lights: Light[]) {
-    if (!this.seen(v) || p < 0.3) return;
+    if (!this.seen(v) || p < 0.3 || p >= cut(MOMENTS.flight1)) return;
     const dawn = rise(p, MOMENTS.dawn[0], MOMENTS.dawn[1]);
     const joy = rise(p, MOMENTS.nandotsav[0], MOMENTS.nandotsav[1]);
     const beat = seconds * 2.4;
@@ -154,12 +257,26 @@ export class Gokul {
       const lit = rise(p, 0.43, 0.44);
       if (lit > 0.01) {
         flame(ctx, x + 0.04, 0.06, 0.13 * lit, seconds, dx);
-        lights.push({ x, y: -0.05, r: 1.4, a: 0.35 * lit * flicker(seconds, dx), color: TORCH });
+        lights.push({
+          x,
+          y: -0.05,
+          r: 1.4,
+          a: 0.35 * lit * flicker(seconds, dx),
+          color: TORCH,
+        });
       }
     }
     // The cows, and the one Nand gives away, with a red cloth on her back.
     for (const c of this.cows) {
-      drawCow(ctx, c.x, c.y, c.cow, c.graze + Math.sin(seconds * 0.4 + c.cow.seed) * 0.1, seconds, c.facing);
+      drawCow(
+        ctx,
+        c.x,
+        c.y,
+        c.cow,
+        c.graze + Math.sin(seconds * 0.4 + c.cow.seed) * 0.1,
+        seconds,
+        c.facing,
+      );
       if (c.cow.seed === 1) {
         ctx.fillStyle = rgb([190, 30, 40], 0.95);
         ctx.beginPath();
@@ -180,14 +297,44 @@ export class Gokul {
     if (dawn < 0.01) return;
     ctx.globalAlpha = dawn;
     // Yashoda at the door with the child; Nand baba, his hand raised over them.
-    const y = drawPerson(ctx, GOKUL.door - 0.05, 0.2, YASHODA, { la: 0.9, lf: 1.9, ra: 0.75, rf: 1.75, sit: 1, nod: 0.18, lean: 0.06 });
-    const child = { x: (y.left.x + y.right.x) / 2 + 0.05, y: (y.left.y + y.right.y) / 2 - 0.06 };
+    const y = drawPerson(ctx, GOKUL.door - 0.05, 0.2, YASHODA, {
+      la: 0.9,
+      lf: 1.9,
+      ra: 0.75,
+      rf: 1.75,
+      sit: 1,
+      nod: 0.18,
+      lean: 0.06,
+    });
+    const child = {
+      x: (y.left.x + y.right.x) / 2 + 0.05,
+      y: (y.left.y + y.right.y) / 2 - 0.06,
+    };
     ctx.fillStyle = "#f2c040";
     ctx.beginPath();
     ctx.ellipse(child.x, child.y, 0.2, 0.1, -0.15, 0, TAU);
     ctx.fill();
-    lights.push({ x: child.x, y: child.y, r: 1.6, a: 0.45 * dawn, color: DIVINE });
-    drawPerson(ctx, GOKUL.door + 1.35, 0.4, NAND, { la: 0.2, lf: 0.3, ra: 1.9, rf: 2.3 + Math.sin(seconds) * 0.05, lean: -0.03 }, -1);
+    lights.push({
+      x: child.x,
+      y: child.y,
+      r: 1.6,
+      a: 0.45 * dawn,
+      color: DIVINE,
+    });
+    drawPerson(
+      ctx,
+      GOKUL.door + 1.35,
+      0.4,
+      NAND,
+      {
+        la: 0.2,
+        lf: 0.3,
+        ra: 1.9,
+        rf: 2.3 + Math.sin(seconds) * 0.05,
+        lean: -0.03,
+      },
+      -1,
+    );
     ctx.globalAlpha = 1;
     if (joy < 0.01) return;
 
@@ -200,29 +347,72 @@ export class Gokul {
       let pose: Pose;
       switch (w.kind) {
         case "dholak":
-          pose = { la: 0.9, lf: 1.4 + Math.max(0, Math.sin(beat * Math.PI)) * 0.4, ra: 0.9, rf: 1.4 + Math.max(0, -Math.sin(beat * Math.PI)) * 0.4, sit: 1 };
+          pose = {
+            la: 0.9,
+            lf: 1.4 + Math.max(0, Math.sin(beat * Math.PI)) * 0.4,
+            ra: 0.9,
+            rf: 1.4 + Math.max(0, -Math.sin(beat * Math.PI)) * 0.4,
+            sit: 1,
+          };
           break;
         case "manjira": {
           const clash = Math.abs(Math.sin(beat * Math.PI));
-          pose = { la: 1.2, lf: 1.5 + clash * 0.4, ra: 1.2, rf: 1.5 + clash * 0.4, bob: -bounce };
+          pose = {
+            la: 1.2,
+            lf: 1.5 + clash * 0.4,
+            ra: 1.2,
+            rf: 1.5 + clash * 0.4,
+            bob: -bounce,
+          };
           break;
         }
         case "dance":
-          pose = { la: 2.4 + Math.sin(beat + w.seed) * 0.4, lf: 2.9, ra: 2.0 - Math.sin(beat + w.seed) * 0.4, rf: 2.6, bob: -bounce, lean: Math.sin(beat * 0.5 + w.seed) * 0.08 };
+          pose = {
+            la: 2.4 + Math.sin(beat + w.seed) * 0.4,
+            lf: 2.9,
+            ra: 2.0 - Math.sin(beat + w.seed) * 0.4,
+            rf: 2.6,
+            bob: -bounce,
+            lean: Math.sin(beat * 0.5 + w.seed) * 0.08,
+          };
           break;
         case "throw": {
           const swing = (beat * 0.35 + w.seed) % 1;
-          pose = { la: 0.5, lf: 1, ra: lerp(0.4, 3.0, swing), rf: lerp(0.8, 3.1, swing), lean: -0.05 };
+          pose = {
+            la: 0.5,
+            lf: 1,
+            ra: lerp(0.4, 3.0, swing),
+            rf: lerp(0.8, 3.1, swing),
+            lean: -0.05,
+          };
           break;
         }
         case "pot":
-          pose = { la: 2.9, lf: 3.5, ra: 0.3, rf: 0.6 + Math.sin(beat) * 0.1, bob: -bounce * 0.5 };
+          pose = {
+            la: 2.9,
+            lf: 3.5,
+            ra: 0.3,
+            rf: 0.6 + Math.sin(beat) * 0.1,
+            bob: -bounce * 0.5,
+          };
           break;
         case "child":
-          pose = { la: 2.8, lf: 3, ra: 2.8, rf: 3, bob: -Math.abs(Math.sin(beat * 1.2 + w.seed)) * 0.12 };
+          pose = {
+            la: 2.8,
+            lf: 3,
+            ra: 2.8,
+            rf: 3,
+            bob: -Math.abs(Math.sin(beat * 1.2 + w.seed)) * 0.12,
+          };
           break;
         default:
-          pose = { la: 1.3 + Math.sin(beat * Math.PI) * 0.2, lf: 2.2, ra: 1.3 + Math.sin(beat * Math.PI) * 0.2, rf: 2.2, bob: -bounce };
+          pose = {
+            la: 1.3 + Math.sin(beat * Math.PI) * 0.2,
+            lf: 2.2,
+            ra: 1.3 + Math.sin(beat * Math.PI) * 0.2,
+            rf: 2.2,
+            bob: -bounce,
+          };
       }
       const hands = drawPerson(ctx, w.x, w.y, w.look, pose, w.facing);
       if (w.kind === "dholak") {
@@ -258,7 +448,8 @@ export class Gokul {
         ctx.ellipse(w.x, w.y - w.look.h * 1.08 - 0.17, 0.12, 0.04, 0, 0, TAU);
         ctx.fill();
       }
-      if (w.kind === "throw") this.dahi(ctx, hands.right, w.facing, seconds, w.seed);
+      if (w.kind === "throw")
+        this.dahi(ctx, hands.right, w.facing, seconds, w.seed);
     }
     ctx.globalAlpha = 1;
     // Turmeric and curd splashed on the ground.
@@ -269,27 +460,51 @@ export class Gokul {
       if (a <= 0) continue;
       ctx.globalAlpha = a * 0.7;
       ctx.beginPath();
-      ctx.ellipse(27 + random() * 10, 0.4 + random() * 1.3, 0.05 + random() * 0.12, 0.02 + random() * 0.03, 0, 0, TAU);
+      ctx.ellipse(
+        27 + random() * 10,
+        0.4 + random() * 1.3,
+        0.05 + random() * 0.12,
+        0.02 + random() * 0.03,
+        0,
+        0,
+        TAU,
+      );
       ctx.fill();
     }
     ctx.globalAlpha = 1;
   }
 
   /** Curd and turmeric flung up and over the lane: dadhi kando. */
-  private dahi(ctx: Ctx, hand: { x: number; y: number }, facing: number, seconds: number, seed: number) {
+  private dahi(
+    ctx: Ctx,
+    hand: { x: number; y: number },
+    facing: number,
+    seconds: number,
+    seed: number,
+  ) {
     for (let k = 0; k < 14; k++) {
       const t = (seconds * 0.55 + k / 14 + seed) % 1;
       const spread = Math.sin(k * 7.3) * 0.5;
       const x = hand.x + facing * (t * (1.6 + spread));
       const y = hand.y - t * 2.2 + t * t * 2.8;
-      ctx.fillStyle = k % 3 ? `rgba(245, 196, 40, ${0.85 * (1 - t)})` : `rgba(250, 246, 230, ${0.85 * (1 - t)})`;
+      ctx.fillStyle =
+        k % 3
+          ? `rgba(245, 196, 40, ${0.85 * (1 - t)})`
+          : `rgba(250, 246, 230, ${0.85 * (1 - t)})`;
       ctx.beginPath();
       ctx.arc(x, y, 0.04 + (k % 4) * 0.012, 0, TAU);
       ctx.fill();
     }
   }
 
-  private tree(ctx: Ctx, x: number, y: number, h: number, kadamba: boolean, seconds: number) {
+  private tree(
+    ctx: Ctx,
+    x: number,
+    y: number,
+    h: number,
+    kadamba: boolean,
+    seconds: number,
+  ) {
     ctx.fillStyle = "#3a2a1c";
     ctx.beginPath();
     ctx.moveTo(x - 0.12, y);
@@ -302,9 +517,21 @@ export class Gokul {
     for (let i = 0; i < 9; i++) {
       const a = (i / 9) * TAU;
       const r = h * (0.22 + random() * 0.1);
-      ctx.fillStyle = rgb(mix(kadamba ? [40, 86, 44] : [52, 92, 46], [90, 130, 60], random() * 0.5));
+      ctx.fillStyle = rgb(
+        mix(
+          kadamba ? [40, 86, 44] : [52, 92, 46],
+          [90, 130, 60],
+          random() * 0.5,
+        ),
+      );
       ctx.beginPath();
-      ctx.arc(x + Math.cos(a) * h * 0.25 + sway, y - h * 0.72 + Math.sin(a) * h * 0.16, r, 0, TAU);
+      ctx.arc(
+        x + Math.cos(a) * h * 0.25 + sway,
+        y - h * 0.72 + Math.sin(a) * h * 0.16,
+        r,
+        0,
+        TAU,
+      );
       ctx.fill();
     }
     if (kadamba) {
@@ -314,13 +541,26 @@ export class Gokul {
         const a = random() * TAU;
         const d = Math.sqrt(random()) * h * 0.38;
         ctx.beginPath();
-        ctx.arc(x + Math.cos(a) * d + sway, y - h * 0.72 + Math.sin(a) * d * 0.7, 0.05, 0, TAU);
+        ctx.arc(
+          x + Math.cos(a) * d + sway,
+          y - h * 0.72 + Math.sin(a) * d * 0.7,
+          0.05,
+          0,
+          TAU,
+        );
         ctx.fill();
       }
     }
   }
 
-  private house(ctx: Ctx, h: House, day: number, p: number, seconds: number, lights: Light[]) {
+  private house(
+    ctx: Ctx,
+    h: House,
+    day: number,
+    p: number,
+    seconds: number,
+    lights: Light[],
+  ) {
     const top = -h.h;
     // Mud walls, a lime-washed plinth with a red geru border.
     ctx.fillStyle = rgb(WALL);
@@ -406,7 +646,14 @@ export class Gokul {
           ctx.lineTo(wx + 0.44, top + 0.76 + k * 0.12);
         }
         ctx.stroke();
-        if (lit > 0.01) lights.push({ x: wx + 0.25, y: top + 1, r: 1.2, a: 0.4 * lit, color: TORCH });
+        if (lit > 0.01)
+          lights.push({
+            x: wx + 0.25,
+            y: top + 1,
+            r: 1.2,
+            a: 0.4 * lit,
+            color: TORCH,
+          });
       }
     }
     if (h.door === null) return;
@@ -420,7 +667,14 @@ export class Gokul {
     const inside = big ? rise(p, 0.43, 0.445) : 0.3;
     ctx.fillStyle = rgb(mix([24, 14, 10], [200, 130, 70], inside * 0.8));
     ctx.fillRect(dx, -dh, dw, dh);
-    if (big && inside > 0.01) lights.push({ x: h.door, y: -dh * 0.5, r: 2.2, a: 0.35 * inside, color: TORCH });
+    if (big && inside > 0.01)
+      lights.push({
+        x: h.door,
+        y: -dh * 0.5,
+        r: 2.2,
+        a: 0.35 * inside,
+        color: TORCH,
+      });
     if (!big) return;
     // The toran: mango leaves and marigolds strung over the door.
     const sway = Math.sin(seconds * 1.1) * 0.01;
@@ -464,7 +718,15 @@ export class Gokul {
         const a = (k / 8) * TAU;
         ctx.fillStyle = k % 2 ? rgb(GERU) : rgb(LIME);
         ctx.beginPath();
-        ctx.ellipse(cx + Math.cos(a) * 0.12, sy + Math.sin(a) * 0.12, 0.1, 0.04, a, 0, TAU);
+        ctx.ellipse(
+          cx + Math.cos(a) * 0.12,
+          sy + Math.sin(a) * 0.12,
+          0.1,
+          0.04,
+          a,
+          0,
+          TAU,
+        );
         ctx.fill();
       }
       ctx.fillStyle = rgb(GERU);

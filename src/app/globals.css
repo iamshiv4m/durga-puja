@@ -131,6 +131,26 @@ body {
   color: var(--gold-dim);
 }
 
+/* The festival journeys paint bright daylight skies, so the corners need their own shadow. */
+#stage[data-style="journey"] .corner {
+  text-shadow:
+    0 0 18px rgba(7, 3, 4, 0.75),
+    0 0 3px rgba(7, 3, 4, 0.6);
+}
+
+#stage[data-style="journey"] .corner-tr .native {
+  color: var(--gold);
+}
+
+/* Wide scripts (Tamil, Malayalam) would run into the wordmark on a phone. */
+@media (max-width: 480px) {
+  #stage[data-style="journey"] .corner-tr .native {
+    max-width: 40vw;
+    font-size: 0.9em;
+    text-align: right;
+  }
+}
+
 .wordmark {
   font-family: var(--sc);
   font-size: 1.1rem;

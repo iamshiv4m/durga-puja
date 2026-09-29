@@ -13,7 +13,8 @@ export const janmashtami: JourneyContent = {
   pageTitle: "Janmāṣṭamī — the night he was born",
   description:
     "Scroll through the night Krishna was born: Kamsa's prison in the monsoon storm, the midnight light, Vasudeva carrying the child across the flooded Yamuna under Sheshnaag's hoods, dawn in Gokul, the midnight jhula in Vrindavan today, and the Dahi Handi in the streets of Maharashtra.",
-  share: "From Kamsa's prison at midnight, across the Yamuna in flood, to the pot of butter hung high over the street.",
+  share:
+    "From Kamsa's prison at midnight, across the Yamuna in flood, to the pot of butter hung high over the street.",
   keywords: [
     "Janmashtami",
     "Krishna Janmashtami",
@@ -102,13 +103,26 @@ export const janmashtami: JourneyContent = {
       side: "left",
     },
   ],
-  finale: { native: "नंद के आनंद भयो, जय कन्हैया लाल की", english: "joy in Nand's house: hail Kanhaiya", window: [0.935, 0.95, 0.985, 0.999] },
+  finale: {
+    native: "नंद के आनंद भयो, जय कन्हैया लाल की",
+    english: "joy in Nand's house: hail Kanhaiya",
+    window: [0.935, 0.95, 0.985, 0.999],
+  },
   hints: {
     scroll: "scroll into the storm",
     touch: [
-      { text: "touch the sky for lightning", window: [0.065, 0.085, 0.4, 0.425] },
-      { text: "touch the jhula to swing it", window: [0.575, 0.59, 0.645, 0.665] },
-      { text: "tap to add a govinda, then tap the handi", window: [0.695, 0.71, 0.79, 0.81] },
+      {
+        text: "touch the sky for lightning",
+        window: [0.065, 0.085, 0.4, 0.425],
+      },
+      {
+        text: "touch the jhula to swing it",
+        window: [0.575, 0.59, 0.645, 0.665],
+      },
+      {
+        text: "tap to add a govinda, then tap the handi",
+        window: [0.695, 0.71, 0.79, 0.81],
+      },
     ],
   },
   verse: {
@@ -125,10 +139,17 @@ export const janmashtami: JourneyContent = {
   },
   card: { native: "जन्माष्टमी की शुभकामनाएँ", english: "Happy Janmashtami" },
   returnLink: "back to the storm",
-  soundLabel: "bansuri, tanpura, temple bells and the shankh, pakhawaj, dholak and manjira, a dhol-tasha band, and the monsoon storm",
+  soundLabel:
+    "bansuri, tanpura, temple bells and the shankh, pakhawaj, dholak and manjira, a dhol-tasha band, and the monsoon storm",
   about: {
     name: "Krishna Janmashtami",
-    alternateName: ["Janmashtami", "जन्माष्टमी", "Gokulashtami", "Krishnashtami", "Srikrishna Jayanti"],
+    alternateName: [
+      "Janmashtami",
+      "जन्माष्टमी",
+      "Gokulashtami",
+      "Krishnashtami",
+      "Srikrishna Jayanti",
+    ],
     sameAs: "https://en.wikipedia.org/wiki/Krishna_Janmashtami",
   },
   ink: "#04060c",

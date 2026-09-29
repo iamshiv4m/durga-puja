@@ -188,7 +188,11 @@ export class Band {
     air.Q.value = 1.5;
     const ag = ctx.createGain();
     ag.gain.value = 0.12;
-    this.v.noiseSource(time, duration + 0.1).connect(air).connect(ag).connect(gain);
+    this.v
+      .noiseSource(time, duration + 0.1)
+      .connect(air)
+      .connect(ag)
+      .connect(gain);
     for (const node of [osc, twin, vibrato]) {
       node.start(time);
       node.stop(end + 0.1);
@@ -443,7 +447,11 @@ export class Band {
     band.frequency.value = freq;
     band.Q.value = q;
     const g = this.env(time, 0.001, decay, level);
-    this.v.noiseSource(time, decay + 0.05).connect(band).connect(g).connect(this.near);
+    this.v
+      .noiseSource(time, decay + 0.05)
+      .connect(band)
+      .connect(g)
+      .connect(this.near);
   }
 
   private env(time: number, attack: number, decay: number, level: number) {

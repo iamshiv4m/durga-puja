@@ -92,9 +92,13 @@ const SAFO: RGB[] = [
 ];
 const MIRROR: RGB = [250, 246, 232];
 
+/** The brightest mirror glints of the frame, collected for the light pass: x, y, size, strength. */
+export const glints: number[] = [];
+const MAX_GLINTS = 1600;
+
 /** Dresses a dancer for the garba. */
 export function makeLook(random: () => number, woman: boolean, h: number): Look {
-  const pick = <T,>(list: T[]) => list[Math.floor(random() * list.length)];
+  const pick = <T>(list: T[]) => list[Math.floor(random() * list.length)];
   const skin = pick(SKIN);
   if (woman) {
     const skirt = pick(CHANIYA);
@@ -130,7 +134,11 @@ export function makeLook(random: () => number, woman: boolean, h: number): Look 
   };
 }
 
-export type Hands = { l: { x: number; y: number }; r: { x: number; y: number }; top: { x: number; y: number } };
+export type Hands = {
+  l: { x: number; y: number };
+  r: { x: number; y: number };
+  top: { x: number; y: number };
+};
 
 const HAIR: RGB = [22, 16, 14];
 
@@ -224,13 +232,21 @@ function cone(
     const r = lerp(wh, R, 0.93);
     ctx.fillStyle = rgb(MIRROR);
     const size = R * 0.045;
-    for (let m = 0; m < mirrors; m++) {
-      const angle = turn * 1.0 + (m / mirrors) * TAU;
-      if (!visible(angle)) continue;
-      const glint = 0.5 + 0.5 * Math.sin(seconds * 5 + m * 2.3 + seed * 3 + angle * 2);
-      ctx.globalAlpha = 0.45 + 0.55 * glint * (0.5 + 0.5 * light);
+    // Three levels of glint, one path each.
+    for (let level = 0; level < 3; level++) {
+      ctx.globalAlpha = 0.3 + 0.45 * ((level + 0.5) / 3) * (0.5 + 0.5 * light);
       ctx.beginPath();
-      ctx.arc(bx + Math.cos(angle) * r, hy + Math.sin(angle) * r * t.s, size, 0, TAU);
+      for (let m = 0; m < mirrors; m++) {
+        const angle = turn * 1.0 + (m / mirrors) * TAU;
+        if (!visible(angle)) continue;
+        const glint = 0.5 + 0.5 * Math.sin(seconds * 5 + m * 2.3 + seed * 3 + angle * 2);
+        if (Math.min(2, Math.floor(glint * 3)) !== level) continue;
+        const mx = bx + Math.cos(angle) * r;
+        const my = hy + Math.sin(angle) * r * t.s;
+        ctx.moveTo(mx + size, my);
+        ctx.arc(mx, my, size, 0, TAU);
+        if (glint > 0.86 && glints.length < MAX_GLINTS * 4) glints.push(mx, my, size, (glint - 0.86) * 7 * (0.3 + 0.7 * light));
+      }
       ctx.fill();
     }
     ctx.globalAlpha = 1;
@@ -299,7 +315,25 @@ export function drawDancer(ctx: Ctx, X: number, Z: number, t: Tilt, look: Look, 
       ctx.fill();
     }
     const R = (0.2 + 0.19 * pose.spin) * h;
-    cone(ctx, bx, by, t, 0.56, 0.07 * h, 0.03, R, lit(look.skirt), lit(look.skirt2), look.border, pose.turn, 14, 16, light, look.seed, seconds);
+    cone(
+      ctx,
+      bx,
+      by,
+      t,
+      0.56 * h,
+      0.07 * h,
+      0.03 * h,
+      R,
+      lit(look.skirt),
+      lit(look.skirt2),
+      look.border,
+      pose.turn,
+      14,
+      16,
+      light,
+      look.seed,
+      seconds,
+    );
     waist = 0.56;
   } else {
     // Churidar legs in a stride, and the mojari.
@@ -323,7 +357,25 @@ export function drawDancer(ctx: Ctx, X: number, Z: number, t: Tilt, look: Look, 
     }
     // The kediyu: fitted at the chest, then a short flare of gathered pleats to the hip.
     const R = (0.13 + 0.1 * pose.spin) * h;
-    cone(ctx, bx, by, t, 0.7, 0.085 * h, 0.42, R, lit(look.skirt), lit(look.skirt2), look.border, pose.turn, 18, 0, light, look.seed, seconds);
+    cone(
+      ctx,
+      bx,
+      by,
+      t,
+      0.7 * h,
+      0.085 * h,
+      0.42 * h,
+      R,
+      lit(look.skirt),
+      lit(look.skirt2),
+      look.border,
+      pose.turn,
+      18,
+      0,
+      light,
+      look.seed,
+      seconds,
+    );
     waist = 0.7;
   }
 
@@ -386,7 +438,10 @@ export function drawDancer(ctx: Ctx, X: number, Z: number, t: Tilt, look: Look, 
   // Arms, from the shoulders to wherever the pose puts the hands.
   const shoulder = L(0.8);
   const sw = 0.075;
-  const hand = (target: [number, number]) => ({ x: U(target[0]), y: L(target[1]) });
+  const hand = (target: [number, number]) => ({
+    x: U(target[0]),
+    y: L(target[1]),
+  });
   const lh = hand(pose.l);
   const rh = hand(pose.r);
   const sleeve = lit(look.top);
@@ -555,7 +610,10 @@ export function drawDancer(ctx: Ctx, X: number, Z: number, t: Tilt, look: Look, 
   const angle = pose.bend * f;
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
-  const out = (x: number, y: number) => ({ x: bx + x * cos - y * sin, y: wy + x * sin + y * cos });
+  const out = (x: number, y: number) => ({
+    x: bx + x * cos - y * sin,
+    y: wy + x * sin + y * cos,
+  });
   return { l: out(lh.x, lh.y), r: out(rh.x, rh.y), top: out(0, hy - hr) };
 }
 
@@ -623,7 +681,17 @@ export function dandiyaPose(phase: number, facing: 1 | -1, energy: number, seed:
  * pallu over her head and right shoulder, or a man in a kurta. Hands as in `Pose`, in figure units
  * of a standing height `look.h`.
  */
-export function drawSeated(ctx: Ctx, X: number, Z: number, t: Tilt, look: Look, facing: 1 | -1, l: [number, number], r: [number, number], light: number) {
+export function drawSeated(
+  ctx: Ctx,
+  X: number,
+  Z: number,
+  t: Tilt,
+  look: Look,
+  facing: 1 | -1,
+  l: [number, number],
+  r: [number, number],
+  light: number,
+) {
   const { h } = look;
   const f = facing;
   const bx = X;
@@ -657,7 +725,10 @@ export function drawSeated(ctx: Ctx, X: number, Z: number, t: Tilt, look: Look, 
   ctx.fill();
   // Arms.
   const shoulder = Y(0.48);
-  const hand = (target: [number, number]) => ({ x: U(target[0]), y: Y(target[1]) });
+  const hand = (target: [number, number]) => ({
+    x: U(target[0]),
+    y: Y(target[1]),
+  });
   const lh = hand(l);
   const rh = hand(r);
   arm(ctx, U(-0.04), shoulder, lh.x, lh.y, 0.02 * h * f, 0.034 * h, lit(look.skin), lit(look.top));

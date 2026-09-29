@@ -368,7 +368,15 @@ export function drawFigure(ctx: Ctx, x: number, y: number, look: Look, pose: Pos
       ctx.quadraticCurveTo(shX, shY + 0.12, shX + 0.05, shY + 0.1);
       ctx.stroke();
     }
-    if (look.gamosa === "waist") gamosaBand(ctx, [{ x: sway - wW - 0.01, y: waist + 0.005 }, { x: sway + wW + 0.01, y: waist + 0.005 }], 0.032);
+    if (look.gamosa === "waist")
+      gamosaBand(
+        ctx,
+        [
+          { x: sway - wW - 0.01, y: waist + 0.005 },
+          { x: sway + wW + 0.01, y: waist + 0.005 },
+        ],
+        0.032,
+      );
   }
 
   // Neck and head.
@@ -415,7 +423,15 @@ export function drawFigure(ctx: Ctx, x: number, y: number, look: Look, pose: Pos
 
   // A gamosa round the neck, its ends down the chest.
   if (look.gamosa === "shoulders") {
-    gamosaBand(ctx, [{ x: shX - shW + 0.01, y: shY + 0.005 }, { x: headX, y: shY + 0.03 }, { x: shX + shW - 0.01, y: shY + 0.005 }], 0.03);
+    gamosaBand(
+      ctx,
+      [
+        { x: shX - shW + 0.01, y: shY + 0.005 },
+        { x: headX, y: shY + 0.03 },
+        { x: shX + shW - 0.01, y: shY + 0.005 },
+      ],
+      0.03,
+    );
     gamosaEnd(ctx, shX - 0.05, shY + 0.01, 0.2, 0.034, -0.05);
     gamosaEnd(ctx, shX + 0.05, shY + 0.01, 0.2, 0.034, 0.05);
   }

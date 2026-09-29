@@ -16,7 +16,13 @@ const LAMP = "255, 170, 80";
 const BLACK: RGB = [30, 26, 32];
 
 export class Wada {
-  private readonly stones: { x: number; y: number; w: number; h: number; k: number }[] = [];
+  private readonly stones: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    k: number;
+  }[] = [];
   private readonly leaves: { x: number; y: number; a: number; s: number }[] = [];
 
   constructor() {
@@ -24,12 +30,24 @@ export class Wada {
     for (let row = 0; row < 7; row++) {
       const y = FLOOR + row * 0.5 + row * row * 0.06;
       const h = 0.5 + row * 0.12;
-      for (let x = X - 14 + random() * 0.8; x < X + 14; x += 0.9 + random() * 0.8) this.stones.push({ x, y, w: 0.8 + random() * 0.7 + row * 0.1, h, k: random() });
+      for (let x = X - 14 + random() * 0.8; x < X + 14; x += 0.9 + random() * 0.8)
+        this.stones.push({
+          x,
+          y,
+          w: 0.8 + random() * 0.7 + row * 0.1,
+          h,
+          k: random(),
+        });
     }
     for (let i = 0; i < 70; i++) {
       const a = random() * TAU;
       const r = random() ** 0.6;
-      this.leaves.push({ x: Math.cos(a) * r * 0.55, y: -Math.abs(Math.sin(a)) * r * 0.75 - random() * 0.2, a: random() * TAU, s: 0.05 + random() * 0.05 });
+      this.leaves.push({
+        x: Math.cos(a) * r * 0.55,
+        y: -Math.abs(Math.sin(a)) * r * 0.75 - random() * 0.2,
+        a: random() * TAU,
+        s: 0.05 + random() * 0.05,
+      });
     }
   }
 
@@ -96,7 +114,13 @@ export class Wada {
       ctx.save();
       flame(ctx, X + nx, 0.93, 0.14, seconds, nx);
       ctx.restore();
-      lights.push({ x: X + nx, y: 0.85, r: 0.6, a: 0.35 * flicker(seconds, nx), color: LAMP });
+      lights.push({
+        x: X + nx,
+        y: 0.85,
+        r: 0.6,
+        a: 0.35 * flicker(seconds, nx),
+        color: LAMP,
+      });
     }
     // The plinth of the osari, in dressed stone.
     ctx.fillStyle = shade([150, 136, 118]);
@@ -210,7 +234,17 @@ export class Wada {
       ctx,
       sx + swing - 0.1,
       1.46,
-      { h: 1.8, skin: SKINS[2], top: [40, 30, 36], bottom: [52, 26, 40], border: [60, 140, 60], dress: "sari", head: "bun", jewel: "nath", bindi: true },
+      {
+        h: 1.8,
+        skin: SKINS[2],
+        top: [40, 30, 36],
+        bottom: [52, 26, 40],
+        border: [60, 140, 60],
+        dress: "sari",
+        head: "bun",
+        jewel: "nath",
+        bindi: true,
+      },
       { la: 0.5, lf: 1.1, ra: 0.6, rf: 1.2, sit: true },
       shade,
       1,
@@ -319,7 +353,13 @@ export class Wada {
     ctx.fillStyle = shade([220, 150, 60]);
     ctx.fillRect(x - 0.08, y - 0.46, 0.16, 0.05);
     flame(ctx, x, y - 0.46, 0.15, seconds, 9);
-    lights.push({ x, y: y - 0.55, r: 0.6, a: 0.35 * flicker(seconds, 9), color: LAMP });
+    lights.push({
+      x,
+      y: y - 0.55,
+      r: 0.6,
+      a: 0.35 * flicker(seconds, 9),
+      color: LAMP,
+    });
     // Haldi-kunku marks on the front, and a swastik in kumkum.
     ctx.fillStyle = shade([240, 190, 30]);
     ctx.beginPath();
@@ -385,17 +425,60 @@ export class Wada {
     shadowAt(hx, hy, 0.4);
     shadowAt(gx, hy + 0.05, 0.4);
     drawFigure(ctx, hx, hy, woman([200, 150, 40]), { la: 1.25, lf: 1.6, ra: 1.1, rf: 1.5, hold: "tabak" }, shade, 1);
-    drawFigure(ctx, gx, hy + 0.05, woman([160, 30, 60], { skin: SKINS[3], head: "pallu" }), { la: 0.2, lf: 0.4, ra: lerp(1.3, 1.95, reach), rf: lerp(1.5, 1.9, reach) }, shade, -1);
+    drawFigure(
+      ctx,
+      gx,
+      hy + 0.05,
+      woman([160, 30, 60], { skin: SKINS[3], head: "pallu" }),
+      {
+        la: 0.2,
+        lf: 0.4,
+        ra: lerp(1.3, 1.95, reach),
+        rf: lerp(1.5, 1.9, reach),
+      },
+      shade,
+      -1,
+    );
     // The new bride in a chandrakala, black with silver moons, in her halwa jewellery.
     const bx = X + 1.5;
     const by = 5.55;
     shadowAt(bx, by, 0.4);
-    drawFigure(ctx, bx, by, woman([220, 190, 90], { skin: SKINS[3], jewel: "halwa", motif: [230, 230, 236] }), { la: 0.25, lf: 1.0, ra: 0.9, rf: 2.3, hold: "sugad" }, shade, -1);
+    drawFigure(
+      ctx,
+      bx,
+      by,
+      woman([220, 190, 90], {
+        skin: SKINS[3],
+        jewel: "halwa",
+        motif: [230, 230, 236],
+      }),
+      { la: 0.25, lf: 1.0, ra: 0.9, rf: 2.3, hold: "sugad" },
+      shade,
+      -1,
+    );
     // A little girl in a black parkar-polka, with her own sugar crown and necklace.
     const cx = X + 2.7;
     const cy = 5.75;
     shadowAt(cx, cy, 0.25);
-    drawFigure(ctx, cx, cy, { h: 1.25, skin: SKINS[0], top: BLACK, bottom: BLACK, border: [230, 180, 40], dress: "frock", head: "bun", jewel: "halwa", bindi: true }, { la: 0.3, lf: 0.6, ra: 0.5 + reach * 0.3, rf: 1.2 }, shade, -1);
+    drawFigure(
+      ctx,
+      cx,
+      cy,
+      {
+        h: 1.25,
+        skin: SKINS[0],
+        top: BLACK,
+        bottom: BLACK,
+        border: [230, 180, 40],
+        dress: "frock",
+        head: "bun",
+        jewel: "halwa",
+        bindi: true,
+      },
+      { la: 0.3, lf: 0.6, ra: 0.5 + reach * 0.3, rf: 1.2 },
+      shade,
+      -1,
+    );
     // A guest coming in at the door with her own sugad.
     const ax = X + 5.2;
     shadowAt(ax, 4.6, 0.35);

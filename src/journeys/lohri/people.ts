@@ -94,10 +94,15 @@ export const KESRI: RGB = [236, 132, 22];
 export const NAVY: RGB = [22, 38, 96];
 
 type Random = () => number;
-const pick = <T>(random: Random, list: T[]) => list[Math.floor(random() * list.length)];
+const pick = <T>(random: Random, list: T[]) =>
+  list[Math.floor(random() * list.length)];
 
 /** A villager: a man in a pagg and kurta, or a woman in salwar-kameez and chunni. */
-export function makeLook(random: Random, woman: boolean, h = woman ? 1.55 + random() * 0.08 : 1.66 + random() * 0.1): Look {
+export function makeLook(
+  random: Random,
+  woman: boolean,
+  h = woman ? 1.55 + random() * 0.08 : 1.66 + random() * 0.1,
+): Look {
   const skin = pick(random, SKIN);
   if (woman) {
     return {
@@ -135,7 +140,13 @@ export function makeLook(random: Random, woman: boolean, h = woman ? 1.55 + rand
 export function makeChild(random: Random, girl: boolean): Look {
   const look = makeLook(random, girl, 0.98 + random() * 0.2);
   look.beard = false;
-  look.head = girl ? (random() < 0.5 ? "bare" : "chunni") : random() < 0.6 ? "patka" : "bare";
+  look.head = girl
+    ? random() < 0.5
+      ? "bare"
+      : "chunni"
+    : random() < 0.6
+      ? "patka"
+      : "bare";
   look.shawl = random() < 0.5 ? pick(random, BRIGHT) : undefined;
   return look;
 }
@@ -167,11 +178,29 @@ export function makeGidda(random: Random, i: number): Look {
 
 /** One of the Panj Pyare: a kesri chola, a blue kamarkassa, a kesri dastar. */
 export function makePyara(skin: RGB): Look {
-  return { h: 1.72, skin, woman: false, top: KESRI, bottom: KESRI, lower: "chola", head: "dastar", wrap: KESRI, beard: true, sash: NAVY };
+  return {
+    h: 1.72,
+    skin,
+    woman: false,
+    top: KESRI,
+    bottom: KESRI,
+    lower: "chola",
+    head: "dastar",
+    wrap: KESRI,
+    beard: true,
+    sash: NAVY,
+  };
 }
 
 /** Draws a person standing on (x, y) facing `facing`; returns where the hands are, in world units. */
-export function drawPerson(ctx: Ctx, x: number, y: number, look: Look, pose: Pose, facing: 1 | -1 = 1): Hands {
+export function drawPerson(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  look: Look,
+  pose: Pose,
+  facing: 1 | -1 = 1,
+): Hands {
   const { h } = look;
   const bob = pose.bob ?? 0;
   const lean = pose.lean ?? 0;
@@ -245,7 +274,14 @@ function legs(ctx: Ctx, look: Look, pose: Pose, bob: number, swirl: number) {
     const shin = thigh - t * 1.45;
     const fx = kx + Math.sin(shin) * 0.24;
     const fy = Math.min(-0.005, ky + Math.cos(shin) * 0.24);
-    return { hx, hy, kx, ky, fx: t < 0.01 ? side * 0.055 : fx, fy: t < 0.01 ? -0.005 : fy };
+    return {
+      hx,
+      hy,
+      kx,
+      ky,
+      fx: t < 0.01 ? side * 0.055 : fx,
+      fy: t < 0.01 ? -0.005 : fy,
+    };
   };
   const l = leg(-1, lift[0]);
   const r = leg(1, lift[1]);
@@ -321,16 +357,34 @@ function legs(ctx: Ctx, look: Look, pose: Pose, bob: number, swirl: number) {
   ctx.beginPath();
   ctx.moveTo(-0.08, -0.52 + bob);
   ctx.lineTo(0.08, -0.52 + bob);
-  ctx.quadraticCurveTo(flare * 0.8, -0.28, flare + sway + lifted * 0.08, hem - lifted * 0.14);
-  ctx.quadraticCurveTo(sway * 0.5, hem + 0.03 - lifted * 0.05, -flare + sway, hem);
+  ctx.quadraticCurveTo(
+    flare * 0.8,
+    -0.28,
+    flare + sway + lifted * 0.08,
+    hem - lifted * 0.14,
+  );
+  ctx.quadraticCurveTo(
+    sway * 0.5,
+    hem + 0.03 - lifted * 0.05,
+    -flare + sway,
+    hem,
+  );
   ctx.quadraticCurveTo(-flare * 0.8, -0.28, -0.08, -0.52 + bob);
   ctx.fill();
   // The border at the hem: gota on a ghagra, a plain stripe on a tehmat.
-  ctx.strokeStyle = look.lower === "ghagra" ? "rgba(250, 206, 90, 0.95)" : rgb(mix(look.bottom, [255, 255, 255], 0.45));
+  ctx.strokeStyle =
+    look.lower === "ghagra"
+      ? "rgba(250, 206, 90, 0.95)"
+      : rgb(mix(look.bottom, [255, 255, 255], 0.45));
   ctx.lineWidth = look.lower === "ghagra" ? 0.03 : 0.018;
   ctx.beginPath();
   ctx.moveTo(flare + sway + lifted * 0.08, hem - lifted * 0.14 - 0.015);
-  ctx.quadraticCurveTo(sway * 0.5, hem + 0.015 - lifted * 0.05, -flare + sway, hem - 0.015);
+  ctx.quadraticCurveTo(
+    sway * 0.5,
+    hem + 0.015 - lifted * 0.05,
+    -flare + sway,
+    hem - 0.015,
+  );
   ctx.stroke();
   // A knee raised under the cloth shows its foot.
   for (const p of [l, r]) if (p.fy < -0.03) foot(p);
@@ -383,7 +437,8 @@ function torso(ctx: Ctx, look: Look, back: boolean) {
     ctx.fill();
     // Mirror-work down the front.
     ctx.fillStyle = "rgba(250, 210, 110, 0.9)";
-    for (let i = 0; i < 4; i++) ctx.fillRect(0.02 + i * 0.012, -0.72 + i * 0.06, 0.014, 0.014);
+    for (let i = 0; i < 4; i++)
+      ctx.fillRect(0.02 + i * 0.012, -0.72 + i * 0.06, 0.014, 0.014);
   }
   if (look.sash) {
     // The kamarkassa at the waist, its ends hanging behind.
@@ -506,7 +561,12 @@ function head(ctx: Ctx, look: Look, back: boolean, swirl: number) {
         ctx.fillStyle = wrap;
         ctx.beginPath();
         ctx.moveTo(-0.06, -0.93);
-        ctx.quadraticCurveTo(-0.12 - swirl * 0.05, -0.8, -0.09 - swirl * 0.08, -0.66);
+        ctx.quadraticCurveTo(
+          -0.12 - swirl * 0.05,
+          -0.8,
+          -0.09 - swirl * 0.08,
+          -0.66,
+        );
         ctx.lineTo(-0.06 - swirl * 0.08, -0.67);
         ctx.quadraticCurveTo(-0.08, -0.8, -0.04, -0.92);
         ctx.fill();
@@ -560,7 +620,12 @@ function chunniBack(ctx: Ctx, look: Look, swirl: number) {
   ctx.fillStyle = rgb(mix(look.wrap, [0, 0, 0], 0.15));
   ctx.beginPath();
   ctx.moveTo(-0.07, -0.93);
-  ctx.quadraticCurveTo(-0.16 - swirl * 0.12, -0.75, -0.15 - swirl * 0.2, -0.46 + Math.abs(swirl) * 0.06);
+  ctx.quadraticCurveTo(
+    -0.16 - swirl * 0.12,
+    -0.75,
+    -0.15 - swirl * 0.2,
+    -0.46 + Math.abs(swirl) * 0.06,
+  );
   ctx.lineTo(0.02 - swirl * 0.1, -0.5);
   ctx.quadraticCurveTo(-0.02, -0.7, 0.03, -0.86);
   ctx.closePath();
@@ -602,7 +667,13 @@ function parandi(ctx: Ctx, look: Look, bob: number, lean: number) {
   ctx.fillStyle = rgb(look.parandi!);
   for (let i = 0; i < 3; i++) {
     ctx.beginPath();
-    ctx.arc(endX + (i - 1) * 0.02, endY + 0.03 + (i % 2) * 0.015, 0.016, 0, TAU);
+    ctx.arc(
+      endX + (i - 1) * 0.02,
+      endY + 0.03 + (i % 2) * 0.015,
+      0.016,
+      0,
+      TAU,
+    );
     ctx.fill();
   }
   ctx.fillStyle = "rgba(250, 206, 90, 0.95)";
@@ -627,7 +698,14 @@ function shawl(ctx: Ctx, look: Look) {
   ctx.stroke();
 }
 
-function arm(ctx: Ctx, look: Look, side: -1 | 1, upper: number, fore: number, back = false) {
+function arm(
+  ctx: Ctx,
+  look: Look,
+  side: -1 | 1,
+  upper: number,
+  fore: number,
+  back = false,
+) {
   const sx = side * SHOULDER.x;
   const sy = SHOULDER.y;
   const ex = sx + Math.sin(upper) * UPPER;
@@ -669,7 +747,8 @@ function arm(ctx: Ctx, look: Look, side: -1 | 1, upper: number, fore: number, ba
     // The bride's chooda: red and ivory bangles up the forearm.
     for (let i = 0; i < 5; i++) {
       const t = 0.35 + i * 0.12;
-      ctx.strokeStyle = i % 2 ? "rgba(246, 236, 214, 1)" : "rgba(200, 20, 40, 1)";
+      ctx.strokeStyle =
+        i % 2 ? "rgba(246, 236, 214, 1)" : "rgba(200, 20, 40, 1)";
       ctx.lineWidth = 0.05;
       ctx.beginPath();
       ctx.moveTo(lerp(ex, hx, t), lerp(ey, hy, t));
@@ -702,40 +781,57 @@ function arm(ctx: Ctx, look: Look, side: -1 | 1, upper: number, fore: number, ba
 // ─── Things in hand ─────────────────────────────────────────────────────────
 
 function dhol(ctx: Ctx) {
-  // The dhol slung from the shoulder, the bass head (dagga side) towards the front.
+  // Slung from the shoulder, lying across the body: the bass head (dagga side) to the front.
   ctx.strokeStyle = "rgba(90, 40, 20, 0.95)";
   ctx.lineWidth = 0.018;
   ctx.beginPath();
-  ctx.moveTo(-0.08, -0.79);
-  ctx.lineTo(0.06, -0.5);
+  ctx.moveTo(-0.07, -0.79);
+  ctx.lineTo(0.0, -0.58);
   ctx.stroke();
-  const body = ctx.createLinearGradient(0, -0.62, 0, -0.34);
-  body.addColorStop(0, "#d86a2a");
-  body.addColorStop(0.5, "#9a3418");
-  body.addColorStop(1, "#5a1c0c");
-  ctx.fillStyle = body;
+  const cx = 0.03;
+  const cy = -0.5;
+  const hw = 0.19;
+  const hh = 0.11;
+  const shell = ctx.createLinearGradient(0, cy - hh, 0, cy + hh);
+  shell.addColorStop(0, "#d8743a");
+  shell.addColorStop(0.45, "#a23c1a");
+  shell.addColorStop(1, "#5a1c0c");
+  ctx.fillStyle = shell;
   ctx.beginPath();
-  ctx.ellipse(0.02, -0.48, 0.2, 0.13, 0, 0, TAU);
+  ctx.moveTo(cx - hw, cy - hh * 0.92);
+  ctx.quadraticCurveTo(cx, cy - hh * 1.2, cx + hw, cy - hh * 0.92);
+  ctx.lineTo(cx + hw, cy + hh * 0.92);
+  ctx.quadraticCurveTo(cx, cy + hh * 1.2, cx - hw, cy + hh * 0.92);
+  ctx.closePath();
   ctx.fill();
-  ctx.strokeStyle = "rgba(250, 206, 110, 0.85)";
-  ctx.lineWidth = 0.007;
-  for (let i = -4; i <= 4; i++) {
+  // The rope lacing, zigzagging from rim to rim.
+  ctx.strokeStyle = "rgba(250, 214, 130, 0.9)";
+  ctx.lineWidth = 0.006;
+  ctx.beginPath();
+  for (let i = 0; i <= 10; i++) {
+    const x = i % 2 ? cx + hw - 0.02 : cx - hw + 0.02;
+    const y = cy - hh * 0.85 + (i / 10) * hh * 1.7;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  // The two heads, edge-on, with their rims.
+  for (const side of [-1, 1]) {
+    ctx.fillStyle = "#efe0bc";
     ctx.beginPath();
-    ctx.moveTo(-0.16, -0.48 + i * 0.026);
-    ctx.lineTo(0.2, -0.48 - i * 0.026);
+    ctx.ellipse(cx + side * hw, cy, 0.03, hh, 0, 0, TAU);
+    ctx.fill();
+    ctx.strokeStyle = "#3a1a0c";
+    ctx.lineWidth = 0.01;
     ctx.stroke();
   }
-  // Tassels of red wool along its belly.
+  // Phumman, woollen tassels, hanging from its belly.
   ctx.fillStyle = "#e0243c";
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 4; i++) {
     ctx.beginPath();
-    ctx.arc(-0.12 + i * 0.07, -0.35, 0.014, 0, TAU);
+    ctx.arc(cx - 0.12 + i * 0.08, cy + hh + 0.02, 0.016, 0, TAU);
     ctx.fill();
   }
-  ctx.fillStyle = "#efe0bc";
-  ctx.beginPath();
-  ctx.ellipse(0.215, -0.48, 0.035, 0.125, 0, 0, TAU);
-  ctx.fill();
 }
 
 function baby(ctx: Ctx) {
@@ -759,8 +855,16 @@ function baby(ctx: Ctx) {
   ctx.fill();
 }
 
-function held(ctx: Ctx, hold: Hold | undefined, left: { x: number; y: number; angle: number }, right: { x: number; y: number; angle: number }): Point {
-  const along = (d: number) => ({ x: right.x + Math.sin(right.angle) * d, y: right.y + Math.cos(right.angle) * d });
+function held(
+  ctx: Ctx,
+  hold: Hold | undefined,
+  left: { x: number; y: number; angle: number },
+  right: { x: number; y: number; angle: number },
+): Point {
+  const along = (d: number) => ({
+    x: right.x + Math.sin(right.angle) * d,
+    y: right.y + Math.cos(right.angle) * d,
+  });
   ctx.lineCap = "round";
   switch (hold) {
     case "dhol": {
@@ -769,13 +873,21 @@ function held(ctx: Ctx, hold: Hold | undefined, left: { x: number; y: number; an
       ctx.lineWidth = 0.022;
       ctx.beginPath();
       ctx.moveTo(right.x, right.y);
-      ctx.quadraticCurveTo(right.x + Math.sin(right.angle) * 0.12, right.y + Math.cos(right.angle) * 0.12, right.x + Math.sin(right.angle + 0.8) * 0.2, right.y + Math.cos(right.angle + 0.8) * 0.2);
+      ctx.quadraticCurveTo(
+        right.x + Math.sin(right.angle) * 0.12,
+        right.y + Math.cos(right.angle) * 0.12,
+        right.x + Math.sin(right.angle + 0.8) * 0.2,
+        right.y + Math.cos(right.angle + 0.8) * 0.2,
+      );
       ctx.stroke();
       ctx.strokeStyle = "#c8a870";
       ctx.lineWidth = 0.01;
       ctx.beginPath();
       ctx.moveTo(left.x, left.y);
-      ctx.lineTo(left.x + Math.sin(left.angle) * 0.24, left.y + Math.cos(left.angle) * 0.24);
+      ctx.lineTo(
+        left.x + Math.sin(left.angle) * 0.24,
+        left.y + Math.cos(left.angle) * 0.24,
+      );
       ctx.stroke();
       return right;
     }
@@ -803,7 +915,12 @@ function held(ctx: Ctx, hold: Hold | undefined, left: { x: number; y: number; an
       ctx.moveTo(right.x - 0.02, right.y);
       ctx.lineTo(right.x + 0.03, right.y);
       ctx.lineTo(right.x + 0.07, right.y + 0.16);
-      ctx.quadraticCurveTo(right.x, right.y + 0.19, right.x - 0.07, right.y + 0.16);
+      ctx.quadraticCurveTo(
+        right.x,
+        right.y + 0.19,
+        right.x - 0.07,
+        right.y + 0.16,
+      );
       ctx.closePath();
       ctx.fill();
       ctx.strokeStyle = "#a0302a";
@@ -825,7 +942,13 @@ function held(ctx: Ctx, hold: Hold | undefined, left: { x: number; y: number; an
       ctx.fillStyle = "#f4ecd8";
       for (let i = 0; i < 6; i++) {
         ctx.beginPath();
-        ctx.arc(cx - 0.07 + i * 0.028, cy - 0.022 - (i % 2) * 0.01, 0.014, 0, TAU);
+        ctx.arc(
+          cx - 0.07 + i * 0.028,
+          cy - 0.022 - (i % 2) * 0.01,
+          0.014,
+          0,
+          TAU,
+        );
         ctx.fill();
       }
       ctx.fillStyle = "#8a4a1c";
@@ -840,7 +963,10 @@ function held(ctx: Ctx, hold: Hold | undefined, left: { x: number; y: number; an
       ctx.strokeStyle = "#7a4a22";
       ctx.lineWidth = 0.028;
       ctx.beginPath();
-      ctx.moveTo(right.x - Math.sin(right.angle) * 0.02, right.y - Math.cos(right.angle) * 0.02);
+      ctx.moveTo(
+        right.x - Math.sin(right.angle) * 0.02,
+        right.y - Math.cos(right.angle) * 0.02,
+      );
       ctx.lineTo(a.x, a.y);
       ctx.stroke();
       ctx.strokeStyle = "#c8ccd0";
@@ -849,9 +975,19 @@ function held(ctx: Ctx, hold: Hold | undefined, left: { x: number; y: number; an
       const d = { x: Math.sin(right.angle), y: Math.cos(right.angle) };
       ctx.beginPath();
       ctx.moveTo(a.x, a.y);
-      ctx.bezierCurveTo(a.x + d.x * 0.1 + n.x * 0.02, a.y + d.y * 0.1 + n.y * 0.02, a.x + d.x * 0.16 + n.x * 0.14, a.y + d.y * 0.16 + n.y * 0.14, a.x + d.x * 0.05 + n.x * 0.19, a.y + d.y * 0.05 + n.y * 0.19);
+      ctx.bezierCurveTo(
+        a.x + d.x * 0.1 + n.x * 0.02,
+        a.y + d.y * 0.1 + n.y * 0.02,
+        a.x + d.x * 0.16 + n.x * 0.14,
+        a.y + d.y * 0.16 + n.y * 0.14,
+        a.x + d.x * 0.05 + n.x * 0.19,
+        a.y + d.y * 0.05 + n.y * 0.19,
+      );
       ctx.stroke();
-      return { x: a.x + d.x * 0.14 + n.x * 0.1, y: a.y + d.y * 0.14 + n.y * 0.1 };
+      return {
+        x: a.x + d.x * 0.14 + n.x * 0.1,
+        y: a.y + d.y * 0.14 + n.y * 0.1,
+      };
     }
     case "sheaf": {
       // A sheaf of wheat held against the hip, its ears fanning out.
@@ -1001,7 +1137,12 @@ export function bhangraPose(beat: number, seed: number, energy: number): Pose {
 }
 
 /** Gidda: clapping hands before the chest, turning, the chunni flying. */
-export function giddaPose(beat: number, seed: number, energy: number, centre = false): Pose {
+export function giddaPose(
+  beat: number,
+  seed: number,
+  energy: number,
+  centre = false,
+): Pose {
   const phase = beat * Math.PI * 2 + seed;
   const clap = Math.pow(0.5 + 0.5 * Math.cos(phase), 3);
   if (centre) {
@@ -1030,7 +1171,14 @@ export function giddaPose(beat: number, seed: number, energy: number, centre = f
 export const STILL: Pose = { la: 0.1, lf: 0.15, ra: -0.1, rf: 0.1 };
 
 /** Someone sitting cross-legged on the floor, for the langar pangat. */
-export function drawSeated(ctx: Ctx, x: number, y: number, look: Look, eating: number, facing: 1 | -1 = 1) {
+export function drawSeated(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  look: Look,
+  eating: number,
+  facing: 1 | -1 = 1,
+) {
   const h = look.h;
   ctx.save();
   ctx.translate(x, y);

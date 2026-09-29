@@ -2,7 +2,8 @@
 // whatever they carry. A person is drawn in units of their height, feet at the origin, facing +x.
 import { TAU, clamp, lerp, mix, rgb, type Ctx, type RGB } from "../paint";
 
-export type Head = "bare" | "bun" | "pagri" | "turban" | "odhni" | "pallu" | "shikha" | "band";
+export type Head =
+  "bare" | "bun" | "pagri" | "turban" | "odhni" | "pallu" | "shikha" | "band";
 export type Dress = "dhoti" | "lehenga" | "sari" | "shorts" | "pyjama";
 
 export type Look = {
@@ -45,7 +46,11 @@ export type Pose = {
   bob?: number;
 };
 
-export type Hands = { left: { x: number; y: number }; right: { x: number; y: number }; head: { x: number; y: number } };
+export type Hands = {
+  left: { x: number; y: number };
+  right: { x: number; y: number };
+  head: { x: number; y: number };
+};
 
 const SHOULDER = { y: -0.79, x: 0.085 };
 const UPPER = 0.17;
@@ -62,7 +67,14 @@ export const SKIN: RGB[] = [
 ];
 
 /** Draws a person standing (or sitting) on (x, y); returns where the hands and head are, in world units. */
-export function drawPerson(ctx: Ctx, x: number, y: number, look: Look, pose: Pose, facing: 1 | -1 = 1): Hands {
+export function drawPerson(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  look: Look,
+  pose: Pose,
+  facing: 1 | -1 = 1,
+): Hands {
   const { h } = look;
   const sit = clamp(pose.sit ?? 0);
   const bob = (pose.bob ?? 0) + sit * 0.4;
@@ -131,7 +143,8 @@ export function drawPerson(ctx: Ctx, x: number, y: number, look: Look, pose: Pos
         const back = Math.max(0, -angle) * 0.9;
         const fx = kx + Math.sin(angle - back) * 0.25;
         const fy = Math.min(-0.012, ky + Math.cos(angle - back) * 0.25);
-        const cloth = look.dress === "shorts" ? 0.55 : look.dress === "dhoti" ? 0.72 : 1;
+        const cloth =
+          look.dress === "shorts" ? 0.55 : look.dress === "dhoti" ? 0.72 : 1;
         ctx.strokeStyle = skin;
         ctx.lineWidth = 0.06;
         ctx.beginPath();
@@ -146,7 +159,10 @@ export function drawPerson(ctx: Ctx, x: number, y: number, look: Look, pose: Pos
         if (cloth <= 0.55) ctx.lineTo(lerp(hx, kx, 0.8), lerp(hy, ky, 0.8));
         else {
           ctx.lineTo(kx, ky);
-          ctx.lineTo(lerp(kx, fx, (cloth - 0.5) * 2), lerp(ky, fy, (cloth - 0.5) * 2));
+          ctx.lineTo(
+            lerp(kx, fx, (cloth - 0.5) * 2),
+            lerp(ky, fy, (cloth - 0.5) * 2),
+          );
         }
         ctx.stroke();
         ctx.fillStyle = rgb(mix(look.skin, [40, 24, 16], 0.25));
@@ -198,8 +214,14 @@ export function drawPerson(ctx: Ctx, x: number, y: number, look: Look, pose: Pos
   } else {
     ctx.moveTo(-0.092, -0.8);
     ctx.lineTo(0.092, -0.8);
-    ctx.lineTo(look.dress === "shorts" || look.bare ? 0.085 : 0.11, look.dress === "shorts" || look.bare ? -0.49 : -0.34);
-    ctx.lineTo(look.dress === "shorts" || look.bare ? -0.085 : -0.11, look.dress === "shorts" || look.bare ? -0.49 : -0.34);
+    ctx.lineTo(
+      look.dress === "shorts" || look.bare ? 0.085 : 0.11,
+      look.dress === "shorts" || look.bare ? -0.49 : -0.34,
+    );
+    ctx.lineTo(
+      look.dress === "shorts" || look.bare ? -0.085 : -0.11,
+      look.dress === "shorts" || look.bare ? -0.49 : -0.34,
+    );
   }
   ctx.closePath();
   ctx.fill();
@@ -259,7 +281,11 @@ export function drawPerson(ctx: Ctx, x: number, y: number, look: Look, pose: Pos
   ctx.restore();
 
   // Arms: sleeve, then forearm and hand.
-  const hands: Hands = { left: { x: 0, y: 0 }, right: { x: 0, y: 0 }, head: { x: x, y: y - h * (0.95 - bob) } };
+  const hands: Hands = {
+    left: { x: 0, y: 0 },
+    right: { x: 0, y: 0 },
+    head: { x: x, y: y - h * (0.95 - bob) },
+  };
   const arm = (side: -1 | 1, upper: number, fore: number) => {
     const sx = side * SHOULDER.x;
     const sy = SHOULDER.y;
@@ -373,13 +399,29 @@ function head(ctx: Ctx, look: Look) {
 
 // ─── Cows ────────────────────────────────────────────────────────────────────
 
-export type Cow = { coat: RGB; horns: RGB; size: number; seed: number; calf?: boolean; bell?: boolean };
+export type Cow = {
+  coat: RGB;
+  horns: RGB;
+  size: number;
+  seed: number;
+  calf?: boolean;
+  bell?: boolean;
+};
 
 /**
  * A zebu cow of Braj, side on, standing on (x, y) and facing `facing`: humped, with a dewlap and
  * curved horns, the tips painted. `graze` lowers the head to the grass; `tail` swishes it.
  */
-export function drawCow(ctx: Ctx, x: number, y: number, cow: Cow, graze: number, seconds: number, facing: 1 | -1 = 1, light = 1) {
+export function drawCow(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  cow: Cow,
+  graze: number,
+  seconds: number,
+  facing: 1 | -1 = 1,
+  light = 1,
+) {
   const s = cow.size;
   const coat = mix([30, 26, 26], cow.coat, light);
   const shade = mix(coat, [40, 30, 30], 0.35);
@@ -446,7 +488,12 @@ export function drawCow(ctx: Ctx, x: number, y: number, cow: Cow, graze: number,
   ctx.fillStyle = rgb(mix(coat, shade, 0.4));
   ctx.beginPath();
   ctx.moveTo(0.42, -0.62);
-  ctx.quadraticCurveTo(0.5, lerp(-0.45, -0.36, g), lerp(0.62, 0.66, g), lerp(-0.72, -0.38, g));
+  ctx.quadraticCurveTo(
+    0.5,
+    lerp(-0.45, -0.36, g),
+    lerp(0.62, 0.66, g),
+    lerp(-0.72, -0.38, g),
+  );
   ctx.lineTo(0.5, -0.78);
   ctx.closePath();
   ctx.fill();
@@ -491,7 +538,12 @@ export function drawCow(ctx: Ctx, x: number, y: number, cow: Cow, graze: number,
     ctx.lineWidth = 0.025;
     ctx.beginPath();
     ctx.moveTo(lerp(0.5, 0.6, g), lerp(-0.86, -0.5, g));
-    ctx.quadraticCurveTo(0.56, lerp(-0.66, -0.42, g), lerp(0.5, 0.52, g), lerp(-0.6, -0.4, g));
+    ctx.quadraticCurveTo(
+      0.56,
+      lerp(-0.66, -0.42, g),
+      lerp(0.5, 0.52, g),
+      lerp(-0.6, -0.4, g),
+    );
     ctx.stroke();
     ctx.fillStyle = rgb([200, 160, 70]);
     ctx.beginPath();
@@ -502,7 +554,14 @@ export function drawCow(ctx: Ctx, x: number, y: number, cow: Cow, graze: number,
 }
 
 /** Seven hoods of Sheshnaag, fanned over (x, y) and opening by `open` (0..1). */
-export function drawHoods(ctx: Ctx, x: number, y: number, size: number, open: number, seconds: number) {
+export function drawHoods(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  size: number,
+  open: number,
+  seconds: number,
+) {
   const count = 7;
   const spread = lerp(0.2, 1.45, open);
   ctx.save();
@@ -552,7 +611,12 @@ export function drawHoods(ctx: Ctx, x: number, y: number, size: number, open: nu
     for (let r = 0; r < 4; r++) {
       ctx.beginPath();
       ctx.moveTo(-0.1 + r * 0.01, -0.12 + r * 0.08);
-      ctx.quadraticCurveTo(0, -0.08 + r * 0.08, 0.1 - r * 0.01, -0.12 + r * 0.08);
+      ctx.quadraticCurveTo(
+        0,
+        -0.08 + r * 0.08,
+        0.1 - r * 0.01,
+        -0.12 + r * 0.08,
+      );
       ctx.stroke();
     }
     ctx.strokeStyle = "rgba(30, 60, 64, 0.9)";

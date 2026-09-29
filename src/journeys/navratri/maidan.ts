@@ -119,6 +119,33 @@ export function paintEffigy(heads: number, h: number, palette: RGB[], seed: numb
     g.arc(-0.9 + random() * 1.8, Y(5.9 + random() * 1.6), 0.05, 0, TAU);
     g.fill();
   }
+  // Ravana's heads are all mounted on one tinsel-edged board: the row, and the tenth on the crown.
+  if (heads > 1) {
+    const board = () => {
+      g.beginPath();
+      g.moveTo(-3.3, Y(7.5));
+      g.lineTo(-3.3, Y(8.7));
+      g.quadraticCurveTo(-2.2, Y(9.05), -1.05, Y(9.1));
+      g.quadraticCurveTo(-0.75, Y(10.45), 0, Y(10.55));
+      g.quadraticCurveTo(0.75, Y(10.45), 1.05, Y(9.1));
+      g.quadraticCurveTo(2.2, Y(9.05), 3.3, Y(8.7));
+      g.lineTo(3.3, Y(7.5));
+      g.closePath();
+    };
+    g.fillStyle = rgb(mix(A, [60, 10, 20], 0.55));
+    board();
+    g.fill();
+    g.strokeStyle = "#e8b440";
+    g.lineWidth = 0.12;
+    board();
+    g.stroke();
+    g.fillStyle = "#f0e6c0";
+    for (let i = 0; i < 26; i++) {
+      g.beginPath();
+      g.arc(-3.1 + (i / 25) * 6.2, Y(8.55 + 0.25 * Math.sin((i / 25) * Math.PI)), 0.05, 0, TAU);
+      g.fill();
+    }
+  }
   // Arms: the sword raised in one, a round shield in the other.
   g.lineCap = "round";
   g.strokeStyle = rgb(D);
@@ -156,7 +183,7 @@ export function paintEffigy(heads: number, h: number, palette: RGB[], seed: numb
   g.arc(-2.1, Y(5.9), 0.14, 0, TAU);
   g.fill();
 
-  // The heads: one in the middle, four either side a little lower, and the tenth above.
+  // The heads: one in the middle, four either side a little lower, and the tenth set on the main crown.
   const head = (x: number, base: number, size: number, face: RGB, crown: RGB) => {
     const hw = 0.42 * size;
     const hh = 0.55 * size;
@@ -220,9 +247,16 @@ export function paintEffigy(heads: number, h: number, palette: RGB[], seed: numb
   const face: RGB = [236, 186, 150];
   if (heads > 1) {
     for (let i = 4; i >= 1; i--) {
-      for (const side of [-1, 1]) head(side * (0.55 + i * 0.6), Y(7.85 - i * 0.08), 0.95, mix(face, FOIL[(i + (side > 0 ? 1 : 3)) % FOIL.length], 0.12), [232, 180, 64]);
+      for (const side of [-1, 1])
+        head(
+          side * (0.55 + i * 0.6),
+          Y(7.85 - i * 0.08),
+          0.95,
+          mix(face, FOIL[(i + (side > 0 ? 1 : 3)) % FOIL.length], 0.12),
+          [232, 180, 64],
+        );
     }
-    head(0, Y(9.95), 0.7, face, [232, 180, 64]);
+    head(0, Y(9.4), 0.72, face, [232, 180, 64]);
     head(0, Y(7.75), 1.35, face, [240, 196, 70]);
   } else {
     head(0, Y(7.75), 1.6, face, [232, 180, 64]);

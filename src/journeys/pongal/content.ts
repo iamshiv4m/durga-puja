@@ -9,11 +9,12 @@ export const pongal: JourneyContent = {
   lang: "ta",
   script: "tamil",
   tagline: "when the pot boils over",
-  greeting: "பொங்கலோ பொங்கல்!",
+  greeting: "இனிய பொங்கல்",
   pageTitle: "Poṅgal — when the pot boils over",
   description:
     "Scroll through the four days of Pongal in a Tamil village: the Bhogi fire before dawn, a kolam looped in rice flour at the door, the new clay pot boiling over for Surya, the cattle painted and belled for Mattu Pongal, and a day out for Kaanum Pongal.",
-  share: "Four days of the Tamil harvest, from the Bhogi fire to the pot boiling over.",
+  share:
+    "Four days of the Tamil harvest, from the Bhogi fire to the pot boiling over.",
   keywords: [
     "Pongal",
     "Thai Pongal",
@@ -87,28 +88,49 @@ export const pongal: JourneyContent = {
       side: "right",
     },
   ],
-  finale: { native: "தை பிறந்தால் வழி பிறக்கும்", english: "when Thai is born, a way is born", window: [0.9, 0.92, 0.975, 0.998] },
+  finale: {
+    native: "தை பிறந்தால் வழி பிறக்கும்",
+    english: "when Thai is born, a way is born",
+    window: [0.9, 0.92, 0.975, 0.998],
+  },
   hints: {
     scroll: "scroll to light the Bhogi fire",
     touch: [
-      { text: "touch between the dots to twist the line", window: [0.25, 0.27, 0.32, 0.34] },
-      { text: "hold the fire to bring the pot to the boil", window: [0.36, 0.38, 0.43, 0.45] },
-      { text: "touch the cattle to ring their bells", window: [0.63, 0.65, 0.72, 0.74] },
+      {
+        text: "touch between the dots to twist the line",
+        window: [0.25, 0.27, 0.32, 0.34],
+      },
+      {
+        text: "hold the fire to bring the pot to the boil",
+        window: [0.36, 0.38, 0.43, 0.45],
+      },
+      {
+        text: "touch the cattle to ring their bells",
+        window: [0.63, 0.65, 0.72, 0.74],
+      },
     ],
   },
   verse: {
     lines: ["சுழன்றும்ஏர்ப் பின்னது உலகம் அதனால்", "உழந்தும் உழவே தலை."],
     lang: "ta",
     script: "tamil",
-    english: "However it turns, the world follows the plough; so, for all its toil, farming comes first.",
+    english:
+      "However it turns, the world follows the plough; so, for all its toil, farming comes first.",
     source: "Thirukkural 1031 · Uzhavu, on farming",
   },
   card: { native: "இனிய பொங்கல் நல்வாழ்த்துகள்", english: "Happy Pongal" },
   returnLink: "back to the Bhogi fire",
-  soundLabel: "nadaswaram and thavil in raga Mohanam, veena, parai, the Bhogi fire, the pot boiling over, and cattle bells",
+  soundLabel:
+    "nadaswaram and thavil in raga Mohanam, veena, parai, the Bhogi fire, the pot boiling over, and cattle bells",
   about: {
     name: "Thai Pongal",
-    alternateName: ["Pongal", "பொங்கல்", "தைப்பொங்கல்", "Pongal festival", "Tamil harvest festival"],
+    alternateName: [
+      "Pongal",
+      "பொங்கல்",
+      "தைப்பொங்கல்",
+      "Pongal festival",
+      "Tamil harvest festival",
+    ],
     sameAs: "https://en.wikipedia.org/wiki/Pongal_(festival)",
   },
   ink: "#0a0605",

@@ -1,11 +1,30 @@
 // Kamsa's prison: a fort wall of dark stone in the storm with a barred arch at its foot, and in the
 // cell behind it Devaki and Vasudeva in chains, a lamp in its niche and a slit of window high up.
 // At midnight the light, the chains, the lock and the gates; outside, two guards and their torches.
-import { TAU, clamp, flame, flicker, lerp, mix, mulberry32, onScreen, rgb, type Ctx, type RGB, type View } from "../paint";
+import {
+  TAU,
+  clamp,
+  flame,
+  flicker,
+  lerp,
+  mix,
+  mulberry32,
+  onScreen,
+  rgb,
+  type Ctx,
+  type RGB,
+  type View,
+} from "../paint";
 import { SKIN, drawPerson, type Look } from "./people";
 import { FORT, PATH_Y } from "./world";
 
-export type Light = { x: number; y: number; r: number; a: number; color: string };
+export type Light = {
+  x: number;
+  y: number;
+  r: number;
+  a: number;
+  color: string;
+};
 
 export const TORCH = "255, 150, 60";
 export const DIVINE = "255, 214, 140";
@@ -52,8 +71,18 @@ const GUARD = (skin: RGB, turban: RGB): Look => ({
   beard: [24, 18, 16],
 });
 const GUARDS = [
-  { x: -3.05, facing: 1 as const, look: GUARD(SKIN[1], [130, 30, 34]), seed: 1 },
-  { x: 3.05, facing: -1 as const, look: GUARD(SKIN[2], [150, 90, 30]), seed: 2 },
+  {
+    x: -3.05,
+    facing: 1 as const,
+    look: GUARD(SKIN[1], [130, 30, 34]),
+    seed: 1,
+  },
+  {
+    x: 3.05,
+    facing: -1 as const,
+    look: GUARD(SKIN[2], [150, 90, 30]),
+    seed: 2,
+  },
 ];
 
 export type FortState = {
@@ -78,7 +107,13 @@ export class Fort {
   private readonly inner: Block[] = [];
   private readonly straw: { x: number; y: number; a: number; l: number }[] = [];
   private readonly puddles: { x: number; y: number; w: number }[] = [];
-  private readonly skyline: { x: number; w: number; h: number; dome: boolean; lit: number[] }[] = [];
+  private readonly skyline: {
+    x: number;
+    w: number;
+    h: number;
+    dome: boolean;
+    lit: number[];
+  }[] = [];
 
   constructor() {
     const random = mulberry32(1402);
@@ -96,12 +131,29 @@ export class Fort {
       let x = -HALF - random() * 0.5;
       while (x < HALF) {
         const w = 0.55 + random() * 0.6;
-        this.inner.push({ x, y: -0.55 - (row + 1) * 0.38, w, h: 0.38, tone: random() });
+        this.inner.push({
+          x,
+          y: -0.55 - (row + 1) * 0.38,
+          w,
+          h: 0.38,
+          tone: random(),
+        });
         x += w;
       }
     }
-    for (let i = 0; i < 90; i++) this.straw.push({ x: -HALF + random() * HALF * 2, y: -0.52 + random() * 0.46, a: (random() - 0.5) * 1.2, l: 0.08 + random() * 0.12 });
-    for (let i = 0; i < 9; i++) this.puddles.push({ x: -8 + random() * 13, y: 0.5 + random() * 2.2, w: 0.6 + random() * 1.2 });
+    for (let i = 0; i < 90; i++)
+      this.straw.push({
+        x: -HALF + random() * HALF * 2,
+        y: -0.52 + random() * 0.46,
+        a: (random() - 0.5) * 1.2,
+        l: 0.08 + random() * 0.12,
+      });
+    for (let i = 0; i < 9; i++)
+      this.puddles.push({
+        x: -8 + random() * 13,
+        y: 0.5 + random() * 2.2,
+        w: 0.6 + random() * 1.2,
+      });
     let x = -34;
     for (let guard = 0; x < 3 && guard < 200; guard++) {
       const w = 1.2 + random() * 2.6;
@@ -137,7 +189,13 @@ export class Fort {
         const wy = -1.2 - b.h * (0.3 + l * 0.5);
         ctx.fillStyle = "rgba(255, 170, 90, 0.7)";
         ctx.fillRect(wx, wy, 0.14, 0.22);
-        s.lights.push({ x: wx + 0.07, y: wy + 0.11, r: 0.5, a: 0.18, color: TORCH });
+        s.lights.push({
+          x: wx + 0.07,
+          y: wy + 0.11,
+          r: 0.5,
+          a: 0.18,
+          color: TORCH,
+        });
       }
     }
   }
@@ -161,9 +219,22 @@ export class Fort {
       ctx.fillRect(t.x + t.w * 0.8 - 0.12, t.top - 1.1, 0.12, 1.1);
       ctx.fillRect(t.x + t.w * 0.12, t.top - 1.2, t.w * 0.76, 0.14);
       ctx.beginPath();
-      ctx.ellipse(t.x + t.w / 2, t.top - 1.2, t.w * 0.34, t.w * 0.3, 0, Math.PI, 0);
+      ctx.ellipse(
+        t.x + t.w / 2,
+        t.top - 1.2,
+        t.w * 0.34,
+        t.w * 0.3,
+        0,
+        Math.PI,
+        0,
+      );
       ctx.fill();
-      ctx.fillRect(t.x + t.w / 2 - 0.03, t.top - 1.2 - t.w * 0.3 - 0.35, 0.06, 0.35);
+      ctx.fillRect(
+        t.x + t.w / 2 - 0.03,
+        t.top - 1.2 - t.w * 0.3 - 0.35,
+        0.06,
+        0.35,
+      );
     }
     // Merlons along the parapet.
     for (let x = WALL.from; x < WALL.to - 0.3; x += 0.7) {
@@ -177,10 +248,17 @@ export class Fort {
     }
     // Stones, each a little different, and the mortar between them.
     for (const b of this.blocks) {
-      if (b.y < WALL.top - 0.1 && !towers.some((t) => b.x + b.w > t.x && b.x < t.x + t.w && b.y > t.top)) continue;
+      if (
+        b.y < WALL.top - 0.1 &&
+        !towers.some((t) => b.x + b.w > t.x && b.x < t.x + t.w && b.y > t.top)
+      )
+        continue;
       if (b.y + b.h > 0.01) continue;
       const shade = (b.tone - 0.5) * 0.18;
-      ctx.fillStyle = shade > 0 ? `rgba(160, 170, 200, ${shade * 0.35})` : `rgba(8, 8, 14, ${-shade * 0.9})`;
+      ctx.fillStyle =
+        shade > 0
+          ? `rgba(160, 170, 200, ${shade * 0.35})`
+          : `rgba(8, 8, 14, ${-shade * 0.9})`;
       ctx.fillRect(b.x, b.y, b.w, b.h);
     }
     ctx.strokeStyle = rgb(MORTAR, 0.8);
@@ -225,7 +303,14 @@ export class Fort {
       ctx.lineTo(bx, -3.1);
     }
     ctx.stroke();
-    if (flash > 0.05) s.lights.push({ x: 0, y: -2.7, r: 2.2, a: 0.4 * flash, color: "170, 190, 255" });
+    if (flash > 0.05)
+      s.lights.push({
+        x: 0,
+        y: -2.7,
+        r: 2.2,
+        a: 0.4 * flash,
+        color: "170, 190, 255",
+      });
     // The floor, and straw on it.
     ctx.fillStyle = rgb(mix([34, 30, 30], [120, 90, 50], warm * 0.8));
     ctx.fillRect(-HALF, -0.58, HALF * 2, 0.6);
@@ -234,7 +319,10 @@ export class Fort {
     ctx.beginPath();
     for (const st of this.straw) {
       ctx.moveTo(st.x, st.y);
-      ctx.lineTo(st.x + Math.cos(st.a) * st.l, st.y + Math.sin(st.a) * st.l * 0.3);
+      ctx.lineTo(
+        st.x + Math.cos(st.a) * st.l,
+        st.y + Math.sin(st.a) * st.l * 0.3,
+      );
     }
     ctx.stroke();
     // The lamp in its niche.
@@ -261,7 +349,10 @@ export class Fort {
     ];
     for (const r of rings) {
       const drop = clamp(s.chains);
-      const end = { x: lerp(r.wrist.x, r.x + (r.x < 0 ? 0.28 : -0.28), drop), y: lerp(r.wrist.y, -0.4, drop * drop) };
+      const end = {
+        x: lerp(r.wrist.x, r.x + (r.x < 0 ? 0.28 : -0.28), drop),
+        y: lerp(r.wrist.y, -0.4, drop * drop),
+      };
       chain(ctx, r.x, r.y, end.x, end.y, lerp(0.35, 0.6, drop), warm);
       ctx.strokeStyle = rgb(mix([70, 70, 76], [220, 190, 130], warm));
       ctx.lineWidth = 0.035;
@@ -286,7 +377,10 @@ export class Fort {
       nod: holding ? 0.25 : 0.12 - s.born * 0.1,
       lean: holding ? 0.08 : 0.04,
     });
-    return { x: (hands.left.x + hands.right.x) / 2 + 0.05, y: (hands.left.y + hands.right.y) / 2 - 0.05 };
+    return {
+      x: (hands.left.x + hands.right.x) / 2 + 0.05,
+      y: (hands.left.y + hands.right.y) / 2 - 0.05,
+    };
   }
 
   /** The arch itself, its gates, the guards and the torches, in front of whoever is in the cell. */
@@ -295,7 +389,13 @@ export class Fort {
     const flash = s.flash;
     const warm = s.born;
     // The deep stone of the arch around the opening, and its voussoirs.
-    const edge = rgb(mix(mix([84, 88, 108], [140, 150, 190], flash * 0.4), [200, 160, 100], warm * 0.5));
+    const edge = rgb(
+      mix(
+        mix([84, 88, 108], [140, 150, 190], flash * 0.4),
+        [200, 160, 100],
+        warm * 0.5,
+      ),
+    );
     ctx.save();
     ctx.strokeStyle = edge;
     ctx.lineWidth = 0.34;
@@ -364,7 +464,14 @@ export class Fort {
       ctx.fillStyle = "#3a2618";
       ctx.fillRect(tx - 0.07, ty - 0.12, 0.14, 0.2);
       const f = flicker(s.seconds * 1.4, side + 4);
-      flame(ctx, tx, ty - 0.08, 0.42 * f * (1 - 0.35 * s.sleep), s.seconds * 1.4, side + 4);
+      flame(
+        ctx,
+        tx,
+        ty - 0.08,
+        0.42 * f * (1 - 0.35 * s.sleep),
+        s.seconds * 1.4,
+        side + 4,
+      );
       s.lights.push({ x: tx, y: ty - 0.3, r: 3.4, a: 0.32 * f, color: TORCH });
       s.lights.push({ x: tx, y: ty - 0.25, r: 0.7, a: 0.7 * f, color: TORCH });
     }
@@ -377,14 +484,19 @@ export class Fort {
       const lean = sleep * 0.45 * -g.facing;
       const sx = x + g.facing * 0.2;
       const base = { x: sx + lean * 0.3, y: PATH_Y - 0.05 };
-      const tip = { x: base.x + Math.sin(lean) * 2.4, y: base.y - Math.cos(lean) * 2.4 };
+      const tip = {
+        x: base.x + Math.sin(lean) * 2.4,
+        y: base.y - Math.cos(lean) * 2.4,
+      };
       ctx.strokeStyle = "#3a2a1c";
       ctx.lineWidth = 0.045;
       ctx.beginPath();
       ctx.moveTo(base.x, base.y);
       ctx.lineTo(tip.x, tip.y);
       ctx.stroke();
-      ctx.fillStyle = rgb(mix([120, 124, 140], [230, 210, 160], warm * 0.5 + flash * 0.3));
+      ctx.fillStyle = rgb(
+        mix([120, 124, 140], [230, 210, 160], warm * 0.5 + flash * 0.3),
+      );
       ctx.save();
       ctx.translate(tip.x, tip.y);
       ctx.rotate(lean);
@@ -398,19 +510,40 @@ export class Fort {
       // A round shield on his back.
       ctx.fillStyle = "#2a2226";
       ctx.beginPath();
-      ctx.arc(x - g.facing * 0.12, PATH_Y - g.look.h * lerp(0.62, 0.32, sleep), 0.26, 0, TAU);
+      ctx.arc(
+        x - g.facing * 0.12,
+        PATH_Y - g.look.h * lerp(0.62, 0.32, sleep),
+        0.26,
+        0,
+        TAU,
+      );
       ctx.fill();
       drawPerson(
         ctx,
         x,
         PATH_Y,
         g.look,
-        { la: 0.1, lf: 0.2, ra: lerp(0.35, 0.2, sleep), rf: lerp(1.35, 0.7, sleep), sit: sleep, nod: sleep * 0.55, lean: -sleep * 0.08 },
+        {
+          la: 0.1,
+          lf: 0.2,
+          ra: lerp(0.35, 0.2, sleep),
+          rf: lerp(1.35, 0.7, sleep),
+          sit: sleep,
+          nod: sleep * 0.55,
+          lean: -sleep * 0.08,
+        },
         g.facing,
       );
     }
     // The first blaze pours out through the bars.
-    if (s.blaze > 0.01 && s.child) s.lights.push({ x: s.child.x, y: s.child.y, r: 12, a: 0.3 * s.blaze, color: DIVINE });
+    if (s.blaze > 0.01 && s.child)
+      s.lights.push({
+        x: s.child.x,
+        y: s.child.y,
+        r: 12,
+        a: 0.3 * s.blaze,
+        color: DIVINE,
+      });
   }
 
   /** The wet ground in front, puddles catching the light. */
@@ -422,7 +555,10 @@ export class Fort {
     ctx.fillRect(-40, -0.02, until + 40, 30);
     for (const pd of this.puddles) {
       if (!onScreen(v, pd.x, pd.y, pd.w)) continue;
-      ctx.fillStyle = rgb(mix([40, 46, 66], [180, 190, 230], s.flash * 0.7), 0.7);
+      ctx.fillStyle = rgb(
+        mix([40, 46, 66], [180, 190, 230], s.flash * 0.7),
+        0.7,
+      );
       ctx.beginPath();
       ctx.ellipse(pd.x, pd.y, pd.w, pd.w * 0.12, 0, 0, TAU);
       ctx.fill();
@@ -431,7 +567,13 @@ export class Fort {
       ctx.lineWidth = 0.012;
       for (let k = 0; k < 3; k++) {
         const t = (((s.seconds * 1.3 + k * 0.37 + pd.x) % 1) + 1) % 1;
-        const rx = pd.x + Math.sin(k * 7 + Math.floor(s.seconds * 1.3 + k * 0.37 + pd.x) * 3.1) * pd.w * 0.6;
+        const rx =
+          pd.x +
+          Math.sin(
+            k * 7 + Math.floor(s.seconds * 1.3 + k * 0.37 + pd.x) * 3.1,
+          ) *
+            pd.w *
+            0.6;
         ctx.globalAlpha = 1 - t;
         ctx.beginPath();
         ctx.ellipse(rx, pd.y, t * 0.25, t * 0.03, 0, 0, TAU);
@@ -445,16 +587,28 @@ export class Fort {
 function archPoint(half: number, t: number) {
   // Up the left jamb, over the pointed crown and down the right, as t goes 0..1.
   const H = SPRING - APEX;
-  const bez = (a: number, b: number, c: number, d: number, u: number) => (1 - u) ** 3 * a + 3 * (1 - u) ** 2 * u * b + 3 * (1 - u) * u * u * c + u ** 3 * d;
+  const bez = (a: number, b: number, c: number, d: number, u: number) =>
+    (1 - u) ** 3 * a +
+    3 * (1 - u) ** 2 * u * b +
+    3 * (1 - u) * u * u * c +
+    u ** 3 * d;
   if (t < 0.5) {
     const u = t * 2;
-    return { x: bez(-half, -half, -half * 0.35, 0, u), y: bez(SPRING, SPRING - 0.75 * H, APEX + 0.08 * H, APEX, u) };
+    return {
+      x: bez(-half, -half, -half * 0.35, 0, u),
+      y: bez(SPRING, SPRING - 0.75 * H, APEX + 0.08 * H, APEX, u),
+    };
   }
   const u = (t - 0.5) * 2;
-  return { x: bez(0, half * 0.35, half, half, u), y: bez(APEX, APEX + 0.08 * H, SPRING - 0.75 * H, SPRING, u) };
+  return {
+    x: bez(0, half * 0.35, half, half, u),
+    y: bez(APEX, APEX + 0.08 * H, SPRING - 0.75 * H, SPRING, u),
+  };
 }
 
-const ARCH_LEFT = Array.from({ length: 65 }, (_, i) => archPoint(HALF, i / 128));
+const ARCH_LEFT = Array.from({ length: 65 }, (_, i) =>
+  archPoint(HALF, i / 128),
+);
 
 /** The height of the inside of the arch above x. */
 function archY(x: number) {
@@ -463,7 +617,8 @@ function archY(x: number) {
   for (let i = 0; i < ARCH_LEFT.length - 1; i++) {
     const a = ARCH_LEFT[i];
     const b = ARCH_LEFT[i + 1];
-    if (ax >= a.x && ax <= b.x) return lerp(a.y, b.y, (ax - a.x) / (b.x - a.x || 1));
+    if (ax >= a.x && ax <= b.x)
+      return lerp(a.y, b.y, (ax - a.x) / (b.x - a.x || 1));
   }
   return APEX;
 }
@@ -474,8 +629,22 @@ function archPath(ctx: Ctx, half: number, closed = true) {
   ctx.beginPath();
   ctx.moveTo(-half, closed ? 0.02 : 0);
   ctx.lineTo(-half, SPRING);
-  ctx.bezierCurveTo(-half, SPRING - 0.75 * H, -half * 0.35, APEX + 0.08 * H, 0, APEX);
-  ctx.bezierCurveTo(half * 0.35, APEX + 0.08 * H, half, SPRING - 0.75 * H, half, SPRING);
+  ctx.bezierCurveTo(
+    -half,
+    SPRING - 0.75 * H,
+    -half * 0.35,
+    APEX + 0.08 * H,
+    0,
+    APEX,
+  );
+  ctx.bezierCurveTo(
+    half * 0.35,
+    APEX + 0.08 * H,
+    half,
+    SPRING - 0.75 * H,
+    half,
+    SPRING,
+  );
   ctx.lineTo(half, closed ? 0.02 : 0);
   if (closed) ctx.closePath();
 }
@@ -535,7 +704,15 @@ function gate(ctx: Ctx, side: number, warm: number, lock: number) {
 }
 
 /** A chain of iron links from (x0, y0) to (x1, y1), hanging with `sag`. */
-function chain(ctx: Ctx, x0: number, y0: number, x1: number, y1: number, sag: number, warm: number) {
+function chain(
+  ctx: Ctx,
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  sag: number,
+  warm: number,
+) {
   const links = 14;
   ctx.strokeStyle = rgb(mix([60, 60, 66], [220, 190, 130], warm));
   ctx.lineWidth = 0.022;
@@ -546,7 +723,15 @@ function chain(ctx: Ctx, x0: number, y0: number, x1: number, y1: number, sag: nu
     const nx = lerp(x0, x1, t + 0.02);
     const ny = lerp(y0, y1, t + 0.02) + Math.sin((t + 0.02) * Math.PI) * sag;
     ctx.beginPath();
-    ctx.ellipse(x, y, 0.05, i % 2 ? 0.018 : 0.03, Math.atan2(ny - y, nx - x), 0, TAU);
+    ctx.ellipse(
+      x,
+      y,
+      0.05,
+      i % 2 ? 0.018 : 0.03,
+      Math.atan2(ny - y, nx - x),
+      0,
+      TAU,
+    );
     ctx.stroke();
   }
 }

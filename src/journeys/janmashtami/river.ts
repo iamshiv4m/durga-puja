@@ -1,7 +1,17 @@
 // The Yamuna in flood: the far bank's trees against the lightning, rows of storm waves, the water
 // rising on the line Vasudeva wades until it touches the child's feet, then parting round him,
 // and Sheshnaag rising behind with his hoods spread over the basket.
-import { TAU, clamp, lerp, mix, mulberry32, rgb, type Ctx, type RGB, type View } from "../paint";
+import {
+  TAU,
+  clamp,
+  lerp,
+  mix,
+  mulberry32,
+  rgb,
+  type Ctx,
+  type RGB,
+  type View,
+} from "../paint";
 import type { Light } from "./fort";
 import { drawHoods } from "./people";
 import { HORIZON, PATH_Y, RIVER, depth } from "./world";
@@ -32,21 +42,33 @@ const DEEP: RGB = [10, 20, 28];
 const WATER: RGB = [30, 56, 68];
 
 export class River {
-  private readonly trees: { x: number; h: number; w: number; kind: number }[] = [];
-  private readonly reeds: { x: number; y: number; h: number; lean: number }[] = [];
+  private readonly trees: { x: number; h: number; w: number; kind: number }[] =
+    [];
+  private readonly reeds: { x: number; y: number; h: number; lean: number }[] =
+    [];
 
   constructor() {
     const random = mulberry32(2208);
     let x = 2;
     for (let guard = 0; x < 27 && guard < 300; guard++) {
-      this.trees.push({ x, h: 0.6 + random() * 1.3, w: 0.5 + random() * 0.9, kind: random() < 0.3 ? 1 : 0 });
+      this.trees.push({
+        x,
+        h: 0.6 + random() * 1.3,
+        w: 0.5 + random() * 0.9,
+        kind: random() < 0.3 ? 1 : 0,
+      });
       x += 0.3 + random() * 0.8;
     }
     for (let i = 0; i < 70; i++) {
       const left = i < 35;
       const y = HORIZON + 0.2 + random() * 2.5;
       const edge = left ? shoreLeft(y) : shoreRight(y);
-      this.reeds.push({ x: edge + (left ? -1 : 1) * random() * 0.7, y, h: 0.3 + random() * 0.5, lean: (random() - 0.5) * 0.4 });
+      this.reeds.push({
+        x: edge + (left ? -1 : 1) * random() * 0.7,
+        y,
+        h: 0.3 + random() * 0.5,
+        lean: (random() - 0.5) * 0.4,
+      });
     }
   }
 
@@ -55,9 +77,14 @@ export class River {
     const d = depth(x);
     const deep = d / RIVER.deep;
     const t = s.seconds;
-    const chop = (0.07 * Math.sin(x * 2.1 - t * 2.6) + 0.045 * Math.sin(x * 4.7 + t * 3.3) + 0.09 * Math.sin(x * 0.9 - t * 1.3)) * lerp(0.2, 1.3, s.storm);
+    const chop =
+      (0.07 * Math.sin(x * 2.1 - t * 2.6) +
+        0.045 * Math.sin(x * 4.7 + t * 3.3) +
+        0.09 * Math.sin(x * 0.9 - t * 1.3)) *
+      lerp(0.2, 1.3, s.storm);
     const swell = s.surge * 0.35 * deep;
-    const crest = s.surge * 0.75 * Math.exp(-(((x - s.vx - 0.1) / 0.6) ** 2)) * deep;
+    const crest =
+      s.surge * 0.75 * Math.exp(-(((x - s.vx - 0.1) / 0.6) ** 2)) * deep;
     const off = Math.abs(x - s.vx);
     const inside = 1 - clamp((off - 1.05) / 0.5);
     const wall = Math.exp(-(((off - 1.55) / 0.3) ** 2)) * 0.55;
@@ -72,7 +99,9 @@ export class River {
     if (right < RIVER.from - 4 || left > RIVER.to + 4) return;
     const flash = s.flash;
     // The far bank upriver: a line of trees against the sky.
-    ctx.fillStyle = rgb(mix(mix([12, 14, 22], [60, 60, 70], s.calm), [70, 80, 120], flash * 0.4));
+    ctx.fillStyle = rgb(
+      mix(mix([12, 14, 22], [60, 60, 70], s.calm), [70, 80, 120], flash * 0.4),
+    );
     ctx.beginPath();
     ctx.moveTo(1, HORIZON + 0.05);
     for (const tr of this.trees) {
@@ -81,7 +110,12 @@ export class River {
         ctx.lineTo(tr.x + tr.w * 0.1, HORIZON - tr.h * 1.4);
         ctx.lineTo(tr.x + tr.w * 0.2, HORIZON - tr.h * 0.3);
       } else {
-        ctx.quadraticCurveTo(tr.x + tr.w * 0.5, HORIZON - tr.h * 1.6, tr.x + tr.w, HORIZON - tr.h * 0.4);
+        ctx.quadraticCurveTo(
+          tr.x + tr.w * 0.5,
+          HORIZON - tr.h * 1.6,
+          tr.x + tr.w,
+          HORIZON - tr.h * 0.4,
+        );
       }
     }
     ctx.lineTo(28, HORIZON + 0.05);
@@ -89,23 +123,45 @@ export class River {
     ctx.fill();
     // Open water, darker far off.
     const water = ctx.createLinearGradient(0, HORIZON, 0, 3);
-    water.addColorStop(0, rgb(mix(mix([30, 40, 54], [140, 150, 170], s.calm), [120, 140, 180], flash * 0.6)));
+    water.addColorStop(
+      0,
+      rgb(
+        mix(
+          mix([30, 40, 54], [140, 150, 170], s.calm),
+          [120, 140, 180],
+          flash * 0.6,
+        ),
+      ),
+    );
     water.addColorStop(0.3, rgb(mix(DEEP, [70, 80, 110], s.calm * 0.6)));
     water.addColorStop(1, rgb(mix(WATER, [80, 96, 120], s.calm * 0.5)));
     ctx.fillStyle = water;
-    ctx.fillRect(shoreLeft(HORIZON) - 1, HORIZON, RIVER.to - RIVER.from + 2, 30);
+    ctx.fillRect(
+      shoreLeft(HORIZON) - 1,
+      HORIZON,
+      RIVER.to - RIVER.from + 2,
+      30,
+    );
     // Rows of storm waves running downriver.
     ctx.lineCap = "round";
     for (let r = 0; r < 9; r++) {
       const y = HORIZON + 0.06 + (r / 8) ** 1.6 * (PATH_Y - 0.9 - HORIZON);
       const amp = (0.02 + (r / 8) * 0.07) * lerp(0.2, 1.4, s.storm);
-      ctx.strokeStyle = rgb(mix([90, 120, 130], [220, 230, 255], flash * 0.5), 0.14 + r * 0.03);
+      ctx.strokeStyle = rgb(
+        mix([90, 120, 130], [220, 230, 255], flash * 0.5),
+        0.14 + r * 0.03,
+      );
       ctx.lineWidth = 0.02 + r * 0.004;
       ctx.beginPath();
       const x0 = shoreLeft(y) + 0.2;
       const x1 = shoreRight(y) - 0.2;
       for (let x = Math.max(x0, left); x <= Math.min(x1, right); x += 0.18) {
-        const wy = y - Math.abs(Math.sin(x * (1.6 + r * 0.2) - s.seconds * (1.4 + r * 0.12) + r)) * amp;
+        const wy =
+          y -
+          Math.abs(
+            Math.sin(x * (1.6 + r * 0.2) - s.seconds * (1.4 + r * 0.12) + r),
+          ) *
+            amp;
         if (x === Math.max(x0, left)) ctx.moveTo(x, wy);
         else ctx.lineTo(x, wy);
       }
@@ -122,7 +178,8 @@ export class River {
       ctx.fillStyle = g;
       ctx.beginPath();
       ctx.moveTo(from(HORIZON), HORIZON);
-      for (let y = HORIZON; y <= 12; y += 0.5) ctx.lineTo(from(y) + Math.sin(y * 3.1) * 0.12, y);
+      for (let y = HORIZON; y <= 12; y += 0.5)
+        ctx.lineTo(from(y) + Math.sin(y * 3.1) * 0.12, y);
       ctx.lineTo(from(12) - dir * 30, 12);
       ctx.lineTo(from(HORIZON) - dir * 30, HORIZON);
       ctx.closePath();
@@ -131,7 +188,8 @@ export class River {
       ctx.strokeStyle = rgb(mix(colour, [120, 110, 90], 0.3), 0.6);
       ctx.lineWidth = 0.08;
       ctx.beginPath();
-      for (let y = HORIZON; y <= 12; y += 0.5) ctx.lineTo(from(y) + Math.sin(y * 3.1) * 0.12, y);
+      for (let y = HORIZON; y <= 12; y += 0.5)
+        ctx.lineTo(from(y) + Math.sin(y * 3.1) * 0.12, y);
       ctx.stroke();
     };
     bank(shoreLeft, 1, ground);
@@ -143,7 +201,12 @@ export class River {
       const sway = Math.sin(s.seconds * 2.2 + r.x * 3) * 0.1 * (0.3 + s.storm);
       for (let k = -1; k <= 1; k++) {
         ctx.moveTo(r.x + k * 0.04, r.y);
-        ctx.quadraticCurveTo(r.x + k * 0.06 + sway * 0.5, r.y - r.h * 0.6, r.x + k * 0.1 + sway + r.lean, r.y - r.h);
+        ctx.quadraticCurveTo(
+          r.x + k * 0.06 + sway * 0.5,
+          r.y - r.h * 0.6,
+          r.x + k * 0.1 + sway + r.lean,
+          r.y - r.h,
+        );
       }
     }
     ctx.stroke();
@@ -171,14 +234,29 @@ export class River {
       ctx.strokeStyle = "rgba(120, 200, 190, 0.5)";
       ctx.lineWidth = 0.03;
       ctx.beginPath();
-      ctx.ellipse(cx, cy, r * 1.4 * up, r * up, 0, Math.PI * 1.1, Math.PI * 1.6);
+      ctx.ellipse(
+        cx,
+        cy,
+        r * 1.4 * up,
+        r * up,
+        0,
+        Math.PI * 1.1,
+        Math.PI * 1.6,
+      );
       ctx.stroke();
     }
     // The body, thick and scaled, curving up his back.
     const path = () => {
       ctx.beginPath();
       ctx.moveTo(s.vx - 1.7, water + 0.1);
-      ctx.bezierCurveTo(s.vx - 1.2, lerp(water, -2.2, up), s.vx - 0.55, lerp(water, -0.55, up), neck.x, neck.y + 0.35);
+      ctx.bezierCurveTo(
+        s.vx - 1.2,
+        lerp(water, -2.2, up),
+        s.vx - 0.55,
+        lerp(water, -0.55, up),
+        neck.x,
+        neck.y + 0.35,
+      );
     };
     ctx.strokeStyle = "#163038";
     ctx.lineWidth = 0.34;
@@ -195,8 +273,20 @@ export class River {
     ctx.stroke();
     ctx.setLineDash([]);
     drawHoods(ctx, neck.x, neck.y + 0.35, 0.95, open, s.seconds);
-    s.lights.push({ x: neck.x, y: neck.y - 0.6, r: 3.2, a: 0.35 * open, color: SERPENT_LIGHT });
-    s.lights.push({ x: neck.x, y: neck.y - 0.55, r: 1.3, a: 0.25 * open, color: "255, 230, 170" });
+    s.lights.push({
+      x: neck.x,
+      y: neck.y - 0.6,
+      r: 3.2,
+      a: 0.35 * open,
+      color: SERPENT_LIGHT,
+    });
+    s.lights.push({
+      x: neck.x,
+      y: neck.y - 0.55,
+      r: 1.3,
+      a: 0.25 * open,
+      color: "255, 230, 170",
+    });
   }
 
   /** The water in front of Vasudeva's line, over his legs, and the waves nearer to us. */
@@ -215,11 +305,18 @@ export class River {
     ctx.clip();
     const step = 0.08;
     const pts: { x: number; y: number }[] = [];
-    for (let x = left; x <= right + step; x += step) pts.push({ x, y: this.surface(x, s) });
+    for (let x = left; x <= right + step; x += step)
+      pts.push({ x, y: this.surface(x, s) });
     const top = Math.min(...pts.map((pt) => pt.y));
     const water = ctx.createLinearGradient(0, top, 0, PATH_Y + 3);
-    water.addColorStop(0, rgb(mix([40, 76, 88], [150, 170, 210], s.flash * 0.5), 0.72));
-    water.addColorStop(0.12, rgb(mix([28, 56, 68], [120, 140, 180], s.flash * 0.4), 0.9));
+    water.addColorStop(
+      0,
+      rgb(mix([40, 76, 88], [150, 170, 210], s.flash * 0.5), 0.72),
+    );
+    water.addColorStop(
+      0.12,
+      rgb(mix([28, 56, 68], [120, 140, 180], s.flash * 0.4), 0.9),
+    );
     water.addColorStop(0.4, rgb(WATER, 0.97));
     water.addColorStop(1, rgb(DEEP));
     ctx.fillStyle = water;
@@ -234,7 +331,9 @@ export class River {
     ctx.strokeStyle = rgb(mix([170, 200, 205], [240, 245, 255], s.flash), 0.7);
     ctx.lineWidth = 0.035;
     ctx.beginPath();
-    pts.forEach((pt, i) => (i ? ctx.lineTo(pt.x, pt.y) : ctx.moveTo(pt.x, pt.y)));
+    pts.forEach((pt, i) =>
+      i ? ctx.lineTo(pt.x, pt.y) : ctx.moveTo(pt.x, pt.y),
+    );
     ctx.stroke();
     ctx.fillStyle = "rgba(220, 235, 240, 0.55)";
     for (let i = 1; i < pts.length - 1; i++) {
@@ -242,18 +341,34 @@ export class River {
       if (slope < 0.5 && (i * 7) % 5) continue;
       const r = 0.02 + Math.min(0.08, slope * 0.02);
       ctx.beginPath();
-      ctx.arc(pts[i].x + Math.sin(i * 3 + s.seconds * 4) * 0.03, pts[i].y + 0.03 + ((i * 13) % 7) * 0.02, r, 0, TAU);
+      ctx.arc(
+        pts[i].x + Math.sin(i * 3 + s.seconds * 4) * 0.03,
+        pts[i].y + 0.03 + ((i * 13) % 7) * 0.02,
+        r,
+        0,
+        TAU,
+      );
       ctx.fill();
     }
     // Waves nearer to us.
     for (let r = 0; r < 6; r++) {
       const y = PATH_Y + 0.35 + r * r * 0.18 + r * 0.25;
       const amp = (0.06 + r * 0.035) * lerp(0.15, 1.3, s.storm);
-      ctx.strokeStyle = rgb(mix([90, 130, 140], [220, 230, 255], s.flash * 0.5), 0.25);
+      ctx.strokeStyle = rgb(
+        mix([90, 130, 140], [220, 230, 255], s.flash * 0.5),
+        0.25,
+      );
       ctx.lineWidth = 0.03 + r * 0.01;
       ctx.beginPath();
       for (let x = left; x <= right; x += 0.2) {
-        const wy = y - Math.abs(Math.sin(x * (1.1 - r * 0.08) - s.seconds * (1.8 - r * 0.1) + r * 2)) * amp;
+        const wy =
+          y -
+          Math.abs(
+            Math.sin(
+              x * (1.1 - r * 0.08) - s.seconds * (1.8 - r * 0.1) + r * 2,
+            ),
+          ) *
+            amp;
         if (x === left) ctx.moveTo(x, wy);
         else ctx.lineTo(x, wy);
       }

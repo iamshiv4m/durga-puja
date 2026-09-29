@@ -2,11 +2,25 @@
 // strung with lights, the sanctum curtain drawn back at midnight, and before it the jhula, a silver
 // swing heaped with flowers, with Laddu Gopal in it. Fifty-six dishes of chhappan bhog on the steps,
 // the pujari with the aarti, the conch, the bells, and the devotees who have fasted until now.
-import { TAU, clamp, flame, flicker, lerp, mix, mulberry32, onScreen, rgb, rise, type Ctx, type RGB, type View } from "../paint";
+import {
+  TAU,
+  clamp,
+  flame,
+  flicker,
+  lerp,
+  mix,
+  mulberry32,
+  onScreen,
+  rgb,
+  rise,
+  type Ctx,
+  type RGB,
+  type View,
+} from "../paint";
 import type { Emit, Frame } from "../types";
 import { TORCH, type Light } from "./fort";
 import { SKIN, drawPerson, type Look } from "./people";
-import { MOMENTS, TEMPLE } from "./world";
+import { MOMENTS, TEMPLE, cut } from "./world";
 
 const X = TEMPLE.x;
 const STONE: RGB = [196, 132, 104];
@@ -15,15 +29,40 @@ const MARBLE: RGB = [236, 224, 206];
 const BULB = "255, 196, 110";
 const GOLD = "255, 206, 120";
 
-const PUJARI: Look = { h: 1.74, skin: SKIN[1], top: [0, 0, 0], bottom: [236, 170, 40], wrap: [0, 0, 0], head: "shikha", dress: "dhoti", bare: true, shawl: [220, 90, 30] };
-const CONCH: Look = { h: 1.7, skin: SKIN[0], top: [0, 0, 0], bottom: [240, 230, 210], wrap: [0, 0, 0], head: "shikha", dress: "dhoti", bare: true, shawl: [230, 180, 50] };
+const PUJARI: Look = {
+  h: 1.74,
+  skin: SKIN[1],
+  top: [0, 0, 0],
+  bottom: [236, 170, 40],
+  wrap: [0, 0, 0],
+  head: "shikha",
+  dress: "dhoti",
+  bare: true,
+  shawl: [220, 90, 30],
+};
+const CONCH: Look = {
+  h: 1.7,
+  skin: SKIN[0],
+  top: [0, 0, 0],
+  bottom: [240, 230, 210],
+  wrap: [0, 0, 0],
+  head: "shikha",
+  dress: "dhoti",
+  bare: true,
+  shawl: [230, 180, 50],
+};
 
 type Dish = { x: number; y: number; kind: number };
 
 export class Temple {
   private readonly emit: Emit;
   private readonly dishes: Dish[] = [];
-  private readonly devotees: { x: number; y: number; look: Look; seed: number }[] = [];
+  private readonly devotees: {
+    x: number;
+    y: number;
+    look: Look;
+    seed: number;
+  }[] = [];
   private readonly bulbs: { x: number; y: number; seed: number }[] = [];
   private angle = 0;
   private speed = 0;
@@ -39,7 +78,12 @@ export class Temple {
       [19, -0.16, 2.7],
       [15, -0.58, 2.3],
     ].forEach(([n, y, half], row) => {
-      for (let i = 0; i < n; i++) this.dishes.push({ x: X - half + ((i + 0.5) / n) * half * 2, y, kind: (i * 3 + row * 5) % 8 });
+      for (let i = 0; i < n; i++)
+        this.dishes.push({
+          x: X - half + ((i + 0.5) / n) * half * 2,
+          y,
+          kind: (i * 3 + row * 5) % 8,
+        });
     });
     const colours: RGB[] = [
       [220, 60, 80],
@@ -54,18 +98,49 @@ export class Temple {
       const woman = i % 2 === 0;
       const c = colours[i % colours.length];
       const look: Look = woman
-        ? { h: 1.58, skin: SKIN[i % 5], top: c, bottom: c, wrap: c, head: "pallu", dress: "sari", woman, border: [240, 196, 90] }
-        : { h: 1.74, skin: SKIN[(i + 1) % 5], top: i % 3 ? [240, 232, 214] : c, bottom: [240, 234, 220], wrap: [0, 0, 0], head: "bare", dress: "pyjama" };
-      this.devotees.push({ x: X - 6.5 + i * 1.02 + (random() - 0.5) * 0.3, y: 1.05 + (i % 3) * 0.28 + random() * 0.1, look, seed: random() * 10 });
+        ? {
+            h: 1.58,
+            skin: SKIN[i % 5],
+            top: c,
+            bottom: c,
+            wrap: c,
+            head: "pallu",
+            dress: "sari",
+            woman,
+            border: [240, 196, 90],
+          }
+        : {
+            h: 1.74,
+            skin: SKIN[(i + 1) % 5],
+            top: i % 3 ? [240, 232, 214] : c,
+            bottom: [240, 234, 220],
+            wrap: [0, 0, 0],
+            head: "bare",
+            dress: "pyjama",
+          };
+      this.devotees.push({
+        x: X - 6.5 + i * 1.02 + (random() - 0.5) * 0.3,
+        y: 1.05 + (i % 3) * 0.28 + random() * 0.1,
+        look,
+        seed: random() * 10,
+      });
     }
     // Lights strung down the shikhara and along the arches.
     for (let i = 0; i < 26; i++) {
       const t = i / 25;
       const y = lerp(-5.9, -11.6, t);
       const half = 2.6 * Math.pow(1 - t, 0.75) + 0.12;
-      this.bulbs.push({ x: X - half, y, seed: random() * 10 }, { x: X + half, y, seed: random() * 10 });
+      this.bulbs.push(
+        { x: X - half, y, seed: random() * 10 },
+        { x: X + half, y, seed: random() * 10 },
+      );
     }
-    for (let x = X - 7.3; x <= X + 7.3; x += 0.36) this.bulbs.push({ x, y: -5.95 + Math.sin(((x - X) / 7.3) * Math.PI * 4) * 0.12, seed: random() * 10 });
+    for (let x = X - 7.3; x <= X + 7.3; x += 0.36)
+      this.bulbs.push({
+        x,
+        y: -5.95 + Math.sin(((x - X) / 7.3) * Math.PI * 4) * 0.12,
+        seed: random() * 10,
+      });
   }
 
   private seen(v: View) {
@@ -77,7 +152,8 @@ export class Temple {
     const dt = Math.max(0, Math.min(0.05, seconds - this.lastSeconds));
     this.lastSeconds = seconds;
     this.swing(dt, p, seconds);
-    if (!this.seen(v) || p < 0.5 || p > 0.72) return;
+    if (!this.seen(v) || p < cut(MOMENTS.flight1) || p >= cut(MOMENTS.flight2))
+      return;
     const midnight = rise(p, MOMENTS.curtain[0], MOMENTS.curtain[1]);
     const aarti = rise(p, MOMENTS.midnight, MOMENTS.midnight + 0.01);
 
@@ -104,14 +180,15 @@ export class Temple {
     // The sanctum door, its silver frame, and the glow within once the curtain opens.
     ctx.fillStyle = rgb([200, 196, 190]);
     ctx.fillRect(X - 1.55, -4.85, 3.1, 4.5);
-    ctx.fillStyle = rgb(mix([40, 20, 16], [255, 200, 120], midnight));
+    ctx.fillStyle = rgb(mix([40, 20, 16], [214, 128, 58], midnight));
     ctx.beginPath();
     ctx.moveTo(X - 1.3, -0.35);
     ctx.lineTo(X - 1.3, -3.9);
     ctx.quadraticCurveTo(X, -4.9, X + 1.3, -3.9);
     ctx.lineTo(X + 1.3, -0.35);
     ctx.fill();
-    if (midnight > 0.01) lights.push({ x: X, y: -2.6, r: 5, a: 0.45 * midnight, color: GOLD });
+    if (midnight > 0.01)
+      lights.push({ x: X, y: -2.6, r: 5, a: 0.22 * midnight, color: GOLD });
     // The curtain, red and gold, drawn aside at midnight.
     for (const side of [-1, 1]) {
       const w = lerp(1.3, 0.28, midnight);
@@ -120,7 +197,13 @@ export class Temple {
       ctx.beginPath();
       ctx.moveTo(x0, -4.2);
       ctx.lineTo(x0 - side * w, -4.2);
-      for (let k = 0; k <= 6; k++) ctx.lineTo(x0 - side * w + Math.sin(k * 1.7 + seconds * 0.5) * 0.03 * (1 - midnight), -4.2 + (k / 6) * 3.85);
+      for (let k = 0; k <= 6; k++)
+        ctx.lineTo(
+          x0 -
+            side * w +
+            Math.sin(k * 1.7 + seconds * 0.5) * 0.03 * (1 - midnight),
+          -4.2 + (k / 6) * 3.85,
+        );
       ctx.lineTo(x0, -0.35);
       ctx.closePath();
       ctx.fill();
@@ -138,7 +221,12 @@ export class Temple {
     ctx.fillStyle = rgb(MARBLE);
     [0.4, -0.04, -0.46].forEach((y, i) => {
       const half = [3.3, 2.9, 2.5][i];
-      ctx.fillRect(X - half, y, half * 2, 0.36 - i * 0.02 + (i === 0 ? 0 : 0.44));
+      ctx.fillRect(
+        X - half,
+        y,
+        half * 2,
+        0.36 - i * 0.02 + (i === 0 ? 0 : 0.44),
+      );
     });
     ctx.fillStyle = "rgba(120, 90, 70, 0.4)";
     ctx.fillRect(X - 3.3, 0.4, 6.6, 0.05);
@@ -156,7 +244,14 @@ export class Temple {
       X - 3.9,
       0.1,
       PUJARI,
-      aarti > 0.5 ? { la: 0.4, lf: 1.2, ra: 1.6 + Math.sin(circle) * 0.35, rf: 2.1 + Math.cos(circle) * 0.35 } : { la: 1.0, lf: 2.4, ra: 1.0, rf: 2.4, nod: 0.1 },
+      aarti > 0.5
+        ? {
+            la: 0.4,
+            lf: 1.2,
+            ra: 1.6 + Math.sin(circle) * 0.35,
+            rf: 2.1 + Math.cos(circle) * 0.35,
+          }
+        : { la: 1.0, lf: 2.4, ra: 1.0, rf: 2.4, nod: 0.1 },
     );
     if (aarti > 0.5) {
       // A brass plate of five flames.
@@ -166,12 +261,43 @@ export class Temple {
       ctx.beginPath();
       ctx.ellipse(hx, hy, 0.2, 0.05, 0, 0, TAU);
       ctx.fill();
-      for (let k = -2; k <= 2; k++) flame(ctx, hx + k * 0.07, hy - 0.03 - (2 - Math.abs(k)) * 0.03, 0.1, seconds, k);
-      lights.push({ x: hx, y: hy - 0.1, r: 2.6, a: 0.55 * flicker(seconds, 3), color: TORCH });
-      lights.push({ x: hx, y: hy - 0.08, r: 0.5, a: 0.9, color: "255, 230, 170" });
+      for (let k = -2; k <= 2; k++)
+        flame(
+          ctx,
+          hx + k * 0.07,
+          hy - 0.03 - (2 - Math.abs(k)) * 0.03,
+          0.1,
+          seconds,
+          k,
+        );
+      lights.push({
+        x: hx,
+        y: hy - 0.1,
+        r: 2.6,
+        a: 0.55 * flicker(seconds, 3),
+        color: TORCH,
+      });
+      lights.push({
+        x: hx,
+        y: hy - 0.08,
+        r: 0.5,
+        a: 0.9,
+        color: "255, 230, 170",
+      });
     }
-    const blow = rise(p, MOMENTS.midnight - 0.004, MOMENTS.midnight) * (1 - rise(p, MOMENTS.midnight + 0.012, MOMENTS.midnight + 0.02));
-    const conch = drawPerson(ctx, X + 3.9, 0.1, CONCH, blow > 0.3 ? { la: 1.5, lf: 2.9, ra: 1.6, rf: 3.0, lean: -0.05, nod: -0.15 } : { la: 1.0, lf: 2.4, ra: 1.0, rf: 2.4, nod: 0.1 }, -1);
+    const blow =
+      rise(p, MOMENTS.midnight - 0.004, MOMENTS.midnight) *
+      (1 - rise(p, MOMENTS.midnight + 0.012, MOMENTS.midnight + 0.02));
+    const conch = drawPerson(
+      ctx,
+      X + 3.9,
+      0.1,
+      CONCH,
+      blow > 0.3
+        ? { la: 1.5, lf: 2.9, ra: 1.6, rf: 3.0, lean: -0.05, nod: -0.15 }
+        : { la: 1.0, lf: 2.4, ra: 1.0, rf: 2.4, nod: 0.1 },
+      -1,
+    );
     if (blow > 0.3) {
       const cx = (conch.left.x + conch.right.x) / 2;
       const cy = (conch.left.y + conch.right.y) / 2;
@@ -217,22 +343,41 @@ export class Temple {
     // Warm light from the sanctum and the lamps on the steps.
     for (let i = 0; i < 9; i++) {
       const x = X - 3 + i * 0.75;
-      lights.push({ x, y: 0.35, r: 0.8, a: 0.25 * flicker(seconds, i), color: TORCH });
+      lights.push({
+        x,
+        y: 0.35,
+        r: 0.8,
+        a: 0.25 * flicker(seconds, i),
+        color: TORCH,
+      });
     }
-    lights.push({ x: X, y: -1.2, r: 7, a: 0.2 + 0.15 * midnight, color: TORCH });
+    lights.push({
+      x: X,
+      y: -1.2,
+      r: 7,
+      a: 0.16 + 0.08 * midnight,
+      color: TORCH,
+    });
   }
 
   private swing(dt: number, p: number, seconds: number) {
     // A pendulum, damped a little; after midnight someone keeps it gently moving.
-    const auto = rise(p, MOMENTS.midnight, MOMENTS.midnight + 0.01) * (p < 0.7 ? 1 : 0);
+    const auto =
+      rise(p, MOMENTS.midnight, MOMENTS.midnight + 0.01) * (p < 0.7 ? 1 : 0);
     this.speed += (-6.2 * Math.sin(this.angle) - 0.35 * this.speed) * dt;
-    if (auto > 0 && Math.abs(this.angle) < 0.04 && Math.abs(this.speed) < 0.35) this.speed += 0.2 * Math.sign(this.speed || 1) * auto;
+    if (auto > 0 && Math.abs(this.angle) < 0.04 && Math.abs(this.speed) < 0.35)
+      this.speed += 0.2 * Math.sign(this.speed || 1) * auto;
     this.angle += this.speed * dt;
     this.angle = clamp(this.angle, -0.6, 0.6);
     // The little bells on the swing ring as it passes the middle.
-    if (Math.abs(this.angle) < 0.05 && Math.abs(this.speed) > 0.25 && seconds - this.lastBell > 0.5) {
+    if (
+      Math.abs(this.angle) < 0.05 &&
+      Math.abs(this.speed) > 0.25 &&
+      seconds - this.lastBell > 0.5
+    ) {
       this.lastBell = seconds;
-      if (p > 0.56 && p < 0.67) this.emit(Math.abs(this.speed) > 0.6 ? "swing-bells" : "swing-bell");
+      if (p > 0.56 && p < 0.67)
+        this.emit(Math.abs(this.speed) > 0.6 ? "swing-bells" : "swing-bell");
     }
   }
 
@@ -241,7 +386,12 @@ export class Temple {
     const silver = "#d8d4cc";
     ctx.fillStyle = silver;
     for (const side of [-1, 1]) {
-      ctx.fillRect(X + side * 1.5 - 0.07, TEMPLE.pivot - 0.35, 0.14, -TEMPLE.pivot + 0.35 - 0.6);
+      ctx.fillRect(
+        X + side * 1.5 - 0.07,
+        TEMPLE.pivot - 0.35,
+        0.14,
+        -TEMPLE.pivot + 0.35 - 0.6,
+      );
       ctx.beginPath();
       ctx.ellipse(X + side * 1.5, -0.6, 0.22, 0.08, 0, 0, TAU);
       ctx.fill();
@@ -296,7 +446,13 @@ export class Temple {
     for (let i = 0; i < 26; i++) {
       ctx.fillStyle = ["#f4a01c", "#f6c030", "#e0303a", "#f0e6d8"][i % 4];
       ctx.beginPath();
-      ctx.arc(-0.78 + random() * 1.56, L - 0.16 + random() * 0.18 - (i % 3 === 0 ? 0.62 : 0), 0.055, 0, TAU);
+      ctx.arc(
+        -0.78 + random() * 1.56,
+        L - 0.16 + random() * 0.18 - (i % 3 === 0 ? 0.62 : 0),
+        0.055,
+        0,
+        TAU,
+      );
       ctx.fill();
     }
     // Laddu Gopal: small, crowned, in yellow, a peacock feather in the crown.
@@ -325,9 +481,24 @@ export class Temple {
     ctx.fill();
     feather(ctx, gx + 0.04, gy - 0.5, 0.3, 0.35);
     ctx.restore();
-    const seat = { x: X + Math.sin(this.angle) * -(TEMPLE.seat - TEMPLE.pivot), y: TEMPLE.pivot + Math.cos(this.angle) * (TEMPLE.seat - TEMPLE.pivot) };
-    lights.push({ x: seat.x, y: seat.y - 0.5, r: 2.2, a: 0.25 + 0.35 * midnight, color: GOLD });
-    lights.push({ x: seat.x, y: seat.y - 0.55, r: 0.7, a: 0.3 + 0.4 * midnight, color: "255, 240, 210" });
+    const seat = {
+      x: X + Math.sin(this.angle) * -(TEMPLE.seat - TEMPLE.pivot),
+      y: TEMPLE.pivot + Math.cos(this.angle) * (TEMPLE.seat - TEMPLE.pivot),
+    };
+    lights.push({
+      x: seat.x,
+      y: seat.y - 0.5,
+      r: 2.2,
+      a: 0.2 + 0.15 * midnight,
+      color: GOLD,
+    });
+    lights.push({
+      x: seat.x,
+      y: seat.y - 0.55,
+      r: 0.7,
+      a: 0.2 + 0.15 * midnight,
+      color: "255, 240, 210",
+    });
     void seconds;
   }
 
@@ -394,7 +565,12 @@ export class Temple {
     ctx.fillStyle = "#f07a1a";
     ctx.beginPath();
     ctx.moveTo(X + 0.02, -13.5);
-    ctx.quadraticCurveTo(X + 0.6, -13.35 + Math.sin(seconds * 2) * 0.06, X + 1.1, -13.2 + Math.sin(seconds * 2.4) * 0.08);
+    ctx.quadraticCurveTo(
+      X + 0.6,
+      -13.35 + Math.sin(seconds * 2) * 0.06,
+      X + 1.1,
+      -13.2 + Math.sin(seconds * 2.4) * 0.08,
+    );
     ctx.lineTo(X + 0.02, -12.9);
     ctx.fill();
     // Pillars and the cusped arches between them.
@@ -418,8 +594,15 @@ export class Temple {
         const py = -3.9 - Math.sin(ang) * Math.min(1.4, half * 0.62);
         ctx.lineTo(px, py);
         if (k > 0) {
-          const ang2 = (k - 0.5) / cusps * Math.PI;
-          ctx.quadraticCurveTo(mid + Math.cos(ang2) * half * 0.86, -3.9 - Math.sin(ang2) * Math.min(1.4, half * 0.62) * 0.86, mid + Math.cos(((k - 1) / cusps) * Math.PI) * half, -3.9 - Math.sin(((k - 1) / cusps) * Math.PI) * Math.min(1.4, half * 0.62));
+          const ang2 = ((k - 0.5) / cusps) * Math.PI;
+          ctx.quadraticCurveTo(
+            mid + Math.cos(ang2) * half * 0.86,
+            -3.9 - Math.sin(ang2) * Math.min(1.4, half * 0.62) * 0.86,
+            mid + Math.cos(((k - 1) / cusps) * Math.PI) * half,
+            -3.9 -
+              Math.sin(((k - 1) / cusps) * Math.PI) *
+                Math.min(1.4, half * 0.62),
+          );
         }
       }
       ctx.lineTo(a - 0.2, -3.9);
@@ -436,10 +619,18 @@ export class Temple {
       ctx.fillRect(x - 0.1, -3.8, 0.06, 3);
     }
     // Garlands between the pillars.
-    for (let i = 0; i < pillars.length - 1; i++) this.garland(ctx, pillars[i] + 0.25, pillars[i + 1] - 0.25, -3.8, 3, 0.3);
+    for (let i = 0; i < pillars.length - 1; i++)
+      this.garland(ctx, pillars[i] + 0.25, pillars[i + 1] - 0.25, -3.8, 3, 0.3);
   }
 
-  private garland(ctx: Ctx, from: number, to: number, y: number, loops: number, sag: number) {
+  private garland(
+    ctx: Ctx,
+    from: number,
+    to: number,
+    y: number,
+    loops: number,
+    sag: number,
+  ) {
     const n = Math.floor((to - from) / 0.09);
     for (let i = 0; i <= n; i++) {
       const t = i / n;
@@ -452,10 +643,18 @@ export class Temple {
     }
   }
 
-  pointer(world: { x: number; y: number }, kind: "down" | "move" | "up", f: Frame) {
+  pointer(
+    world: { x: number; y: number },
+    kind: "down" | "move" | "up",
+    f: Frame,
+  ) {
     if (kind !== "down" || f.p < 0.565 || f.p > 0.668) return;
     // Anywhere near the jhula pushes it, the way the reader touched it.
-    if (Math.abs(world.x - X) < 2.4 && world.y > TEMPLE.pivot - 0.6 && world.y < 0.6) {
+    if (
+      Math.abs(world.x - X) < 2.4 &&
+      world.y > TEMPLE.pivot - 0.6 &&
+      world.y < 0.6
+    ) {
       const dir = world.x < X ? -1 : 1;
       this.speed += -dir * 0.9;
       this.emit("push");
@@ -539,7 +738,14 @@ function dish(ctx: Ctx, d: Dish) {
 }
 
 /** A hanging temple bell, `ring` swinging it. */
-function bell(ctx: Ctx, x: number, top: number, length: number, size: number, ring: number) {
+function bell(
+  ctx: Ctx,
+  x: number,
+  top: number,
+  length: number,
+  size: number,
+  ring: number,
+) {
   ctx.save();
   ctx.translate(x, top);
   ctx.rotate(ring);
@@ -552,7 +758,12 @@ function bell(ctx: Ctx, x: number, top: number, length: number, size: number, ri
   ctx.fillStyle = "#c89438";
   ctx.beginPath();
   ctx.moveTo(-size * 0.2, length);
-  ctx.quadraticCurveTo(-size * 0.35, length + size * 0.5, -size * 0.55, length + size);
+  ctx.quadraticCurveTo(
+    -size * 0.35,
+    length + size * 0.5,
+    -size * 0.55,
+    length + size,
+  );
   ctx.lineTo(size * 0.55, length + size);
   ctx.quadraticCurveTo(size * 0.35, length + size * 0.5, size * 0.2, length);
   ctx.closePath();
@@ -567,7 +778,13 @@ function bell(ctx: Ctx, x: number, top: number, length: number, size: number, ri
 }
 
 /** A peacock feather, the mor pankh: a quill, its barbs and the eye. */
-export function feather(ctx: Ctx, x: number, y: number, length: number, angle: number) {
+export function feather(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  length: number,
+  angle: number,
+) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(angle);

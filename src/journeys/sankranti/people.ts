@@ -35,7 +35,17 @@ export type Hold = "lota" | "tabak" | "firki" | "pole" | "dish" | "trishul" | "l
  * Arm angles from hanging straight down, positive swinging the way the figure faces: 0 at the
  * side, π/2 straight out in front, π straight up. `sit` folds the legs under.
  */
-export type Pose = { la: number; lf: number; ra: number; rf: number; lean?: number; bob?: number; sit?: boolean; hold?: Hold; tip?: number };
+export type Pose = {
+  la: number;
+  lf: number;
+  ra: number;
+  rf: number;
+  lean?: number;
+  bob?: number;
+  sit?: boolean;
+  hold?: Hold;
+  tip?: number;
+};
 
 export type Point = { x: number; y: number };
 export type Hands = { left: Point; right: Point; head: Point };
@@ -623,8 +633,14 @@ export function drawFigure(ctx: Ctx, x: number, y: number, look: Look, pose: Pos
     }
     case "pole": {
       // A long bamboo with a thorny branch tied at the top, to catch the loose kites.
-      const a = { x: right.x + Math.sin(right.angle) * 0.9, y: right.y + Math.cos(right.angle) * 0.9 };
-      const b = { x: right.x - Math.sin(right.angle) * 0.2, y: right.y - Math.cos(right.angle) * 0.2 };
+      const a = {
+        x: right.x + Math.sin(right.angle) * 0.9,
+        y: right.y + Math.cos(right.angle) * 0.9,
+      };
+      const b = {
+        x: right.x - Math.sin(right.angle) * 0.2,
+        y: right.y - Math.cos(right.angle) * 0.2,
+      };
       ctx.strokeStyle = shade([170, 140, 80]);
       ctx.lineWidth = 0.016;
       ctx.beginPath();
@@ -691,7 +707,11 @@ export function drawFigure(ctx: Ctx, x: number, y: number, look: Look, pose: Pos
     const ry = p.x * Math.sin(lean) + py * Math.cos(lean) + HIP + bob + sitDrop;
     return { x: x + facing * rx * h, y: y + ry * h };
   };
-  return { left: world(left), right: world(right), head: world({ x: 0, y: -0.9 }) };
+  return {
+    left: world(left),
+    right: world(right),
+    head: world({ x: 0, y: -0.9 }),
+  };
 }
 
 /** A sugad: a little clay pot, marked with haldi and kumkum, with carrots, sugarcane and ber in it. */

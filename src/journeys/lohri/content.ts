@@ -9,11 +9,12 @@ export const lohri: JourneyContent = {
   lang: "pa",
   script: "gurmukhi",
   tagline: "from the winter fire to the golden wheat",
-  greeting: "ਲੱਖ ਲੱਖ ਵਧਾਈਆਂ",
+  greeting: "ਵਧਾਈਆਂ",
   pageTitle: "Lohṛī & Vaisākhī — from the winter fire to the golden wheat",
   description:
     "Scroll through Punjab's farming year: children singing for Lohri on a foggy January night, the bonfire and a baby's first Lohri, the wheat turning from green to gold, the Vaisakhi harvest and bhangra, the Khalsa at Anandpur Sahib in 1699, and the village mela.",
-  share: "From the Lohri fire in the January fog to the golden wheat of Vaisakhi.",
+  share:
+    "From the Lohri fire in the January fog to the golden wheat of Vaisakhi.",
   keywords: [
     "Lohri",
     "ਲੋਹੜੀ",
@@ -102,29 +103,52 @@ export const lohri: JourneyContent = {
       side: "right",
     },
   ],
-  finale: { native: "ਵਿਸਾਖੀ ਦੀਆਂ ਲੱਖ ਲੱਖ ਵਧਾਈਆਂ", english: "lakhs of good wishes, and a golden year", window: [0.905, 0.925, 0.975, 0.998] },
+  finale: {
+    native: "ਵਿਸਾਖੀ ਦੀਆਂ ਲੱਖ ਲੱਖ ਵਧਾਈਆਂ",
+    english: "lakhs of good wishes, and a golden year",
+    window: [0.905, 0.925, 0.975, 0.998],
+  },
   hints: {
     scroll: "scroll into the fog",
     touch: [
-      { text: "touch the fire to throw rewri and popcorn", window: [0.2, 0.215, 0.4, 0.415] },
-      { text: "drag across the wheat to cut it", window: [0.56, 0.575, 0.64, 0.655] },
+      {
+        text: "touch the fire to throw rewri and popcorn",
+        window: [0.2, 0.215, 0.4, 0.415],
+      },
+      {
+        text: "drag across the wheat to cut it",
+        window: [0.56, 0.575, 0.64, 0.655],
+      },
       { text: "touch to play the dhol", window: [0.8, 0.815, 0.87, 0.885] },
     ],
   },
   verse: {
-    lines: ["ਵੈਸਾਖੁ ਭਲਾ ਸਾਖਾ ਵੇਸ ਕਰੇ ॥", "ਧਨ ਦੇਖੈ ਹਰਿ ਦੁਆਰਿ ਆਵਹੁ ਦਇਆ ਕਰੇ ॥", "ਨਾਨਕ ਵੈਸਾਖੀਂ ਪ੍ਰਭੁ ਪਾਵੈ ਸੁਰਤਿ ਸਬਦਿ ਮਨੁ ਮਾਨਾ ॥"],
+    lines: [
+      "ਵੈਸਾਖੁ ਭਲਾ ਸਾਖਾ ਵੇਸ ਕਰੇ ॥",
+      "ਧਨ ਦੇਖੈ ਹਰਿ ਦੁਆਰਿ ਆਵਹੁ ਦਇਆ ਕਰੇ ॥",
+      "ਨਾਨਕ ਵੈਸਾਖੀਂ ਪ੍ਰਭੁ ਪਾਵੈ ਸੁਰਤਿ ਸਬਦਿ ਮਨੁ ਮਾਨਾ ॥",
+    ],
     lang: "pa",
     script: "gurmukhi",
     english:
       "Vaisakh is lovely: the branches put on their new leaves. The bride watches the door for her Lord: come, in Your mercy. … Nanak: in Vaisakh the Lord is found, when the mind is steeped in the Word.",
-    source: "Guru Nanak Dev Ji, Bārah Māhā, Rāg Tukhārī · Sri Guru Granth Sahib Ji, Ang 1108",
+    source:
+      "Guru Nanak Dev Ji, Bārah Māhā, Rāg Tukhārī · Sri Guru Granth Sahib Ji, Ang 1108",
   },
   card: { native: "ਲੱਖ ਲੱਖ ਵਧਾਈਆਂ", english: "Happy Lohri & Vaisakhi" },
   returnLink: "back to the Lohri fire",
-  soundLabel: "dhol, tumbi, algoza, chimta, harmonium and nagara, with handclaps and calls",
+  soundLabel:
+    "dhol, tumbi, algoza, chimta, harmonium and nagara, with handclaps and calls",
   about: {
     name: "Lohri and Vaisakhi",
-    alternateName: ["Lohri", "ਲੋਹੜੀ", "Vaisakhi", "Baisakhi", "ਵਿਸਾਖੀ", "Khalsa Sajna Divas"],
+    alternateName: [
+      "Lohri",
+      "ਲੋਹੜੀ",
+      "Vaisakhi",
+      "Baisakhi",
+      "ਵਿਸਾਖੀ",
+      "Khalsa Sajna Divas",
+    ],
     sameAs: "https://en.wikipedia.org/wiki/Vaisakhi",
   },
   ink: "#07060a",

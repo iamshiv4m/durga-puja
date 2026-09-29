@@ -16,16 +16,30 @@ export class Village {
 
   constructor() {
     const random = mulberry32(2026);
-    for (let i = 0; i < 420; i++) {
-      const y = 0.05 + random() ** 1.6 * (YARD - 0.1);
-      this.mustard.push({ x: X - 22 + random() * 44, y, r: 0.02 + y * 0.03 });
+    // Flowers only on the mustard strips, and not on the path between them.
+    const strips = [0, 0.08, 0.2, 0.36, 0.58, 0.86, 1.24, 1.7, 2.2, YARD + 0.1];
+    for (let i = 0, guard = 0; i < 900 && guard < 5000; guard++) {
+      const y = 0.05 + random() ** 1.3 * (YARD - 0.1);
+      const x = X - 22 + random() * 44;
+      const strip = strips.findIndex((top, k) => y >= top && y < strips[k + 1]);
+      if (strip % 3 === 1) continue;
+      const t = y / YARD;
+      if (x > lerp(X - 1.3, X + 0.3, t) && x < lerp(X - 0.8, X + 1.9, t)) continue;
+      this.mustard.push({ x, y, r: 0.01 + y * 0.012 });
+      i++;
     }
     for (let i = 0; i < 12; i++) this.steam.push({ t: i / 12, seed: random() * 10 });
-    for (let i = 0; i < 60; i++) this.marks.push({ x: X - 8 + random() * 16, y: YARD + 0.3 + random() * 4.5, r: 0.2 + random() * 0.35, a: random() * TAU });
+    for (let i = 0; i < 60; i++)
+      this.marks.push({
+        x: X - 8 + random() * 16,
+        y: YARD + 0.3 + random() * 4.5,
+        r: 0.2 + random() * 0.35,
+        a: random() * TAU,
+      });
   }
 
   draw(w: World) {
-    const { ctx, v, env } = w;
+    const { v, env } = w;
     const [left, right] = spanX(v, 2);
     if (right < X - 24 || left > X + 24) return;
     const shade: Shade = (c, a = 1) => paint(c, env, 0, a);
@@ -65,14 +79,15 @@ export class Village {
     ctx.lineTo(X + 0.4, YARD);
     ctx.closePath();
     ctx.fill();
-    ctx.fillStyle = paint([250, 216, 50], env, 0.1);
+    ctx.fillStyle = paint([252, 222, 60], env, 0.1);
+    ctx.beginPath();
     for (const m of this.mustard) {
       if (m.x < l || m.x > r) continue;
       const sway = Math.sin(seconds * 1.2 + m.x * 2) * m.r * 0.5;
-      ctx.beginPath();
+      ctx.moveTo(m.x + sway + m.r, m.y);
       ctx.arc(m.x + sway, m.y, m.r, 0, TAU);
-      ctx.fill();
     }
+    ctx.fill();
     void v;
   }
 
@@ -88,7 +103,12 @@ export class Village {
     ctx.closePath();
     ctx.fill();
     const random = mulberry32(8);
-    const blobs = Array.from({ length: 22 }, () => ({ bx: x + (random() - 0.5) * 4, by: y - 2.6 - random() * 2.2, r: 0.5 + random() * 0.6, k: random() }));
+    const blobs = Array.from({ length: 22 }, () => ({
+      bx: x + (random() - 0.5) * 4,
+      by: y - 2.6 - random() * 2.2,
+      r: 0.5 + random() * 0.6,
+      k: random(),
+    }));
     for (const pass of [0, 1]) {
       for (const b of blobs) {
         const sway = Math.sin(seconds * 0.6 + b.k * 6) * 0.04;
@@ -250,7 +270,23 @@ export class Village {
     const x = X - 3.4;
     const y = YARD + 0.05;
     if (!onScreen(v, x - 2, y - 4, 7)) return;
-    const hands = drawFigure(ctx, x, y, { h: 1.05, skin: SKINS[1], top: [40, 100, 170], bottom: [70, 60, 60], dress: "kurta", head: "topi", headColor: [210, 40, 40] }, { la: 1.2, lf: 1.9, ra: 2.6, rf: 2.9 }, shade, -1);
+    const hands = drawFigure(
+      ctx,
+      x,
+      y,
+      {
+        h: 1.05,
+        skin: SKINS[1],
+        top: [40, 100, 170],
+        bottom: [70, 60, 60],
+        dress: "kurta",
+        head: "topi",
+        headColor: [210, 40, 40],
+      },
+      { la: 1.2, lf: 1.9, ra: 2.6, rf: 2.9 },
+      shade,
+      -1,
+    );
     const kx = x - 3.6 + Math.sin(seconds * 0.7) * 0.25;
     const ky = y - 5.6 + Math.sin(seconds * 1.1) * 0.2;
     ctx.strokeStyle = shade([250, 250, 250], 0.55);
@@ -315,7 +351,32 @@ export class Village {
     ctx.fillStyle = shade([120, 80, 46]);
     ctx.fillRect(cx - 1.18, cy - 0.62, 2.42, 0.06);
     const chew = Math.max(0, Math.sin(seconds * 1.6)) * 0.4;
-    drawFigure(ctx, cx - 0.3, cy - 0.6, { h: 2.0, skin: SKINS[0], top: [236, 230, 216], bottom: [240, 236, 224], dress: "kurta", head: "topi", headColor: [110, 90, 70], shawl: [120, 100, 80], beard: [220, 218, 212] }, { la: 1.1, lf: 1.6, ra: 1.0 + chew, rf: 2.2 + chew, sit: true, hold: "leaf" }, shade, 1);
+    drawFigure(
+      ctx,
+      cx - 0.3,
+      cy - 0.6,
+      {
+        h: 2.0,
+        skin: SKINS[0],
+        top: [236, 230, 216],
+        bottom: [240, 236, 224],
+        dress: "kurta",
+        head: "topi",
+        headColor: [110, 90, 70],
+        shawl: [120, 100, 80],
+        beard: [220, 218, 212],
+      },
+      {
+        la: 1.1,
+        lf: 1.6,
+        ra: 1.0 + chew,
+        rf: 2.2 + chew,
+        sit: true,
+        hold: "leaf",
+      },
+      shade,
+      1,
+    );
     // A kansa plate of tilkut beside him: sesame pounded into jaggery, from Gaya.
     ctx.fillStyle = shade([200, 170, 100]);
     ctx.beginPath();
@@ -396,9 +457,74 @@ export class Village {
     ctx.fill();
 
     const serve = Math.sin(seconds * 0.9) * 0.15;
-    drawFigure(ctx, mx - 1.0, my, { h: 1.95, skin: SKINS[1], top: [150, 30, 40], bottom: [200, 40, 50], border: [240, 190, 50], dress: "sari", head: "pallu", shawl: [80, 60, 90], bindi: true }, { la: 0.9, lf: 1.4, ra: 1.3 + serve, rf: 1.5 + serve, sit: true }, shade, 1);
-    drawFigure(ctx, mx + 0.6, my + 0.02, { h: 1.35, skin: SKINS[3], top: [220, 170, 40], bottom: [60, 70, 110], dress: "kurta", head: "topi", headColor: [40, 110, 170] }, { la: 1.2, lf: 1.4, ra: 0.9 - serve, rf: 2.4 - serve, sit: true, hold: "leaf" }, shade, -1);
-    drawFigure(ctx, mx + 1.9, my + 0.3, { h: 1.25, skin: SKINS[0], top: [200, 60, 120], bottom: [240, 120, 60], border: [250, 220, 90], dress: "frock", head: "bun", shawl: [230, 200, 60] }, { la: 1.2, lf: 1.4, ra: 1.0 + serve, rf: 2.5 + serve, sit: true, hold: "leaf" }, shade, -1);
+    drawFigure(
+      ctx,
+      mx - 1.0,
+      my,
+      {
+        h: 1.95,
+        skin: SKINS[1],
+        top: [150, 30, 40],
+        bottom: [200, 40, 50],
+        border: [240, 190, 50],
+        dress: "sari",
+        head: "pallu",
+        shawl: [80, 60, 90],
+        bindi: true,
+      },
+      { la: 0.9, lf: 1.4, ra: 1.3 + serve, rf: 1.5 + serve, sit: true },
+      shade,
+      1,
+    );
+    drawFigure(
+      ctx,
+      mx + 0.6,
+      my + 0.02,
+      {
+        h: 1.35,
+        skin: SKINS[3],
+        top: [220, 170, 40],
+        bottom: [60, 70, 110],
+        dress: "kurta",
+        head: "topi",
+        headColor: [40, 110, 170],
+      },
+      {
+        la: 1.2,
+        lf: 1.4,
+        ra: 0.9 - serve,
+        rf: 2.4 - serve,
+        sit: true,
+        hold: "leaf",
+      },
+      shade,
+      -1,
+    );
+    drawFigure(
+      ctx,
+      mx + 1.9,
+      my + 0.3,
+      {
+        h: 1.25,
+        skin: SKINS[0],
+        top: [200, 60, 120],
+        bottom: [240, 120, 60],
+        border: [250, 220, 90],
+        dress: "frock",
+        head: "bun",
+        shawl: [230, 200, 60],
+      },
+      {
+        la: 1.2,
+        lf: 1.4,
+        ra: 1.0 + serve,
+        rf: 2.5 + serve,
+        sit: true,
+        hold: "leaf",
+      },
+      shade,
+      -1,
+    );
   }
 
   /** The chulha of clay, and the handi of khichdi on it for later. */
@@ -440,7 +566,13 @@ export class Village {
     ctx.clip();
     flame(ctx, x, y - 0.02, 0.3, seconds, 4);
     ctx.restore();
-    lights.push({ x, y: y - 0.12, r: 0.6, a: 0.5 * flicker(seconds, 4), color: FIRE });
+    lights.push({
+      x,
+      y: y - 0.12,
+      r: 0.6,
+      a: 0.5 * flicker(seconds, 4),
+      color: FIRE,
+    });
     // The handi: black with soot below, clay above; khichdi yellow with turmeric.
     ctx.fillStyle = shade([50, 36, 30]);
     ctx.beginPath();

@@ -51,7 +51,12 @@ export function paintPachedi(width: number, height: number) {
     g.arc(W - band * 1.3, y, band * 0.1, 0, TAU);
     g.fill();
   }
-  const inner = { x: band * 1.7, y: band * 1.7, w: W - band * 3.4, h: H - band * 3.4 };
+  const inner = {
+    x: band * 1.7,
+    y: band * 1.7,
+    w: W - band * 3.4,
+    h: H - band * 3.4,
+  };
   g.fillStyle = CREAM;
   g.fillRect(inner.x, inner.y, inner.w, inner.h);
 
@@ -612,10 +617,17 @@ export function drawJyot(g: Ctx, x: number, y: number, c: number, lit: number, s
 
 // ─── The mandvi ──────────────────────────────────────────────────────────────
 
-type MandviState = Altar & { night: number; seconds: number; pachedi: HTMLCanvasElement };
+type MandviState = Altar & {
+  night: number;
+  seconds: number;
+  pachedi: HTMLCanvasElement;
+};
 
 /** Projects a point of the mandvi. */
-const P = (t: Tilt, X: number, Z: number, H: number) => ({ x: X, y: Z * t.s - H * t.c });
+const P = (t: Tilt, X: number, Z: number, H: number) => ({
+  x: X,
+  y: Z * t.s - H * t.c,
+});
 
 function quad(g: Ctx, pts: { x: number; y: number }[]) {
   g.beginPath();
@@ -645,7 +657,7 @@ export function drawMandvi(g: Ctx, t: Tilt, st: MandviState) {
   g.fillStyle = "#f4f0e0";
   for (let i = 0; i < 13; i++) {
     g.beginPath();
-    g.arc(-half + 0.08 + (i / 12) * (half * 2 - 0.16), front.y + (deck * 0.55) * c, 0.022, 0, TAU);
+    g.arc(-half + 0.08 + (i / 12) * (half * 2 - 0.16), front.y + deck * 0.55 * c, 0.022, 0, TAU);
     g.fill();
   }
   g.fillStyle = rgb(GOLD);
@@ -733,12 +745,7 @@ export function drawMandvi(g: Ctx, t: Tilt, st: MandviState) {
   }
   // The roof slab seen from above.
   g.fillStyle = "#9a3420";
-  quad(g, [
-    P(t, -half - 0.1, -half - 0.1, archTop),
-    P(t, half + 0.1, -half - 0.1, archTop),
-    P(t, half + 0.1, half + 0.1, archTop),
-    P(t, -half - 0.1, half + 0.1, archTop),
-  ]);
+  quad(g, [P(t, -half - 0.1, -half - 0.1, archTop), P(t, half + 0.1, -half - 0.1, archTop), P(t, half + 0.1, half + 0.1, archTop), P(t, -half - 0.1, half + 0.1, archTop)]);
   // The dome.
   const db = P(t, 0, 0, archTop + 0.05);
   const dh = top - archTop - 0.25;
@@ -775,7 +782,7 @@ export function drawMandvi(g: Ctx, t: Tilt, st: MandviState) {
   for (let i = 0; i <= 24; i++) {
     const k = i / 24;
     const X = lerp(-half, half, k);
-    const sag = Math.sin((k * 3) % 1 * Math.PI) * 0.12;
+    const sag = Math.sin(((k * 3) % 1) * Math.PI) * 0.12;
     g.fillStyle = i % 3 === 1 ? "#3f8a32" : i % 2 ? "#f28a1a" : "#f5b018";
     g.beginPath();
     g.arc(X, P(t, X, half + 0.1, archTop - 0.02).y + sag * c + 0.02, 0.035, 0, TAU);

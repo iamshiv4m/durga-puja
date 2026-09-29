@@ -3,7 +3,17 @@
 // grows through the winter and turns from green to gold by Vaisakhi.
 //
 // World units, y down. The far edge of the plain is at HORIZON; everything nearer stands at y > HORIZON.
-import { TAU, clamp, lerp, mix, mulberry32, rgb, type Ctx, type RGB, type View } from "../paint";
+import {
+  TAU,
+  clamp,
+  lerp,
+  mix,
+  mulberry32,
+  rgb,
+  type Ctx,
+  type RGB,
+  type View,
+} from "../paint";
 
 export const HORIZON = -3.2;
 /** The wheat, east of the village, tiled in strips; the part in HARVEST can be cut. */
@@ -32,7 +42,8 @@ export function fieldRows() {
 }
 
 /** How big a row reads, smaller towards the horizon. */
-export const rowScale = (y: number) => lerp(0.4, 1.0, clamp((y - HORIZON) / (FIELD_NEAR - HORIZON)));
+export const rowScale = (y: number) =>
+  lerp(0.4, 1.0, clamp((y - HORIZON) / (FIELD_NEAR - HORIZON)));
 
 /** How tall the wheat stands through the season, 0 (Poh) to 1 (Vaisakh). */
 export function wheatHeight(season: number) {
@@ -60,10 +71,17 @@ export function wheatColour(ripe: number): { stalk: RGB; ear: RGB } {
   ];
   const t = clamp(ripe) * 3;
   const i = Math.min(2, Math.floor(t));
-  return { stalk: mix(stalks[i], stalks[i + 1], t - i), ear: mix(ears[i], ears[i + 1], t - i) };
+  return {
+    stalk: mix(stalks[i], stalks[i + 1], t - i),
+    ear: mix(ears[i], ears[i + 1], t - i),
+  };
 }
 
-export type WheatTiles = { stages: HTMLCanvasElement[][]; width: number; height: number };
+export type WheatTiles = {
+  stages: HTMLCanvasElement[][];
+  width: number;
+  height: number;
+};
 
 /** Stage 0 young tufts, 1 knee-high, 2 in ear, 3 ripe; three variants of each, so rows don't repeat. */
 export function paintWheatTiles(): WheatTiles {
@@ -83,12 +101,22 @@ export function paintWheatTiles(): WheatTiles {
       const colour = wheatColour([0, 0.33, 0.66, 1][s]);
       const tall = wheatHeight(s / 3);
       // Soil between the plants, then clumps back to front.
-      g.fillStyle = s === 0 ? "rgba(92, 70, 44, 0.9)" : "rgba(60, 50, 30, 0.35)";
+      g.fillStyle =
+        s === 0 ? "rgba(92, 70, 44, 0.9)" : "rgba(60, 50, 30, 0.35)";
       g.fillRect(0, -0.12, WHEAT.tile, 0.12);
       const count = 46;
       for (let i = 0; i < count; i++) {
         const x = ((i + random() * 0.8) / count) * WHEAT.tile;
-        clump(g, x, -random() * 0.08, tall * (0.85 + random() * 0.3), s, colour, random, 0);
+        clump(
+          g,
+          x,
+          -random() * 0.08,
+          tall * (0.85 + random() * 0.3),
+          s,
+          colour,
+          random,
+          0,
+        );
       }
       row.push(canvas);
     }
@@ -98,11 +126,21 @@ export function paintWheatTiles(): WheatTiles {
 }
 
 /** One clump of wheat, standing on (x, y): a few stalks leaning out, and ears if it is old enough. */
-export function clump(g: Ctx, x: number, y: number, tall: number, stage: number, colour: { stalk: RGB; ear: RGB }, random: () => number, sway: number) {
+export function clump(
+  g: Ctx,
+  x: number,
+  y: number,
+  tall: number,
+  stage: number,
+  colour: { stalk: RGB; ear: RGB },
+  random: () => number,
+  sway: number,
+) {
   const stalks = stage === 0 ? 5 : 6;
   g.lineCap = "round";
   for (let k = 0; k < stalks; k++) {
-    const lean = (k / (stalks - 1) - 0.5) * 0.5 + (random() - 0.5) * 0.12 + sway;
+    const lean =
+      (k / (stalks - 1) - 0.5) * 0.5 + (random() - 0.5) * 0.12 + sway;
     const h = tall * (0.75 + random() * 0.3);
     const tx = x + Math.sin(lean) * h;
     const ty = y - Math.cos(lean) * h;
@@ -119,7 +157,12 @@ export function clump(g: Ctx, x: number, y: number, tall: number, stage: number,
       const side = k % 2 ? 1 : -1;
       g.beginPath();
       g.moveTo(x + Math.sin(lean) * h * 0.2, y - h * 0.3);
-      g.quadraticCurveTo(x + side * h * 0.3, y - h * 0.6, x + side * h * 0.45, y - h * 0.35);
+      g.quadraticCurveTo(
+        x + side * h * 0.3,
+        y - h * 0.6,
+        x + side * h * 0.45,
+        y - h * 0.35,
+      );
       g.stroke();
     }
     if (stage >= 2) {
@@ -134,7 +177,10 @@ export function clump(g: Ctx, x: number, y: number, tall: number, stage: number,
       g.lineWidth = 0.006;
       g.beginPath();
       g.moveTo(tx + Math.sin(lean) * 0.16, ty - Math.cos(lean) * 0.16);
-      g.lineTo(tx + Math.sin(lean + 0.2) * 0.3, ty - Math.cos(lean + 0.2) * 0.3);
+      g.lineTo(
+        tx + Math.sin(lean + 0.2) * 0.3,
+        ty - Math.cos(lean + 0.2) * 0.3,
+      );
       g.stroke();
     }
   }
@@ -144,10 +190,16 @@ export function clump(g: Ctx, x: number, y: number, tall: number, stage: number,
  * Draws one row of the wheat at `y` from tiles, blending the two stages either side of `ripe` and
  * leaning with the wind; `skip` leaves out the harvest's strip, drawn clump by clump.
  */
-export function drawWheatRow(g: Ctx, v: View, tiles: WheatTiles, y: number, ripe: number, seconds: number, wind: number, skip: boolean) {
-  const t = clamp(ripe) * 3;
-  const a = Math.min(2, Math.floor(t));
-  const f = t - a;
+export function drawWheatRow(
+  g: Ctx,
+  v: View,
+  tiles: WheatTiles,
+  y: number,
+  ripe: number | ((x: number) => number),
+  seconds: number,
+  wind: number,
+  skip: boolean,
+) {
   const scale = rowScale(y);
   const h = tiles.height * scale;
   const w = tiles.width;
@@ -158,24 +210,37 @@ export function drawWheatRow(g: Ctx, v: View, tiles: WheatTiles, y: number, ripe
     if (x + w < left || x > right) continue;
     if (skip && x >= HARVEST.x0 - 0.01 && x < HARVEST.x1 - 0.01) continue;
     const variant = Math.abs(vi + Math.round(x / w)) % 3;
-    const lean = wind * (0.12 * Math.sin(seconds * 1.1 - x * 0.35 + y * 0.6) + 0.05 * Math.sin(seconds * 2.3 + x));
+    // Each plot ripens at its own pace.
+    const t = clamp(typeof ripe === "number" ? ripe : ripe(x)) * 3;
+    const a = Math.min(2, Math.floor(t));
+    const f = t - a;
+    const lean =
+      wind *
+      (0.12 * Math.sin(seconds * 1.1 - x * 0.35 + y * 0.6) +
+        0.05 * Math.sin(seconds * 2.3 + x));
     g.save();
     g.translate(x, y);
     g.transform(1, 0, -lean, 1, 0, 0);
     if (f < 0.99) {
       g.globalAlpha = 1;
-      g.drawImage(tiles.stages[a][variant], 0, -h, w, h);
+      g.drawImage(tiles.stages[a][variant], -0.03, -h, w + 0.06, h);
     }
     if (f > 0.01) {
       g.globalAlpha = f;
-      g.drawImage(tiles.stages[a + 1][variant], 0, -h, w, h);
+      g.drawImage(tiles.stages[a + 1][variant], -0.03, -h, w + 0.06, h);
     }
     g.restore();
   }
   g.globalAlpha = 1;
 }
 
-export type Clump = { x: number; y: number; tall: number; seed: number; cut: number };
+export type Clump = {
+  x: number;
+  y: number;
+  tall: number;
+  seed: number;
+  cut: number;
+};
 
 /** The clumps of the harvest strip, which the reapers and the reader can cut. */
 export function makeClumps(rows: number[]): Clump[][] {
@@ -185,15 +250,32 @@ export function makeClumps(rows: number[]): Clump[][] {
     .map((y) => {
       const list: Clump[] = [];
       const step = 0.11;
-      for (let x = HARVEST.x0 + random() * step; x < HARVEST.x1; x += step * (0.7 + random() * 0.6)) {
-        list.push({ x, y: y - random() * 0.06, tall: 0.85 + random() * 0.3, seed: Math.floor(random() * 1e6), cut: 0 });
+      for (
+        let x = HARVEST.x0 + random() * step;
+        x < HARVEST.x1;
+        x += step * (0.7 + random() * 0.6)
+      ) {
+        list.push({
+          x,
+          y: y - random() * 0.06,
+          tall: 0.85 + random() * 0.3,
+          seed: Math.floor(random() * 1e6),
+          cut: 0,
+        });
       }
       return list;
     });
 }
 
 /** One row of the harvest strip: clumps standing, and stubble where they have been cut. */
-export function drawClumpRow(g: Ctx, v: View, row: Clump[], ripe: number, seconds: number, wind: number) {
+export function drawClumpRow(
+  g: Ctx,
+  v: View,
+  row: Clump[],
+  ripe: number,
+  seconds: number,
+  wind: number,
+) {
   if (!row.length) return;
   const y = row[0].y;
   const scale = rowScale(y);
@@ -220,7 +302,11 @@ export function drawClumpRow(g: Ctx, v: View, row: Clump[], ripe: number, second
     const c = row[i];
     if (c.cut >= 0.5 || c.x < left || c.x > right) continue;
     const random = mulberry32(c.seed);
-    const sway = wind * (0.12 * Math.sin(seconds * 1.1 - c.x * 0.35 + y * 0.6) + 0.05 * Math.sin(seconds * 2.3 + c.x)) + c.cut * 1.2;
+    const sway =
+      wind *
+        (0.12 * Math.sin(seconds * 1.1 - c.x * 0.35 + y * 0.6) +
+          0.05 * Math.sin(seconds * 2.3 + c.x)) +
+      c.cut * 1.2;
     clump(g, c.x, c.y, tall * c.tall, stage, colour, random, sway);
   }
 }
@@ -236,33 +322,67 @@ export function paintMustardTile(bloom: boolean) {
   g.scale(TILE_PX, TILE_PX);
   g.translate(0, TILE_H);
   const random = mulberry32(bloom ? 41 : 42);
-  for (let i = 0; i < 38; i++) {
-    const x = ((i + random()) / 38) * WHEAT.tile;
-    const h = 0.8 + random() * 0.45;
-    g.strokeStyle = rgb(mix([70, 120, 70], [40, 80, 50], random()));
-    g.lineWidth = 0.02;
-    g.lineCap = "round";
+  g.lineCap = "round";
+  const heads: { x: number; y: number }[] = [];
+  for (let i = 0; i < 44; i++) {
+    const x = ((i + random()) / 44) * WHEAT.tile;
+    const h = 0.75 + random() * 0.4;
+    // Leaves low down, broad and blue-green.
+    g.fillStyle = rgb(mix([96, 140, 84], [70, 112, 72], random()));
+    for (let k = 0; k < 2; k++) {
+      g.beginPath();
+      g.ellipse(
+        x + (k ? 0.09 : -0.09),
+        -0.16 - random() * 0.14,
+        0.13,
+        0.045,
+        k ? -0.5 : 0.5,
+        0,
+        TAU,
+      );
+      g.fill();
+    }
+    g.strokeStyle = rgb(mix([110, 150, 84], [80, 120, 70], random()));
+    g.lineWidth = 0.016;
     for (let k = 0; k < 4; k++) {
-      const lean = (k / 3 - 0.5) * 0.6 + (random() - 0.5) * 0.2;
+      const lean = (k / 3 - 0.5) * 0.7 + (random() - 0.5) * 0.2;
+      const tx = x + Math.sin(lean) * h;
+      const ty = -Math.cos(lean) * h;
       g.beginPath();
       g.moveTo(x, 0);
-      g.quadraticCurveTo(x + lean * 0.2, -h * 0.5, x + Math.sin(lean) * h, -Math.cos(lean) * h);
+      g.quadraticCurveTo(x + lean * 0.2, -h * 0.5, tx, ty);
       g.stroke();
-      // Leaves low down, broad and blue-green.
-      if (k < 2) {
-        g.fillStyle = rgb(mix([84, 130, 84], [60, 100, 70], random()));
+      heads.push({ x: tx, y: ty });
+    }
+  }
+  // The flowers: loose clusters of four-petalled yellow that run together into one sheet; or,
+  // later, the thin green pods.
+  for (const head of heads) {
+    if (bloom) {
+      for (let j = 0; j < 10; j++) {
+        g.fillStyle = rgb(mix([240, 196, 24], [255, 236, 100], random()));
         g.beginPath();
-        g.ellipse(x + (k ? 0.1 : -0.1), -0.2 - random() * 0.15, 0.14, 0.05, k ? -0.5 : 0.5, 0, TAU);
+        g.arc(
+          head.x + (random() - 0.5) * 0.2,
+          head.y + (random() - 0.4) * 0.16,
+          0.03 + random() * 0.018,
+          0,
+          TAU,
+        );
         g.fill();
       }
-      // Flower heads: loose clusters of four-petalled yellow.
-      const fx = x + Math.sin(lean) * h;
-      const fy = -Math.cos(lean) * h;
-      g.fillStyle = bloom ? rgb(mix([246, 206, 30], [255, 232, 90], random())) : rgb([150, 150, 70]);
-      for (let j = 0; j < 6; j++) {
+    } else {
+      g.strokeStyle = rgb(mix([150, 150, 70], [120, 130, 60], random()));
+      g.lineWidth = 0.012;
+      for (let j = 0; j < 5; j++) {
+        const a = -Math.PI / 2 + (random() - 0.5) * 1.4;
         g.beginPath();
-        g.arc(fx + (random() - 0.5) * 0.14, fy + (random() - 0.5) * 0.12, bloom ? 0.035 : 0.02, 0, TAU);
-        g.fill();
+        g.moveTo(head.x, head.y + 0.05);
+        g.lineTo(
+          head.x + Math.cos(a) * 0.12,
+          head.y + 0.05 + Math.sin(a) * 0.12,
+        );
+        g.stroke();
       }
     }
   }
@@ -312,7 +432,12 @@ export function paintCane() {
       const len = 0.6 + random() * 0.5;
       g.beginPath();
       g.moveTo(tx, ty);
-      g.quadraticCurveTo(tx + side * len * 0.6, ty - 0.35, tx + side * len, ty + 0.25 + random() * 0.3);
+      g.quadraticCurveTo(
+        tx + side * len * 0.6,
+        ty - 0.35,
+        tx + side * len,
+        ty + 0.25 + random() * 0.3,
+      );
       g.stroke();
     }
   }
@@ -320,28 +445,69 @@ export function paintCane() {
 }
 
 /** A tiled row of mustard across the west fields. */
-export function drawMustardRow(g: Ctx, v: View, tile: HTMLCanvasElement, y: number, seconds: number, wind: number, x0: number, x1: number, skip?: { x0: number; x1: number }) {
+export function drawMustardRow(
+  g: Ctx,
+  v: View,
+  tile: HTMLCanvasElement,
+  y: number,
+  seconds: number,
+  wind: number,
+  x0: number,
+  x1: number,
+  skip?: { x0: number; x1: number },
+) {
   const w = WHEAT.tile;
   const scale = rowScale(y);
   const h = TILE_H * scale;
   const left = v.x - v.width / 2 / v.scale - w;
   const right = v.x + v.width / 2 / v.scale + w;
-  const offset = x1 - x0 > w * 3 ? ((y * 13.7) % 1) * w - w : 0;
-  for (let x = x0 + offset; x < x1 - w * 0.5; x += w) {
+  // Long fields stagger their tiles row to row, so no seam runs down the field; the ends are then
+  // trimmed back to a field edge, with a little give from row to row.
+  const long = x1 - x0 > w * 3;
+  const offset = long ? ((y * 13.7) % 1) * w - w : 0;
+  const end0 = long ? x0 + 0.12 * Math.sin(y * 5.1) : x0;
+  const end1 = long ? x1 + 0.12 * Math.sin(y * 4.3 + 1) : x1;
+  let guard = 0;
+  for (let x = x0 + offset; x < end1 && guard++ < 200; x += w) {
     if (x + w < left || x > right) continue;
-    if (skip && x + w > skip.x0 && x < skip.x1) continue;
+    const a0 = Math.max(x, end0);
+    const b1 = Math.min(x + w, end1);
+    const parts: [number, number][] = [];
+    if (skip && b1 > skip.x0 && a0 < skip.x1) {
+      const s0 = skip.x0 + 0.1 * Math.sin(y * 3.7);
+      const s1 = skip.x1 + 0.1 * Math.sin(y * 2.9 + 2);
+      parts.push([a0, Math.min(b1, s0)], [Math.max(a0, s1), b1]);
+    } else parts.push([a0, b1]);
     const lean = wind * 0.1 * Math.sin(seconds * 0.9 - x * 0.3 + y);
     g.save();
     g.translate(x, y);
     g.transform(1, 0, -lean, 1, 0, 0);
-    g.drawImage(tile, 0, -h, w, h);
+    for (const [a, b] of parts) {
+      if (b - a < 0.02) continue;
+      const pad0 = a === x ? 0.03 : 0;
+      const pad1 = b === x + w ? 0.03 : 0;
+      g.drawImage(
+        tile,
+        ((a - x) / w) * tile.width,
+        0,
+        ((b - a) / w) * tile.width,
+        tile.height,
+        a - x - pad0,
+        -h,
+        b - a + pad0 + pad1,
+        h,
+      );
+    }
     g.restore();
   }
 }
 
 // ─── Horizon ────────────────────────────────────────────────────────────────
 
-export type Horizon = { trees: { x: number; r: number; h: number; kind: number }[]; hills: { x: number; y: number }[] };
+export type Horizon = {
+  trees: { x: number; r: number; h: number; kind: number }[];
+  hills: { x: number; y: number }[];
+};
 
 export function makeHorizon(): Horizon {
   const random = mulberry32(77);
@@ -350,14 +516,24 @@ export function makeHorizon(): Horizon {
   let guard = 0;
   while (x < 95 && guard++ < 2000) {
     const kind = random() < 0.2 ? 2 : random() < 0.5 ? 1 : 0;
-    trees.push({ x, r: 0.35 + random() * 0.6 + (kind === 2 ? 0.5 : 0), h: 0.6 + random() * 0.9, kind });
-    x += 0.4 + random() * 1.6 + (random() < 0.12 ? 3 : 0);
+    trees.push({
+      x,
+      r: 0.16 + random() * 0.26 + (kind === 2 ? 0.2 : 0),
+      h: 0.25 + random() * 0.4,
+      kind,
+    });
+    x += 0.25 + random() * 0.9 + (random() < 0.12 ? 2 : 0);
   }
   // The Shivaliks: low blue ridges, rising to the east.
   const hills: Horizon["hills"] = [];
   for (let hx = 20; hx <= 100; hx += 0.6) {
     const rise = clamp((hx - 22) / 16);
-    const y = -rise * (1.3 + 0.9 * Math.sin(hx * 0.21) + 0.5 * Math.sin(hx * 0.53 + 1) + 0.25 * Math.sin(hx * 1.7));
+    const y =
+      -rise *
+      (1.3 +
+        0.9 * Math.sin(hx * 0.21) +
+        0.5 * Math.sin(hx * 0.53 + 1) +
+        0.25 * Math.sin(hx * 1.7));
     hills.push({ x: hx, y: HORIZON - 0.2 + y });
   }
   return { trees, hills };
@@ -371,7 +547,8 @@ export function drawHorizon(g: Ctx, v: View, horizon: Horizon, haze: RGB) {
     g.fillStyle = rgb(mix([96, 116, 150], haze, 0.55));
     g.beginPath();
     g.moveTo(Math.max(20, left), HORIZON + 0.1);
-    for (const p of horizon.hills) if (p.x > left - 1 && p.x < right + 1) g.lineTo(p.x, p.y);
+    for (const p of horizon.hills)
+      if (p.x > left - 1 && p.x < right + 1) g.lineTo(p.x, p.y);
     g.lineTo(Math.min(100, right), HORIZON + 0.1);
     g.closePath();
     g.fill();
@@ -379,7 +556,12 @@ export function drawHorizon(g: Ctx, v: View, horizon: Horizon, haze: RGB) {
     g.fillStyle = rgb(mix([84, 106, 120], haze, 0.4));
     g.beginPath();
     g.moveTo(Math.max(24, left), HORIZON + 0.1);
-    for (const p of horizon.hills) if (p.x > 24 && p.x > left - 1 && p.x < right + 1) g.lineTo(p.x, HORIZON + 0.1 + (p.y - HORIZON) * 0.45 + 0.1 * Math.sin(p.x * 2.1));
+    for (const p of horizon.hills)
+      if (p.x > 24 && p.x > left - 1 && p.x < right + 1)
+        g.lineTo(
+          p.x,
+          HORIZON + 0.1 + (p.y - HORIZON) * 0.45 + 0.1 * Math.sin(p.x * 2.1),
+        );
     g.lineTo(Math.min(100, right), HORIZON + 0.1);
     g.closePath();
     g.fill();
@@ -403,18 +585,36 @@ export function drawHorizon(g: Ctx, v: View, horizon: Horizon, haze: RGB) {
   }
   g.fill();
   // Low scrub along the foot of it.
-  g.fillRect(left, HORIZON - 0.25, right - left, 0.35);
+  g.fillRect(left, HORIZON - 0.12, right - left, 0.22);
 }
 
 /** A tree in the fields: a spreading pipal or a kikar. */
-export function drawTree(g: Ctx, x: number, y: number, size: number, kind: "pipal" | "kikar" | "shisham", seconds: number, green: RGB) {
+export function drawTree(
+  g: Ctx,
+  x: number,
+  y: number,
+  size: number,
+  kind: "pipal" | "kikar" | "shisham",
+  seconds: number,
+  green: RGB,
+) {
   const sway = Math.sin(seconds * 0.6 + x) * 0.03 * size;
   g.fillStyle = "#4a3426";
   g.beginPath();
   g.moveTo(x - 0.12 * size, y);
-  g.quadraticCurveTo(x - 0.05 * size, y - 1.2 * size, x - 0.3 * size, y - 2 * size);
+  g.quadraticCurveTo(
+    x - 0.05 * size,
+    y - 1.2 * size,
+    x - 0.3 * size,
+    y - 2 * size,
+  );
   g.lineTo(x - 0.15 * size, y - 2.05 * size);
-  g.quadraticCurveTo(x + 0.02 * size, y - 1.5 * size, x + 0.35 * size, y - 2.1 * size);
+  g.quadraticCurveTo(
+    x + 0.02 * size,
+    y - 1.5 * size,
+    x + 0.35 * size,
+    y - 2.1 * size,
+  );
   g.lineTo(x + 0.45 * size, y - 2.0 * size);
   g.quadraticCurveTo(x + 0.1 * size, y - 1.1 * size, x + 0.14 * size, y);
   g.closePath();
@@ -440,9 +640,19 @@ export function drawTree(g: Ctx, x: number, y: number, size: number, kind: "pipa
             [0.5, -2.4, 0.6, 0.6],
           ];
   blobs.forEach(([bx, by, rx, ry], i) => {
-    g.fillStyle = rgb(mix(green, i % 2 ? [20, 40, 20] : [120, 150, 80], 0.15 + (i % 3) * 0.08));
+    g.fillStyle = rgb(
+      mix(green, i % 2 ? [20, 40, 20] : [120, 150, 80], 0.15 + (i % 3) * 0.08),
+    );
     g.beginPath();
-    g.ellipse(x + bx * size + sway * (1 - by / 4), y + by * size, rx * size, ry * size, 0, 0, TAU);
+    g.ellipse(
+      x + bx * size + sway * (1 - by / 4),
+      y + by * size,
+      rx * size,
+      ry * size,
+      0,
+      0,
+      TAU,
+    );
     g.fill();
   });
 }

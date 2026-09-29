@@ -1,13 +1,28 @@
 // The things of Pongal, painted in code: the new clay pot on its hearth with the turmeric tied
 // round its neck and the sugarcane over it, the banana leaf laid for Surya, the kuthuvilakku, the
 // Bhogi fire, and the houses of the street with their thinnai and their red and white stripes.
-import { TAU, clamp, flicker, lerp, mix, mulberry32, rgb, type Ctx, type RGB } from "../paint";
+import {
+  TAU,
+  clamp,
+  flicker,
+  lerp,
+  mix,
+  mulberry32,
+  rgb,
+  type Ctx,
+  type RGB,
+} from "../paint";
 import { GOLD, paint, type Env } from "./people";
 
 const caches = new Map<string, HTMLCanvasElement>();
 
 /** Paints something once into an offscreen canvas and reuses it. */
-export function cached(key: string, width: number, height: number, draw: (g: Ctx) => void) {
+export function cached(
+  key: string,
+  width: number,
+  height: number,
+  draw: (g: Ctx) => void,
+) {
   let canvas = caches.get(key);
   if (!canvas) {
     canvas = document.createElement("canvas");
@@ -25,7 +40,19 @@ const MILK: RGB = [250, 246, 234];
 // ─── Sugarcane and turmeric ─────────────────────────────────────────────────
 
 /** A stalk of sugarcane from (x0, y0) at the root to (x1, y1), jointed, with its leaves at the top. */
-export function drawCane(ctx: Ctx, x0: number, y0: number, x1: number, y1: number, width: number, env: Env, lift = 0, leaves = true, seed = 1, sway = 0) {
+export function drawCane(
+  ctx: Ctx,
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  width: number,
+  env: Env,
+  lift = 0,
+  leaves = true,
+  seed = 1,
+  sway = 0,
+) {
   const length = Math.hypot(x1 - x0, y1 - y0);
   const angle = Math.atan2(y1 - y0, x1 - x0);
   ctx.save();
@@ -40,7 +67,13 @@ export function drawCane(ctx: Ctx, x0: number, y0: number, x1: number, y1: numbe
   // The joints, pale and ringed.
   const joints = Math.max(3, Math.round(length / (width * 5)));
   ctx.fillStyle = paint([200, 176, 120], env, lift, 0.8);
-  for (let i = 1; i < joints; i++) ctx.fillRect((i / joints) * length - width * 0.08, -width / 2, width * 0.16, width);
+  for (let i = 1; i < joints; i++)
+    ctx.fillRect(
+      (i / joints) * length - width * 0.08,
+      -width / 2,
+      width * 0.16,
+      width,
+    );
   ctx.restore();
   if (!leaves) return;
   // Long leaves arching out from the top.
@@ -52,17 +85,35 @@ export function drawCane(ctx: Ctx, x0: number, y0: number, x1: number, y1: numbe
     const bend = (random() < 0.5 ? -1 : 1) * (0.6 + random() * 0.6);
     const mx = x1 + Math.cos(a) * l * 0.5;
     const my = y1 + Math.sin(a) * l * 0.5;
-    ctx.strokeStyle = paint(mix([70, 130, 50], [140, 170, 70], random()), env, lift);
+    ctx.strokeStyle = paint(
+      mix([70, 130, 50], [140, 170, 70], random()),
+      env,
+      lift,
+    );
     ctx.lineWidth = width * 0.55;
     ctx.beginPath();
     ctx.moveTo(x1, y1);
-    ctx.quadraticCurveTo(mx, my - l * 0.2, mx + Math.cos(a + bend) * l * 0.5, my + Math.sin(a + bend) * l * 0.5 + l * 0.15);
+    ctx.quadraticCurveTo(
+      mx,
+      my - l * 0.2,
+      mx + Math.cos(a + bend) * l * 0.5,
+      my + Math.sin(a + bend) * l * 0.5 + l * 0.15,
+    );
     ctx.stroke();
   }
 }
 
 /** A whole turmeric plant, pulled up with its rhizome: broad leaves on a stem, `size` tall. */
-export function drawTurmeric(ctx: Ctx, x: number, y: number, size: number, angle: number, env: Env, lift = 0, seed = 1) {
+export function drawTurmeric(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  size: number,
+  angle: number,
+  env: Env,
+  lift = 0,
+  seed = 1,
+) {
   const random = mulberry32(seed * 131);
   ctx.save();
   ctx.translate(x, y);
@@ -72,7 +123,15 @@ export function drawTurmeric(ctx: Ctx, x: number, y: number, size: number, angle
   ctx.fillStyle = paint([196, 128, 50], env, lift);
   for (let i = 0; i < 4; i++) {
     ctx.beginPath();
-    ctx.ellipse(-0.06 + i * 0.04, 0.02 + random() * 0.03, 0.05, 0.03, random() * 1.5, 0, TAU);
+    ctx.ellipse(
+      -0.06 + i * 0.04,
+      0.02 + random() * 0.03,
+      0.05,
+      0.03,
+      random() * 1.5,
+      0,
+      TAU,
+    );
     ctx.fill();
   }
   ctx.strokeStyle = paint([120, 150, 70], env, lift);
@@ -111,57 +170,97 @@ export function drawTurmeric(ctx: Ctx, x: number, y: number, size: number, angle
 // ─── The pot and the hearth ─────────────────────────────────────────────────
 
 /** Three stones for the hearth, the fire between them, and firewood pushed in from the front. */
-export function drawHearth(ctx: Ctx, x: number, y: number, size: number, fire: number, seconds: number, env: Env, lift: number, onLight: (x: number, y: number, r: number, a: number) => void) {
+export function drawHearth(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  size: number,
+  fire: number,
+  seconds: number,
+  env: Env,
+  lift: number,
+  onLight: (x: number, y: number, r: number, a: number) => void,
+) {
   const s = size;
-  // The wood, ends glowing where they burn.
-  ctx.lineCap = "round";
-  for (const [dx, a, l] of [
-    [-0.12, 0.1, 0.9],
-    [0.08, -0.12, 0.85],
-    [0.0, 0.02, 1.0],
-  ]) {
-    ctx.save();
-    ctx.translate(x + dx * s, y - 0.1 * s);
-    ctx.rotate(a);
-    ctx.strokeStyle = paint([92, 60, 38], env, lift);
-    ctx.lineWidth = 0.08 * s;
+  const stone = (dx: number, dy: number, k: number) => {
+    const sx = x + dx * s;
+    const sy = y + dy * s;
+    const g = ctx.createLinearGradient(sx, sy - 0.3 * s * k, sx, sy);
+    g.addColorStop(0, paint([60, 48, 40], env, lift + fire * 0.3));
+    g.addColorStop(1, paint([150, 120, 96], env, lift + fire * 0.2));
+    ctx.fillStyle = g;
     ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(0, l * 0.6 * s);
-    ctx.stroke();
-    ctx.restore();
-  }
+    ctx.moveTo(sx - 0.13 * s * k, sy);
+    ctx.lineTo(sx - 0.11 * s * k, sy - 0.26 * s * k);
+    ctx.quadraticCurveTo(
+      sx,
+      sy - 0.32 * s * k,
+      sx + 0.11 * s * k,
+      sy - 0.26 * s * k,
+    );
+    ctx.lineTo(sx + 0.13 * s * k, sy);
+    ctx.closePath();
+    ctx.fill();
+  };
+  // The three stones: rough, blackened on top from use; the third one at the back.
+  stone(0, -0.06, 0.9);
   // Flames, licking up round the pot's belly.
   if (fire > 0.01) {
     for (let i = 0; i < 7; i++) {
       const t = i / 6;
       const fx = x + lerp(-0.34, 0.34, t) * s;
-      const h = s * (0.35 + 0.25 * Math.sin(t * Math.PI)) * fire * flicker(seconds, i * 1.3) * (0.8 + 0.3 * Math.sin(seconds * (7 + i) + i));
+      const h =
+        s *
+        (0.35 + 0.25 * Math.sin(t * Math.PI)) *
+        fire *
+        flicker(seconds, i * 1.3) *
+        (0.8 + 0.3 * Math.sin(seconds * (7 + i) + i));
       tongue(ctx, fx, y - 0.08 * s, h, 0.14 * s, seconds, i);
     }
     onLight(x, y - 0.25 * s, 2.2 * s * (0.6 + fire * 0.6), 0.55 * fire);
     onLight(x, y - 0.12 * s, 0.6 * s, 0.9 * fire);
   }
-  // The three stones: rough, blackened on top from use.
-  for (const dx of [-0.46, 0, 0.46]) {
-    const sx = x + dx * s;
-    const sy = y - (dx === 0 ? -0.04 : 0) * s;
-    const g = ctx.createLinearGradient(sx, sy - 0.3 * s, sx, sy);
-    g.addColorStop(0, paint([60, 48, 40], env, lift + fire * 0.3));
-    g.addColorStop(1, paint([150, 120, 96], env, lift + fire * 0.2));
-    ctx.fillStyle = g;
+  stone(-0.46, 0, 1);
+  stone(0.46, 0, 1);
+  // The wood, pushed in through the open front, ends glowing where they burn.
+  ctx.lineCap = "round";
+  for (const [a, l] of [
+    [-0.45, 0.55],
+    [0.4, 0.5],
+    [0.05, 0.42],
+  ]) {
+    const ex = x + Math.sin(a) * l * s;
+    const ey = y + 0.02 * s + Math.cos(a) * l * 0.28 * s;
+    ctx.strokeStyle = paint([92, 60, 38], env, lift + fire * 0.15);
+    ctx.lineWidth = 0.07 * s;
     ctx.beginPath();
-    ctx.moveTo(sx - 0.13 * s, sy);
-    ctx.lineTo(sx - 0.11 * s, sy - 0.26 * s);
-    ctx.quadraticCurveTo(sx, sy - 0.32 * s, sx + 0.11 * s, sy - 0.26 * s);
-    ctx.lineTo(sx + 0.13 * s, sy);
-    ctx.closePath();
-    ctx.fill();
+    ctx.moveTo(x + Math.sin(a) * 0.08 * s, y - 0.04 * s);
+    ctx.lineTo(ex, ey);
+    ctx.stroke();
+    if (fire > 0.01) {
+      ctx.strokeStyle = `rgba(255, ${150 + Math.round(60 * flicker(seconds, a * 5))}, 60, ${0.85 * fire})`;
+      ctx.lineWidth = 0.05 * s;
+      ctx.beginPath();
+      ctx.moveTo(x + Math.sin(a) * 0.08 * s, y - 0.04 * s);
+      ctx.lineTo(
+        x + Math.sin(a) * 0.18 * s,
+        y - 0.04 * s + (ey - y + 0.04 * s) * 0.3,
+      );
+      ctx.stroke();
+    }
   }
 }
 
 /** One tongue of flame, `h` tall, standing on (x, y). */
-export function tongue(ctx: Ctx, x: number, y: number, h: number, w: number, seconds: number, seed: number) {
+export function tongue(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  h: number,
+  w: number,
+  seconds: number,
+  seed: number,
+) {
   const lean = Math.sin(seconds * 3.1 + seed * 2.3) * w * 0.6;
   const layers: [string, number, number][] = [
     ["rgba(230, 70, 20, 0.85)", 1, 1],
@@ -174,8 +273,22 @@ export function tongue(ctx: Ctx, x: number, y: number, h: number, w: number, sec
     ctx.fillStyle = colour;
     ctx.beginPath();
     ctx.moveTo(x - tw, y);
-    ctx.bezierCurveTo(x - tw, y - th * 0.5, x + lean * 0.5 - tw * 0.2, y - th * 0.7, x + lean, y - th);
-    ctx.bezierCurveTo(x + lean * 0.5 + tw * 0.4, y - th * 0.6, x + tw, y - th * 0.4, x + tw, y);
+    ctx.bezierCurveTo(
+      x - tw,
+      y - th * 0.5,
+      x + lean * 0.5 - tw * 0.2,
+      y - th * 0.7,
+      x + lean,
+      y - th,
+    );
+    ctx.bezierCurveTo(
+      x + lean * 0.5 + tw * 0.4,
+      y - th * 0.6,
+      x + tw,
+      y - th * 0.4,
+      x + tw,
+      y,
+    );
     ctx.closePath();
     ctx.fill();
   }
@@ -192,25 +305,74 @@ export type PotState = {
  * The new clay pongal pot, `size` across the belly, standing on (x, y): sandal and kumkum on its
  * belly, a turmeric plant tied round its neck, and the milk rising.
  */
-export function drawPot(ctx: Ctx, x: number, y: number, size: number, state: PotState, seconds: number, env: Env, lift: number, seed = 1) {
+export function drawPot(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  size: number,
+  state: PotState,
+  seconds: number,
+  env: Env,
+  lift: number,
+  seed = 1,
+) {
   const s = size;
   const rimY = y - 0.98 * s;
   const rimW = 0.3 * s;
   // The turmeric plant's leaves stand up behind the neck.
-  drawTurmeric(ctx, x - 0.12 * s, rimY + 0.16 * s, 0.75 * s, -0.35, env, lift, seed);
-  drawTurmeric(ctx, x + 0.16 * s, rimY + 0.16 * s, 0.7 * s, 0.4, env, lift, seed + 1);
+  drawTurmeric(
+    ctx,
+    x - 0.12 * s,
+    rimY + 0.16 * s,
+    0.75 * s,
+    -0.35,
+    env,
+    lift,
+    seed,
+  );
+  drawTurmeric(
+    ctx,
+    x + 0.16 * s,
+    rimY + 0.16 * s,
+    0.7 * s,
+    0.4,
+    env,
+    lift,
+    seed + 1,
+  );
 
   // Belly, shoulder and neck.
-  const g = ctx.createRadialGradient(x - 0.18 * s, y - 0.62 * s, 0.05 * s, x, y - 0.45 * s, 0.62 * s);
+  const g = ctx.createRadialGradient(
+    x - 0.18 * s,
+    y - 0.62 * s,
+    0.05 * s,
+    x,
+    y - 0.45 * s,
+    0.62 * s,
+  );
   g.addColorStop(0, paint(mix(CLAY, [255, 190, 130], 0.35), env, lift + 0.1));
   g.addColorStop(0.6, paint(CLAY, env, lift));
   g.addColorStop(1, paint(mix(CLAY, [40, 14, 8], 0.5), env, lift));
   ctx.fillStyle = g;
   ctx.beginPath();
   ctx.moveTo(x - rimW * 0.9, rimY + 0.1 * s);
-  ctx.bezierCurveTo(x - 0.62 * s, y - 0.72 * s, x - 0.6 * s, y - 0.1 * s, x - 0.2 * s, y - 0.02 * s);
+  ctx.bezierCurveTo(
+    x - 0.62 * s,
+    y - 0.72 * s,
+    x - 0.6 * s,
+    y - 0.1 * s,
+    x - 0.2 * s,
+    y - 0.02 * s,
+  );
   ctx.quadraticCurveTo(x, y + 0.02 * s, x + 0.2 * s, y - 0.02 * s);
-  ctx.bezierCurveTo(x + 0.6 * s, y - 0.1 * s, x + 0.62 * s, y - 0.72 * s, x + rimW * 0.9, rimY + 0.1 * s);
+  ctx.bezierCurveTo(
+    x + 0.6 * s,
+    y - 0.1 * s,
+    x + 0.62 * s,
+    y - 0.72 * s,
+    x + rimW * 0.9,
+    rimY + 0.1 * s,
+  );
   ctx.closePath();
   ctx.fill();
   // Soot creeping up from the fire.
@@ -227,7 +389,12 @@ export function drawPot(ctx: Ctx, x: number, y: number, size: number, state: Pot
   for (let i = 0; i < 3; i++) {
     ctx.beginPath();
     ctx.moveTo(x - 0.2 * s, y - (0.55 - i * 0.07) * s);
-    ctx.quadraticCurveTo(x, y - (0.52 - i * 0.07) * s, x + 0.2 * s, y - (0.55 - i * 0.07) * s);
+    ctx.quadraticCurveTo(
+      x,
+      y - (0.52 - i * 0.07) * s,
+      x + 0.2 * s,
+      y - (0.55 - i * 0.07) * s,
+    );
     ctx.stroke();
   }
   ctx.fillStyle = paint([210, 30, 40], env, lift + 0.15);
@@ -238,7 +405,13 @@ export function drawPot(ctx: Ctx, x: number, y: number, size: number, state: Pot
   for (let i = 0; i < 11; i++) {
     const a = lerp(-1.1, 1.1, i / 10);
     ctx.beginPath();
-    ctx.arc(x + Math.sin(a) * 0.46 * s, y - 0.72 * s + Math.cos(a) * 0.04 * s, 0.014 * s, 0, TAU);
+    ctx.arc(
+      x + Math.sin(a) * 0.46 * s,
+      y - 0.72 * s + Math.cos(a) * 0.04 * s,
+      0.014 * s,
+      0,
+      TAU,
+    );
     ctx.fill();
   }
 
@@ -260,48 +433,169 @@ export function drawPot(ctx: Ctx, x: number, y: number, size: number, state: Pot
   ctx.ellipse(x, rimY, rimW * 0.95, 0.05 * s, 0, 0, TAU);
   ctx.fill();
   if (boil > 0.05) {
-    const random = mulberry32(seed * 71 + Math.floor(seconds * 8));
-    const dome = clamp((boil - 0.55) / 0.45) * 0.18 * s + state.spill * 0.14 * s;
-    ctx.fillStyle = paint(MILK, env, lift + 0.3);
-    ctx.beginPath();
-    ctx.ellipse(x, rimY - dome * 0.3, rimW * (0.95 + state.spill * 0.25), 0.05 * s + dome, 0, Math.PI, TAU);
-    ctx.fill();
-    // Bubbles on the top of it.
-    const count = Math.floor(4 + boil * 10 + state.spill * 10);
-    for (let i = 0; i < count; i++) {
-      const bx = x + (random() - 0.5) * rimW * 1.8 * (1 + state.spill * 0.3);
-      const bt = Math.abs(bx - x) / (rimW * (1 + state.spill * 0.3));
-      const by = rimY - (0.05 * s + dome) * Math.sqrt(Math.max(0, 1 - bt * bt)) * 0.8;
-      ctx.beginPath();
-      ctx.arc(bx, by, (0.02 + random() * 0.035) * s * (0.5 + boil * 0.5), 0, TAU);
-      ctx.fill();
-    }
-    if (state.spill > 0.01) {
-      // Foam spilling down the sides, in runs of different lengths.
-      const runs = [-0.95, -0.7, -0.35, 0.1, 0.45, 0.75, 1.0];
-      runs.forEach((r, i) => {
-        const len = state.spill * (0.25 + ((i * 37) % 10) / 16) * s;
-        const rx = x + r * rimW * 1.05;
-        const out = Math.abs(r) * 0.22 * s;
-        ctx.strokeStyle = paint(MILK, env, lift + 0.3, 0.95);
-        ctx.lineWidth = (0.05 + ((i * 13) % 5) / 100) * s;
+    const random = mulberry32(seed * 71 + Math.floor(seconds * 7));
+    const spill = state.spill;
+    const heave = clamp((boil - 0.5) / 0.5);
+    const cream = paint(MILK, env, lift + 0.3);
+    const shade = paint(mix(MILK, [196, 170, 130], 0.55), env, lift + 0.15);
+    // Froth running over the lip and down the shoulder in fat drips, each ending in a bead.
+    if (spill > 0.01) {
+      const runs: [number, number, number][] = [
+        [-1.04, 0.3, 0.1],
+        [-0.55, 0.12, 0.14],
+        [-0.12, 0.2, 0.09],
+        [0.38, 0.08, 0.16],
+        [0.8, 0.26, 0.11],
+      ];
+      runs.forEach(([r, reach, width]) => {
+        const len = spill * reach * s;
+        const x0 = x + r * rimW;
+        const w = width * s;
+        const out = r * 0.16 * s * Math.min(1, len / (0.2 * s));
+        const bottom = rimY + 0.03 * s + len;
+        ctx.fillStyle = shade;
         ctx.beginPath();
-        ctx.moveTo(rx, rimY);
-        ctx.quadraticCurveTo(rx + Math.sign(r) * out, rimY + len * 0.4, rx + Math.sign(r) * out * 1.3, rimY + len);
-        ctx.stroke();
+        ctx.moveTo(x0 - w * 0.6, rimY);
+        ctx.quadraticCurveTo(
+          x0 - w * 0.5 + out * 0.6,
+          rimY + len * 0.5,
+          x0 + out - w * 0.28,
+          bottom,
+        );
+        ctx.arc(x0 + out, bottom, w * 0.3, Math.PI, 0, true);
+        ctx.quadraticCurveTo(
+          x0 + w * 0.5 + out * 0.6,
+          rimY + len * 0.5,
+          x0 + w * 0.6,
+          rimY,
+        );
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = cream;
         ctx.beginPath();
-        ctx.arc(rx + Math.sign(r) * out * 1.3, rimY + len, ctx.lineWidth * 0.62, 0, TAU);
-        ctx.fillStyle = paint(MILK, env, lift + 0.3);
+        ctx.moveTo(x0 - w * 0.45, rimY);
+        ctx.quadraticCurveTo(
+          x0 - w * 0.4 + out * 0.6,
+          rimY + len * 0.5,
+          x0 + out - w * 0.2,
+          bottom - w * 0.05,
+        );
+        ctx.arc(
+          x0 + out - w * 0.03,
+          bottom - w * 0.05,
+          w * 0.2,
+          Math.PI,
+          0,
+          true,
+        );
+        ctx.quadraticCurveTo(
+          x0 + w * 0.2 + out * 0.6,
+          rimY + len * 0.5,
+          x0 + w * 0.3,
+          rimY,
+        );
+        ctx.closePath();
         ctx.fill();
       });
     }
+    // The froth heaving up out of the mouth: a soft dome of bubbles.
+    const dome = heave * 0.1 * s + spill * 0.12 * s;
+    const domeW = rimW * (0.96 + heave * 0.08 + spill * 0.2);
+    ctx.fillStyle = shade;
+    ctx.beginPath();
+    ctx.ellipse(x, rimY + 0.01 * s, domeW * 1.02, 0.06 * s, 0, 0, TAU);
+    ctx.fill();
+    ctx.fillStyle = cream;
+    ctx.beginPath();
+    ctx.ellipse(x, rimY, domeW, 0.05 * s + dome, 0, Math.PI, TAU);
+    ctx.ellipse(x, rimY, domeW, 0.05 * s, 0, 0, Math.PI);
+    ctx.fill();
+    // Bubbles over it, some just burst to rings.
+    const count = Math.floor(5 + boil * 8 + spill * 14);
+    for (let i = 0; i < count; i++) {
+      const t = random() * 2 - 1;
+      const bx = x + t * domeW * 0.92;
+      const by =
+        rimY -
+        (0.05 * s + dome) *
+          Math.sqrt(Math.max(0, 1 - t * t)) *
+          (0.55 + random() * 0.4);
+      const br = (0.018 + random() * 0.03) * s * (0.6 + heave * 0.4);
+      if (random() < 0.3) {
+        ctx.strokeStyle = shade;
+        ctx.lineWidth = 0.008 * s;
+        ctx.beginPath();
+        ctx.arc(bx, by, br, 0, TAU);
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = shade;
+        ctx.beginPath();
+        ctx.arc(bx, by + br * 0.25, br, 0, TAU);
+        ctx.fill();
+        ctx.fillStyle = cream;
+        ctx.beginPath();
+        ctx.arc(bx - br * 0.15, by, br * 0.85, 0, TAU);
+        ctx.fill();
+      }
+    }
   }
+}
+
+/** One tongue of a big fire: hot at the root, going to smoke-red at the tip, swaying. */
+export function flameTongue(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  height: number,
+  width: number,
+  seconds: number,
+  seed: number,
+) {
+  const h = height * flicker(seconds * 0.6, seed);
+  const sway =
+    Math.sin(seconds * 3.1 + seed * 4.3) * width * 0.35 +
+    Math.sin(seconds * 7.7 + seed) * width * 0.12;
+  const tip = { x: x + sway, y: y - h };
+  const body = ctx.createLinearGradient(x, y, x, tip.y);
+  body.addColorStop(0, "rgba(255, 214, 110, 0.95)");
+  body.addColorStop(0.35, "rgba(255, 140, 30, 0.9)");
+  body.addColorStop(0.75, "rgba(230, 70, 20, 0.6)");
+  body.addColorStop(1, "rgba(160, 30, 10, 0)");
+  ctx.fillStyle = body;
+  ctx.beginPath();
+  ctx.moveTo(x - width / 2, y);
+  ctx.bezierCurveTo(
+    x - width * 0.6,
+    y - h * 0.4,
+    tip.x - width * 0.2,
+    tip.y + h * 0.35,
+    tip.x,
+    tip.y,
+  );
+  ctx.bezierCurveTo(
+    tip.x + width * 0.25,
+    tip.y + h * 0.4,
+    x + width * 0.6,
+    y - h * 0.35,
+    x + width / 2,
+    y,
+  );
+  ctx.closePath();
+  ctx.fill();
 }
 
 // ─── The offering to Surya ──────────────────────────────────────────────────
 
 /** A banana leaf laid on the ground, `length` long, its tip to +x, seen from above at a slant. */
-export function drawLeaf(ctx: Ctx, x: number, y: number, length: number, env: Env, lift: number, squash = 0.4) {
+export function drawLeaf(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  length: number,
+  env: Env,
+  lift: number,
+  squash = 0.4,
+) {
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(length, length * squash);
@@ -337,16 +631,38 @@ export function drawLeaf(ctx: Ctx, x: number, y: number, length: number, env: En
 }
 
 /** A heap of sakkarai pongal, brown with jaggery, shining with ghee, cashews and raisins in it. */
-export function drawPongalHeap(ctx: Ctx, x: number, y: number, width: number, env: Env, lift: number, sweet = true) {
+export function drawPongalHeap(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  width: number,
+  env: Env,
+  lift: number,
+  sweet = true,
+) {
   const w = width;
   const base: RGB = sweet ? [168, 100, 40] : [236, 222, 180];
-  const g = ctx.createRadialGradient(x - w * 0.15, y - w * 0.3, w * 0.02, x, y - w * 0.15, w * 0.55);
+  const g = ctx.createRadialGradient(
+    x - w * 0.15,
+    y - w * 0.3,
+    w * 0.02,
+    x,
+    y - w * 0.15,
+    w * 0.55,
+  );
   g.addColorStop(0, paint(mix(base, [255, 230, 160], 0.4), env, lift + 0.2));
   g.addColorStop(1, paint(base, env, lift));
   ctx.fillStyle = g;
   ctx.beginPath();
   ctx.moveTo(x - w / 2, y);
-  ctx.bezierCurveTo(x - w * 0.45, y - w * 0.45, x + w * 0.45, y - w * 0.45, x + w / 2, y);
+  ctx.bezierCurveTo(
+    x - w * 0.45,
+    y - w * 0.45,
+    x + w * 0.45,
+    y - w * 0.45,
+    x + w / 2,
+    y,
+  );
   ctx.quadraticCurveTo(x, y + w * 0.08, x - w / 2, y);
   ctx.fill();
   const random = mulberry32(Math.round(x * 100));
@@ -367,12 +683,23 @@ export function drawPongalHeap(ctx: Ctx, x: number, y: number, width: number, en
   }
 }
 
-export function drawBananas(ctx: Ctx, x: number, y: number, size: number, env: Env, lift: number) {
+export function drawBananas(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  size: number,
+  env: Env,
+  lift: number,
+) {
   for (let i = 0; i < 4; i++) {
     ctx.save();
     ctx.translate(x + i * size * 0.14, y - i * size * 0.02);
     ctx.rotate(-0.2 + i * 0.12);
-    ctx.fillStyle = paint(mix([236, 200, 50], [200, 170, 40], i / 4), env, lift + 0.1);
+    ctx.fillStyle = paint(
+      mix([236, 200, 50], [200, 170, 40], i / 4),
+      env,
+      lift + 0.1,
+    );
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.quadraticCurveTo(size * 0.3, -size * 0.28, size * 0.62, -size * 0.1);
@@ -385,7 +712,14 @@ export function drawBananas(ctx: Ctx, x: number, y: number, size: number, env: E
 }
 
 /** Half a coconut, broken open for the offering. */
-export function drawCoconut(ctx: Ctx, x: number, y: number, r: number, env: Env, lift: number) {
+export function drawCoconut(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  r: number,
+  env: Env,
+  lift: number,
+) {
   ctx.fillStyle = paint([120, 76, 40], env, lift);
   ctx.beginPath();
   ctx.ellipse(x, y, r, r * 0.75, 0, 0, Math.PI);
@@ -401,7 +735,17 @@ export function drawCoconut(ctx: Ctx, x: number, y: number, r: number, env: Env,
 }
 
 /** The kuthuvilakku: a tall brass lamp, five wicks burning in its bowl, the annam on top. */
-export function drawKuthuvilakku(ctx: Ctx, x: number, y: number, h: number, lit: number, seconds: number, env: Env, lift: number, onLight: (x: number, y: number, r: number, a: number) => void) {
+export function drawKuthuvilakku(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  h: number,
+  lit: number,
+  seconds: number,
+  env: Env,
+  lift: number,
+  onLight: (x: number, y: number, r: number, a: number) => void,
+) {
   const brass = (extra = 0) => paint(GOLD, env, lift + 0.2 + lit * 0.3 + extra);
   const g = ctx.createLinearGradient(x - h * 0.1, 0, x + h * 0.1, 0);
   g.addColorStop(0, paint(mix(GOLD, [80, 50, 10], 0.5), env, lift + lit * 0.3));
@@ -442,7 +786,12 @@ export function drawKuthuvilakku(ctx: Ctx, x: number, y: number, h: number, lit:
     ctx.fillStyle = "rgba(255, 170, 60, 0.95)";
     ctx.beginPath();
     ctx.moveTo(fx - h * 0.022, fy);
-    ctx.quadraticCurveTo(fx - h * 0.02, fy - fh * 0.6, fx + Math.sin(seconds * 3 + i) * h * 0.01, fy - fh);
+    ctx.quadraticCurveTo(
+      fx - h * 0.02,
+      fy - fh * 0.6,
+      fx + Math.sin(seconds * 3 + i) * h * 0.01,
+      fy - fh,
+    );
     ctx.quadraticCurveTo(fx + h * 0.02, fy - fh * 0.6, fx + h * 0.022, fy);
     ctx.fill();
     ctx.fillStyle = "rgba(255, 246, 210, 0.95)";
@@ -474,7 +823,17 @@ export type House = {
  * pillars, the sloping roof over it, the carved door, barred windows, and, from Bhogi on, the
  * kaappu of neem, avaram and poolai tied at the eave. `lamp` is the lamp lit inside the door.
  */
-export function drawHouse(ctx: Ctx, h: House, env: Env, lift: number, fresh: number, kaappu: number, lamp: number, seconds: number, onLight: (x: number, y: number, r: number, a: number) => void) {
+export function drawHouse(
+  ctx: Ctx,
+  h: House,
+  env: Env,
+  lift: number,
+  fresh: number,
+  kaappu: number,
+  lamp: number,
+  seconds: number,
+  onLight: (x: number, y: number, r: number, a: number) => void,
+) {
   const { x, width: w, height: H } = h;
   const left = x - w / 2;
   const right = x + w / 2;
@@ -503,20 +862,29 @@ export function drawHouse(ctx: Ctx, h: House, env: Env, lift: number, fresh: num
   ctx.fillRect(x - dw / 2 - 0.16, -plinth - dh - 0.2, dw + 0.32, dh + 0.2);
   ctx.fillStyle = paint(h.door, env, lift);
   ctx.fillRect(x - dw / 2 - 0.08, -plinth - dh - 0.1, dw + 0.16, dh + 0.1);
-  const inside = ctx.createRadialGradient(x, -plinth - 0.6, 0.05, x, -plinth - 0.9, 1.4);
+  const inside = ctx.createRadialGradient(
+    x,
+    -plinth - 0.6,
+    0.05,
+    x,
+    -plinth - 0.9,
+    1.4,
+  );
   inside.addColorStop(0, rgb(mix([20, 12, 8], [255, 196, 110], lamp)));
   inside.addColorStop(0.6, rgb(mix([12, 8, 6], [150, 80, 36], lamp)));
   inside.addColorStop(1, rgb(mix([8, 6, 5], [50, 24, 12], lamp)));
   ctx.fillStyle = inside;
   ctx.fillRect(x - dw / 2, -plinth - dh, dw, dh);
-  if (lamp > 0.01) onLight(x, -plinth - 0.8, 1.8, 0.35 * lamp * flicker(seconds, h.seed));
+  if (lamp > 0.01)
+    onLight(x, -plinth - 0.8, 1.8, 0.35 * lamp * flicker(seconds, h.seed));
   // The door leaves, swung back, studded with brass.
   for (const side of [-1, 1]) {
     const lx = x + side * (dw / 2 - 0.12) - 0.06;
     ctx.fillStyle = paint(mix(h.door, [0, 0, 0], 0.2), env, lift);
     ctx.fillRect(lx, -plinth - dh, 0.12, dh);
     ctx.fillStyle = paint(GOLD, env, lift + 0.2);
-    for (let i = 0; i < 6; i++) ctx.fillRect(lx + 0.04, -plinth - dh + 0.2 + i * 0.3, 0.04, 0.04);
+    for (let i = 0; i < 6; i++)
+      ctx.fillRect(lx + 0.04, -plinth - dh + 0.2 + i * 0.3, 0.04, 0.04);
   }
   // A lintel carved with a little Lakshmi niche.
   ctx.fillStyle = paint(mix(h.door, [255, 220, 160], 0.1), env, lift);
@@ -530,7 +898,8 @@ export function drawHouse(ctx: Ctx, h: House, env: Env, lift: number, fresh: num
     ctx.fillStyle = rgb(mix([10, 8, 6], [120, 70, 34], lamp * 0.6));
     ctx.fillRect(wx - 0.42, -plinth - 1.67, 0.84, 0.84);
     ctx.fillStyle = paint(mix(h.door, [0, 0, 0], 0.1), env, lift);
-    for (let i = 1; i < 6; i++) ctx.fillRect(wx - 0.42 + i * 0.14 - 0.015, -plinth - 1.67, 0.03, 0.84);
+    for (let i = 1; i < 6; i++)
+      ctx.fillRect(wx - 0.42 + i * 0.14 - 0.015, -plinth - 1.67, 0.03, 0.84);
   }
 
   // The roof: rows of half-round country tiles, or thatch, sloping down over the thinnai.
@@ -636,7 +1005,8 @@ export function drawHouse(ctx: Ctx, h: House, env: Env, lift: number, fresh: num
     ctx.fillRect(from, -plinth, to - from, plinth);
     if (h.stripes) {
       ctx.fillStyle = paint([184, 60, 38], env, lift);
-      for (let sx = from + 0.09; sx < to - 0.1; sx += 0.36) ctx.fillRect(sx, -plinth + 0.06, 0.18, plinth - 0.06);
+      for (let sx = from + 0.09; sx < to - 0.1; sx += 0.36)
+        ctx.fillRect(sx, -plinth + 0.06, 0.18, plinth - 0.06);
     }
     ctx.fillStyle = paint([120, 110, 100], env, lift);
     ctx.fillRect(from - 0.05, -plinth - 0.05, to - from + 0.1, 0.07);
@@ -644,7 +1014,12 @@ export function drawHouse(ctx: Ctx, h: House, env: Env, lift: number, fresh: num
   // Steps up to the door.
   for (let i = 0; i < 3; i++) {
     ctx.fillStyle = paint(mix([170, 160, 146], [0, 0, 0], i * 0.08), env, lift);
-    ctx.fillRect(x - gap + 0.05, -plinth + (i + 1) * (plinth / 3) - 0.18, (gap - 0.05) * 2, plinth / 3);
+    ctx.fillRect(
+      x - gap + 0.05,
+      -plinth + (i + 1) * (plinth / 3) - 0.18,
+      (gap - 0.05) * 2,
+      plinth / 3,
+    );
   }
 
   // Pillars on the thinnai's edge up to the eave: dark wood, a stone base, a bracket at the top.
@@ -673,35 +1048,62 @@ export function drawHouse(ctx: Ctx, h: House, env: Env, lift: number, fresh: num
 }
 
 /** The thulasi maadam: a little whitewashed pedestal in the yard with the holy basil growing in it. */
-export function drawThulasi(ctx: Ctx, x: number, y: number, size: number, env: Env, lift: number) {
+export function drawThulasi(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  size: number,
+  env: Env,
+  lift: number,
+) {
   const s = size;
   ctx.fillStyle = paint([236, 230, 216], env, lift);
   ctx.fillRect(x - 0.22 * s, y - 0.62 * s, 0.44 * s, 0.62 * s);
   ctx.fillRect(x - 0.28 * s, y - 0.7 * s, 0.56 * s, 0.1 * s);
   ctx.fillRect(x - 0.28 * s, y - 0.1 * s, 0.56 * s, 0.1 * s);
   ctx.fillStyle = paint([184, 60, 38], env, lift);
-  for (let i = 0; i < 3; i++) ctx.fillRect(x - 0.18 * s + i * 0.14 * s, y - 0.52 * s, 0.07 * s, 0.34 * s);
+  for (let i = 0; i < 3; i++)
+    ctx.fillRect(x - 0.18 * s + i * 0.14 * s, y - 0.52 * s, 0.07 * s, 0.34 * s);
   ctx.fillStyle = paint([240, 180, 30], env, lift + 0.1);
   ctx.beginPath();
   ctx.arc(x, y - 0.35 * s, 0.05 * s, 0, TAU);
   ctx.fill();
   const random = mulberry32(Math.round(x * 13));
   for (let i = 0; i < 22; i++) {
-    ctx.fillStyle = paint(mix([46, 96, 40], [90, 140, 60], random()), env, lift);
+    ctx.fillStyle = paint(
+      mix([46, 96, 40], [90, 140, 60], random()),
+      env,
+      lift,
+    );
     ctx.beginPath();
-    ctx.ellipse(x + (random() - 0.5) * 0.4 * s, y - 0.75 * s - random() * 0.45 * s, 0.06 * s, 0.035 * s, random() * 3, 0, TAU);
+    ctx.ellipse(
+      x + (random() - 0.5) * 0.4 * s,
+      y - 0.75 * s - random() * 0.45 * s,
+      0.06 * s,
+      0.035 * s,
+      random() * 3,
+      0,
+      TAU,
+    );
     ctx.fill();
   }
 }
 
 /** The cattle shed: posts, a thatched roof sloping to the street, a heap of straw, and the trough. */
-export function drawShed(ctx: Ctx, x: number, width: number, env: Env, lift: number) {
+export function drawShed(
+  ctx: Ctx,
+  x: number,
+  width: number,
+  env: Env,
+  lift: number,
+) {
   const left = x - width / 2;
   const right = x + width / 2;
   ctx.fillStyle = paint([70, 52, 36], env, lift);
   ctx.fillRect(left, -2.6, width, 2.6);
   ctx.fillStyle = paint([96, 74, 50], env, lift);
-  for (let i = 0; i < 18; i++) ctx.fillRect(left + (i / 18) * width, -2.6, 0.04, 2.6);
+  for (let i = 0; i < 18; i++)
+    ctx.fillRect(left + (i / 18) * width, -2.6, 0.04, 2.6);
   // Straw heaped at the back.
   ctx.fillStyle = paint([206, 170, 96], env, lift);
   ctx.beginPath();
@@ -759,7 +1161,15 @@ export function drawShed(ctx: Ctx, x: number, width: number, env: Env, lift: num
  * The pile for Bhogi: old mats, a broken winnowing basket, a worn broom and the year's broken
  * wood, on (x, y), `size` wide. `burn` (0..1) takes it down to embers.
  */
-export function drawPile(ctx: Ctx, x: number, y: number, size: number, burn: number, env: Env, lift: number) {
+export function drawPile(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  size: number,
+  burn: number,
+  env: Env,
+  lift: number,
+) {
   const s = size * (1 - burn * 0.55);
   const char = clamp(burn * 1.4);
   const c = (base: RGB) => paint(mix(base, [30, 20, 16], char), env, lift);
@@ -816,16 +1226,37 @@ export function drawPile(ctx: Ctx, x: number, y: number, size: number, burn: num
 }
 
 /** Palmyra and coconut palms, the trees of the Tamil country, as a flat shape on (x, y), `h` tall. */
-export function palmPath(x: number, y: number, h: number, lean: number, palmyra: boolean, seed: number) {
+export function palmPath(
+  x: number,
+  y: number,
+  h: number,
+  lean: number,
+  palmyra: boolean,
+  seed: number,
+  part: "all" | "trunk" | "crown" = "all",
+) {
   const path = new Path2D();
   const random = mulberry32(seed);
   const top = { x: x + lean * h, y: y - h };
   // The trunk, a little wider at the foot.
-  path.moveTo(x - h * 0.025, y);
-  path.quadraticCurveTo(x + lean * h * 0.3, y - h * 0.5, top.x - h * 0.012, top.y);
-  path.lineTo(top.x + h * 0.012, top.y);
-  path.quadraticCurveTo(x + lean * h * 0.3 + h * 0.02, y - h * 0.5, x + h * 0.025, y);
-  path.closePath();
+  if (part !== "crown") {
+    path.moveTo(x - h * 0.025, y);
+    path.quadraticCurveTo(
+      x + lean * h * 0.3,
+      y - h * 0.5,
+      top.x - h * 0.012,
+      top.y,
+    );
+    path.lineTo(top.x + h * 0.012, top.y);
+    path.quadraticCurveTo(
+      x + lean * h * 0.3 + h * 0.02,
+      y - h * 0.5,
+      x + h * 0.025,
+      y,
+    );
+    path.closePath();
+  }
+  if (part === "trunk") return path;
   if (palmyra) {
     // A round head of stiff fan leaves.
     for (let i = 0; i < 16; i++) {
@@ -834,8 +1265,14 @@ export function palmPath(x: number, y: number, h: number, lean: number, palmyra:
       const fx = top.x + Math.cos(a) * r;
       const fy = top.y + Math.sin(a) * r * 0.85;
       path.moveTo(top.x, top.y);
-      path.lineTo(fx + Math.cos(a + 0.4) * h * 0.04, fy + Math.sin(a + 0.4) * h * 0.04);
-      path.lineTo(fx + Math.cos(a - 0.4) * h * 0.04, fy + Math.sin(a - 0.4) * h * 0.04);
+      path.lineTo(
+        fx + Math.cos(a + 0.4) * h * 0.04,
+        fy + Math.sin(a + 0.4) * h * 0.04,
+      );
+      path.lineTo(
+        fx + Math.cos(a - 0.4) * h * 0.04,
+        fy + Math.sin(a - 0.4) * h * 0.04,
+      );
       path.closePath();
     }
   } else {
@@ -843,8 +1280,14 @@ export function palmPath(x: number, y: number, h: number, lean: number, palmyra:
     for (let i = 0; i < 9; i++) {
       const a = -Math.PI / 2 + (i - 4) * 0.38 + (random() - 0.5) * 0.2;
       const l = h * (0.28 + random() * 0.08);
-      const end = { x: top.x + Math.cos(a) * l, y: top.y + Math.sin(a) * l * 0.5 + l * 0.45 };
-      const mid = { x: top.x + Math.cos(a) * l * 0.55, y: top.y + Math.sin(a) * l * 0.55 - l * 0.08 };
+      const end = {
+        x: top.x + Math.cos(a) * l,
+        y: top.y + Math.sin(a) * l * 0.5 + l * 0.45,
+      };
+      const mid = {
+        x: top.x + Math.cos(a) * l * 0.55,
+        y: top.y + Math.sin(a) * l * 0.55 - l * 0.08,
+      };
       path.moveTo(top.x, top.y);
       path.quadraticCurveTo(mid.x, mid.y - h * 0.02, end.x, end.y);
       path.quadraticCurveTo(mid.x, mid.y + h * 0.02, top.x, top.y + h * 0.01);

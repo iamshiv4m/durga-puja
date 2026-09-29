@@ -12,7 +12,11 @@ import { lerp, mix, rise, type RGB, type Shot } from "../paint";
 
 export const PATH_Y = 0.3;
 export const HORIZON = -1.6;
-export const FORT = { x: 0, arch: { half: 2.1, spring: -2.7, apex: -3.95 }, floor: -0.35 };
+export const FORT = {
+  x: 0,
+  arch: { half: 2.1, spring: -2.7, apex: -3.95 },
+  floor: -0.35,
+};
 export const RIVER = { from: 5.4, to: 22.6, deep: 1.05 };
 export const GOKUL = { door: 30.6, house: [28.1, 33.4] as const };
 export const TEMPLE = { x: 58, pivot: -3.7, seat: -1.55 };
@@ -77,7 +81,11 @@ export function vasudeva(p: number) {
     y = PATH_Y;
     walking = 1;
   } else {
-    x = lerp(21.6, GOKUL.door, Math.min(1, (p - MOMENTS.bank) / (MOMENTS.door - MOMENTS.bank)));
+    x = lerp(
+      21.6,
+      GOKUL.door,
+      Math.min(1, (p - MOMENTS.bank) / (MOMENTS.door - MOMENTS.bank)),
+    );
     y = lerp(PATH_Y, 0.12, rise(p, MOMENTS.door - 0.006, MOMENTS.door));
     walking = p < MOMENTS.door ? 1 : 0;
   }
@@ -97,7 +105,11 @@ export function vasudeva(p: number) {
 
 /** How deep the Yamuna is at x, on the line Vasudeva wades. */
 export function depth(x: number) {
-  return RIVER.deep * rise(x, RIVER.from + 1.2, RIVER.from + 3.6) * (1 - rise(x, RIVER.to - 3.6, RIVER.to - 1.2));
+  return (
+    RIVER.deep *
+    rise(x, RIVER.from + 1.2, RIVER.from + 3.6) *
+    (1 - rise(x, RIVER.to - 3.6, RIVER.to - 1.2))
+  );
 }
 
 export const SHOTS: Shot[] = [
@@ -120,10 +132,10 @@ export const PORTRAIT_SHOTS: Shot[] = [
 
 /** Later shots, after the camera starts following Vasudeva, keyed by place. */
 export const LATER: Shot[] = [
-  { at: 0.44, x: 33.2, y: -1.55, zoom: 1.0 },
-  { at: 0.53, x: 33.8, y: -1.6, zoom: 1.08 },
-  { at: 0.578, x: 55.5, y: -2.3, zoom: 1.0 },
-  { at: 0.65, x: 55.7, y: -2.2, zoom: 1.1 },
+  { at: 0.44, x: 33.2, y: -2.05, zoom: 1.0 },
+  { at: 0.53, x: 33.8, y: -2.1, zoom: 1.06 },
+  { at: 0.578, x: 57.4, y: -2.3, zoom: 1.0 },
+  { at: 0.65, x: 57.2, y: -2.2, zoom: 1.1 },
   { at: 0.69, x: 87.6, y: -3.1, zoom: 0.62 },
   { at: 0.745, x: 87.4, y: -3.7, zoom: 0.6 },
   { at: 0.8, x: 87.2, y: -4.4, zoom: 0.58 },
@@ -254,8 +266,21 @@ export function hop(p: number, [a, b]: readonly [number, number]) {
   return Math.sin(((p - a) / (b - a)) * Math.PI);
 }
 
+/** The top of a flight, where the cloud is thickest: one place stops being drawn there, the next begins. */
+export function cut([a, b]: readonly [number, number]) {
+  return (a + b) / 2;
+}
+
 /** How hard it is raining. */
 export function storm(p: number) {
-  const hush = 1 - 0.9 * rise(p, MOMENTS.hush[0], MOMENTS.hush[1]) * (1 - rise(p, 0.212, 0.23));
-  return (1 - rise(p, 0.405, 0.43)) * hush * (0.75 + 0.25 * rise(p, 0.3, 0.34) * (1 - rise(p, 0.38, 0.4)));
+  const hush =
+    1 -
+    0.9 *
+      rise(p, MOMENTS.hush[0], MOMENTS.hush[1]) *
+      (1 - rise(p, 0.212, 0.23));
+  return (
+    (1 - rise(p, 0.405, 0.43)) *
+    hush *
+    (0.75 + 0.25 * rise(p, 0.3, 0.34) * (1 - rise(p, 0.38, 0.4)))
+  );
 }

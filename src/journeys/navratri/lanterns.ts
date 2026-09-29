@@ -7,18 +7,35 @@ export type Form = { gu: string; en: string; paper: RGB; sign: string };
 
 export const FORMS: Form[] = [
   { gu: "શૈલપુત્રી", en: "Shailaputri", paper: [206, 44, 40], sign: "trishul" },
-  { gu: "બ્રહ્મચારિણી", en: "Brahmacharini", paper: [236, 138, 40], sign: "mala" },
+  {
+    gu: "બ્રહ્મચારિણી",
+    en: "Brahmacharini",
+    paper: [236, 138, 40],
+    sign: "mala",
+  },
   { gu: "ચંદ્રઘંટા", en: "Chandraghanta", paper: [236, 190, 60], sign: "bell" },
   { gu: "કૂષ્માંડા", en: "Kushmanda", paper: [248, 164, 50], sign: "sun" },
   { gu: "સ્કંદમાતા", en: "Skandamata", paper: [70, 150, 84], sign: "lotus" },
   { gu: "કાત્યાયની", en: "Katyayani", paper: [214, 70, 44], sign: "sword" },
   { gu: "કાલરાત્રિ", en: "Kalaratri", paper: [46, 46, 96], sign: "vajra" },
   { gu: "મહાગૌરી", en: "Mahagauri", paper: [238, 234, 222], sign: "damaru" },
-  { gu: "સિદ્ધિદાત્રી", en: "Siddhidatri", paper: [218, 88, 148], sign: "chakra" },
+  {
+    gu: "સિદ્ધિદાત્રી",
+    en: "Siddhidatri",
+    paper: [218, 88, 148],
+    sign: "chakra",
+  },
 ];
 
 /** The rope across the chowk, and where on it each lantern hangs. */
-export const STRING = { z: -1.2, from: -9, to: 9, high: 6.7, sag: 1.1, drop: 0.45 };
+export const STRING = {
+  z: -1.2,
+  from: -9,
+  to: 9,
+  high: 6.7,
+  sag: 1.1,
+  drop: 0.45,
+};
 export const lanternX = (i: number) => -6 + i * 1.5;
 export const ropeH = (x: number) => {
   const k = (x - STRING.from) / (STRING.to - STRING.from);
@@ -28,7 +45,11 @@ export const ropeH = (x: number) => {
 export function lanternAt(t: Tilt, i: number, sway: number) {
   const x = lanternX(i);
   const h = ropeH(x) - STRING.drop - 0.32;
-  return { x: x + sway, y: STRING.z * t.s - h * t.c, hang: STRING.z * t.s - (ropeH(x) - 0.02) * t.c };
+  return {
+    x: x + sway,
+    y: STRING.z * t.s - h * t.c,
+    hang: STRING.z * t.s - (ropeH(x) - 0.02) * t.c,
+  };
 }
 
 const W = 0.5;

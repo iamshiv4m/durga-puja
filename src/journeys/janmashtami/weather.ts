@@ -1,13 +1,49 @@
 // The sky over the whole story: its colour through the night and day, the half moon of Ashtami, the
 // dawn sun, the band of monsoon cloud, lightning, and the rain.
-import { TAU, clamp, glow, glowSprite, lerp, mix, mulberry32, onScreen, rgb, toScreen, type Ctx, type RGB, type View } from "../paint";
-import { CLOUD_LIGHT, CLOUD_SHADE, HORIZON, SKY_LOW, SKY_TOP, track } from "./world";
+import {
+  TAU,
+  clamp,
+  glow,
+  glowSprite,
+  lerp,
+  mix,
+  mulberry32,
+  onScreen,
+  rgb,
+  toScreen,
+  type Ctx,
+  type RGB,
+  type View,
+} from "../paint";
+import {
+  CLOUD_LIGHT,
+  CLOUD_SHADE,
+  HORIZON,
+  SKY_LOW,
+  SKY_TOP,
+  track,
+} from "./world";
 
-type Puff = { x: number; y: number; w: number; variant: number; storm: boolean };
-type Bolt = { points: { x: number; y: number }[]; branches: { x: number; y: number }[][]; born: number; life: number };
+type Puff = {
+  x: number;
+  y: number;
+  w: number;
+  variant: number;
+  storm: boolean;
+};
+type Bolt = {
+  points: { x: number; y: number }[];
+  branches: { x: number; y: number }[][];
+  born: number;
+  life: number;
+};
 
 const QUANT = 6;
-const q = (c: RGB): RGB => [Math.round(c[0] / QUANT) * QUANT, Math.round(c[1] / QUANT) * QUANT, Math.round(c[2] / QUANT) * QUANT];
+const q = (c: RGB): RGB => [
+  Math.round(c[0] / QUANT) * QUANT,
+  Math.round(c[1] / QUANT) * QUANT,
+  Math.round(c[2] / QUANT) * QUANT,
+];
 
 /** A puff of cloud lit from above, `light` over `shade`; the last few tints are kept. */
 const puffCache = new Map<string, HTMLCanvasElement>();
@@ -26,7 +62,14 @@ function puffSprite(light: RGB, shade: RGB, variant: number) {
     const cx = 40 + t * 176 + (random() - 0.5) * 20;
     const r = 30 + Math.sin(t * Math.PI) * 34 + random() * 14;
     const cy = 112 - Math.sin(t * Math.PI) * 26 - random() * 12;
-    const gradient = g.createRadialGradient(cx - r * 0.2, cy - r * 0.45, r * 0.1, cx, cy, r);
+    const gradient = g.createRadialGradient(
+      cx - r * 0.2,
+      cy - r * 0.45,
+      r * 0.1,
+      cx,
+      cy,
+      r,
+    );
     gradient.addColorStop(0, rgb(mix(light, [255, 255, 255], 0.08), 0.95));
     gradient.addColorStop(0.55, rgb(mix(light, shade, 0.45), 0.8));
     gradient.addColorStop(1, rgb(shade, 0));
@@ -42,7 +85,8 @@ function puffSprite(light: RGB, shade: RGB, variant: number) {
 
 export class Weather {
   private readonly puffs: Puff[] = [];
-  private readonly stars: { x: number; y: number; r: number; seed: number }[] = [];
+  private readonly stars: { x: number; y: number; r: number; seed: number }[] =
+    [];
   private bolts: Bolt[] = [];
   private random = mulberry32(8080);
   /** Brightness of the lightning this frame, 0..1. */
@@ -55,15 +99,37 @@ export class Weather {
       const stormy = x < 30;
       const rows = stormy ? 3 : 2;
       for (let r = 0; r < rows; r++) {
-        const y = stormy ? -12.5 + r * 2.1 + random() * 1.2 : -16.5 + r * 3 + random() * 2;
-        this.puffs.push({ x: x + random() * 1.5, y, w: (stormy ? 5.5 : 5) + random() * 4, variant: Math.floor(random() * 3), storm: stormy });
+        const y = stormy
+          ? -12.5 + r * 2.1 + random() * 1.2
+          : -16.5 + r * 3 + random() * 2;
+        this.puffs.push({
+          x: x + random() * 1.5,
+          y,
+          w: (stormy ? 5.5 : 5) + random() * 4,
+          variant: Math.floor(random() * 3),
+          storm: stormy,
+        });
       }
     }
-    for (let i = 0; i < 220; i++) this.stars.push({ x: random(), y: random() ** 1.3, r: 0.4 + random() * 1.1, seed: random() * 10 });
+    for (let i = 0; i < 220; i++)
+      this.stars.push({
+        x: random(),
+        y: random() ** 1.3,
+        r: 0.4 + random() * 1.1,
+        seed: random() * 10,
+      });
   }
 
   /** The sky, behind everything, in screen space. `moon` and `sun` fade them in. */
-  sky(ctx: Ctx, v: View, p: number, seconds: number, moon: number, sun: number, stars: number) {
+  sky(
+    ctx: Ctx,
+    v: View,
+    p: number,
+    seconds: number,
+    moon: number,
+    sun: number,
+    stars: number,
+  ) {
     const { width, height } = v;
     const horizon = clamp(toScreen(v, 0, HORIZON).y / height, 0.08, 1.6);
     const top = track(SKY_TOP, p);
@@ -80,7 +146,8 @@ export class Weather {
       ctx.fillStyle = "#eef0ff";
       for (const s of this.stars) {
         const y = s.y * height * horizon * 0.9;
-        const twinkle = 0.55 + 0.45 * Math.sin(seconds * (0.7 + s.seed * 0.2) + s.seed * 6);
+        const twinkle =
+          0.55 + 0.45 * Math.sin(seconds * (0.7 + s.seed * 0.2) + s.seed * 6);
         ctx.globalAlpha = twinkle * stars * (1 - y / (height * horizon)) * 0.8;
         ctx.fillRect(s.x * width, y, s.r, s.r);
       }
@@ -128,7 +195,10 @@ export class Weather {
     const shade = mix(track(CLOUD_SHADE, p), [70, 80, 120], this.flash * 0.7);
     const sprites = [0, 1, 2].map((i) => puffSprite(light, shade, i));
     for (const c of this.puffs) {
-      const x = c.x + Math.sin(seconds * 0.05 + c.w) * 0.6 + drift * (c.storm ? 1 : 0.4);
+      const x =
+        c.x +
+        Math.sin(seconds * 0.05 + c.w) * 0.6 +
+        drift * (c.storm ? 1 : 0.4);
       const h = c.w * 0.58;
       if (!onScreen(v, x, c.y, c.w)) continue;
       ctx.globalAlpha = c.storm ? 0.95 : 0.85;
@@ -164,18 +234,32 @@ export class Weather {
       }
       branches.push(branch);
     }
-    this.bolts.push({ points, branches, born: seconds, life: 0.45 + random() * 0.2 });
+    this.bolts.push({
+      points,
+      branches,
+      born: seconds,
+      life: 0.45 + random() * 0.2,
+    });
   }
 
   /** Lightning, drawn additively in world space; also sets `flash`. */
   lightning(ctx: Ctx, v: View, seconds: number) {
-    this.bolts = this.bolts.filter((b) => seconds - b.born < b.life && seconds >= b.born - 0.001);
+    this.bolts = this.bolts.filter(
+      (b) => seconds - b.born < b.life && seconds >= b.born - 0.001,
+    );
     let flash = 0;
     const sprite = glowSprite("170, 190, 255");
     for (const b of this.bolts) {
       const age = (seconds - b.born) / b.life;
       // A bolt flickers: a strike, a dip, a return stroke.
-      const strength = age < 0.12 ? 1 : age < 0.22 ? 0.35 : age < 0.36 ? 0.9 : Math.max(0, 1 - (age - 0.36) / 0.64) * 0.6;
+      const strength =
+        age < 0.12
+          ? 1
+          : age < 0.22
+            ? 0.35
+            : age < 0.36
+              ? 0.9
+              : Math.max(0, 1 - (age - 0.36) / 0.64) * 0.6;
       flash = Math.max(flash, strength);
       ctx.globalCompositeOperation = "lighter";
       const mid = b.points[Math.floor(b.points.length * 0.4)];
@@ -203,7 +287,14 @@ export class Weather {
   }
 
   /** Rain, in screen space: two sheets of streaks, the near one faster and heavier. */
-  rain(ctx: Ctx, width: number, height: number, amount: number, seconds: number, reduced: boolean) {
+  rain(
+    ctx: Ctx,
+    width: number,
+    height: number,
+    amount: number,
+    seconds: number,
+    reduced: boolean,
+  ) {
     if (amount < 0.02) return;
     const t = reduced ? 0 : seconds;
     const slant = 0.2;
@@ -222,7 +313,11 @@ export class Weather {
         const fx = a - Math.floor(a);
         const fy = b - Math.floor(b);
         const y = ((fy + t * sheet.speed) % 1.1) * height * 1.1 - height * 0.05;
-        const x = ((fx + (t * sheet.speed * slant * height) / width) % 1.2) * width * 1.2 - width * 0.1;
+        const x =
+          ((fx + (t * sheet.speed * slant * height) / width) % 1.2) *
+            width *
+            1.2 -
+          width * 0.1;
         const len = sheet.len * height;
         ctx.moveTo(x, y);
         ctx.lineTo(x - len * slant, y - len);
@@ -232,7 +327,14 @@ export class Weather {
   }
 
   /** Flying through the cloud: a wash of mist, and puffs rushing past the lens. */
-  mist(ctx: Ctx, width: number, height: number, p: number, amount: number, seconds: number) {
+  mist(
+    ctx: Ctx,
+    width: number,
+    height: number,
+    p: number,
+    amount: number,
+    seconds: number,
+  ) {
     if (amount < 0.01) return;
     const light = track(CLOUD_LIGHT, p);
     const shade = track(CLOUD_SHADE, p);
@@ -242,7 +344,8 @@ export class Weather {
     const random = mulberry32(77);
     for (let i = 0; i < 9; i++) {
       const w = width * (0.6 + random() * 0.8);
-      const x = ((random() + seconds * 0.02 + p * 18) % 1.6) * width * 1.4 - w * 0.9;
+      const x =
+        ((random() + seconds * 0.02 + p * 18) % 1.6) * width * 1.4 - w * 0.9;
       const y = random() * height - w * 0.2;
       ctx.globalAlpha = amount * 0.7;
       ctx.drawImage(sprite, x, y, w, w * 0.58);
