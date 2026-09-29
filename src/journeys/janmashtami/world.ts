@@ -11,7 +11,7 @@
 import { lerp, mix, rise, type RGB, type Shot } from "../paint";
 
 export const PATH_Y = 0.3;
-export const HORIZON = -0.25;
+export const HORIZON = -1.6;
 export const FORT = { x: 0, arch: { half: 2.1, spring: -2.7, apex: -3.95 }, floor: -0.35 };
 export const RIVER = { from: 5.4, to: 22.6, deep: 1.05 };
 export const GOKUL = { door: 30.6, house: [28.1, 33.4] as const };

@@ -21,7 +21,7 @@ export type Look = {
   odhni: RGB;
   /** Churidar. */
   legs: RGB;
-  head: "bun" | "odhni" | "safo" | "topi" | "bare";
+  head: "bun" | "odhni" | "safo" | "topi" | "bare" | "mukut";
   /** Grey hair, a shawl: the elders. */
   old?: boolean;
   seed: number;
@@ -511,6 +511,29 @@ export function drawDancer(ctx: Ctx, X: number, Z: number, t: Tilt, look: Look, 
       ctx.arc(U(-0.05 + (i % 4) * 0.03), hy - hr * (0.75 - Math.floor(i / 4) * 0.35), hr * 0.07, 0, TAU);
       ctx.fill();
     }
+  } else if (look.head === "mukut") {
+    // A Ramlila crown of gilt paper, tall and pointed.
+    ctx.fillStyle = rgb(HAIR);
+    ctx.beginPath();
+    ctx.ellipse(U(-0.02), hy + hr * 0.3, hr * 1.1, hr * 1.1, 0, 0, TAU);
+    ctx.fill();
+    ctx.fillStyle = rgb(lit(look.skin));
+    ctx.beginPath();
+    ctx.ellipse(U(0.02), hy + hr * 0.25 * (1 - t.s), hr * 0.82, hr * 0.72 * (1 - 0.7 * t.s), 0, 0, TAU);
+    ctx.fill();
+    ctx.fillStyle = "#e8b440";
+    ctx.beginPath();
+    ctx.moveTo(U(-0.07), hy - hr * 0.5);
+    ctx.lineTo(U(-0.05), hy - hr * 2.2);
+    ctx.lineTo(U(0), hy - hr * 3.0);
+    ctx.lineTo(U(0.05), hy - hr * 2.2);
+    ctx.lineTo(U(0.07), hy - hr * 0.5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#c81e2a";
+    ctx.beginPath();
+    ctx.arc(U(0), hy - hr * 1.3, hr * 0.22, 0, TAU);
+    ctx.fill();
   } else {
     // A white topi.
     ctx.fillStyle = rgb(HAIR);

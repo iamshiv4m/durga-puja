@@ -26,7 +26,7 @@ export type Look = {
   top: RGB;
   /** Pyjama, tehmat, salwar or ghagra. */
   bottom: RGB;
-  lower: "pyjama" | "tehmat" | "salwar" | "ghagra" | "chola";
+  lower: "pyjama" | "tehmat" | "salwar" | "ghagra" | "chola" | "shorts";
   head: "pagg" | "turla" | "patka" | "chunni" | "bare" | "dastar";
   /** The turban, or the chunni. */
   wrap: RGB;
@@ -195,7 +195,16 @@ export function drawPerson(ctx: Ctx, x: number, y: number, look: Look, pose: Pos
   ctx.rotate(lean);
   ctx.translate(0, -HIP);
 
-  if (look.head === "chunni") chunniBack(ctx, look, swirl);
+  if (look.head === "chunni" && !back) chunniBack(ctx, look, swirl);
+  if (back && pose.hold === "sword") {
+    // Held upright before the chest: from behind, only the blade shows over the shoulder.
+    ctx.strokeStyle = "#d8dce4";
+    ctx.lineWidth = 0.022;
+    ctx.beginPath();
+    ctx.moveTo(0.05, -0.7);
+    ctx.lineTo(0.05, -1.32);
+    ctx.stroke();
+  }
   torso(ctx, look, back);
   head(ctx, look, back, swirl);
   if (look.parandi && back) parandi(ctx, look, 0, 0);
@@ -204,10 +213,10 @@ export function drawPerson(ctx: Ctx, x: number, y: number, look: Look, pose: Pos
   if (pose.hold === "dhol") dhol(ctx);
   if (pose.hold === "baby") baby(ctx);
 
-  const left = arm(ctx, look, -1, pose.la, pose.lf);
-  const right = arm(ctx, look, 1, pose.ra, pose.rf);
+  const left = arm(ctx, look, -1, pose.la, pose.lf, back);
+  const right = arm(ctx, look, 1, pose.ra, pose.rf, back);
   if (look.shawl && !back) shawl(ctx, look);
-  const tip = held(ctx, pose.hold, left, right);
+  const tip = back ? { x: 0.05, y: -1.32 } : held(ctx, pose.hold, left, right);
 
   const m = ctx.getTransform();
   ctx.restore();
@@ -230,8 +239,9 @@ function legs(ctx: Ctx, look: Look, pose: Pose, bob: number, swirl: number) {
     const hx = side * 0.04;
     const hy = -0.48 + bob;
     const thigh = t * 1.25;
-    const kx = hx + Math.sin(thigh) * 0.25;
-    const ky = hy + Math.cos(thigh) * 0.25;
+    // Crouching (bob > 0) bends the knees outwards.
+    const kx = hx + Math.sin(thigh) * 0.25 + side * Math.max(0, bob) * 1.2;
+    const ky = hy + Math.cos(thigh) * 0.25 - Math.max(0, bob) * 0.4;
     const shin = thigh - t * 1.45;
     const fx = kx + Math.sin(shin) * 0.24;
     const fy = Math.min(-0.005, ky + Math.cos(shin) * 0.24);
@@ -259,6 +269,28 @@ function legs(ctx: Ctx, look: Look, pose: Pose, bob: number, swirl: number) {
       ctx.moveTo(p.hx, p.hy);
       ctx.lineTo(p.kx, p.ky);
       ctx.lineTo(p.fx, p.fy - 0.03);
+      ctx.stroke();
+    }
+    foot(l);
+    foot(r);
+    return;
+  }
+  if (look.lower === "shorts") {
+    // Kabaddi: shorts, and bare legs below.
+    ctx.lineCap = "round";
+    for (const p of [l, r]) {
+      ctx.strokeStyle = rgb(look.bottom);
+      ctx.lineWidth = 0.09;
+      ctx.beginPath();
+      ctx.moveTo(p.hx, p.hy);
+      ctx.lineTo(lerp(p.hx, p.kx, 0.7), lerp(p.hy, p.ky, 0.7));
+      ctx.stroke();
+      ctx.strokeStyle = rgb(look.skin);
+      ctx.lineWidth = 0.055;
+      ctx.beginPath();
+      ctx.moveTo(lerp(p.hx, p.kx, 0.7), lerp(p.hy, p.ky, 0.7));
+      ctx.lineTo(p.kx, p.ky);
+      ctx.lineTo(p.fx, p.fy - 0.02);
       ctx.stroke();
     }
     foot(l);
@@ -382,6 +414,23 @@ function torso(ctx: Ctx, look: Look, back: boolean) {
 }
 
 function head(ctx: Ctx, look: Look, back: boolean, swirl: number) {
+  if (back && look.head === "chunni") {
+    // From behind: the chunni over the head and falling down the back.
+    ctx.fillStyle = rgb(look.wrap);
+    ctx.beginPath();
+    ctx.ellipse(0, -0.9, 0.068, 0.078, 0, 0, TAU);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-0.07, -0.9);
+    ctx.quadraticCurveTo(-0.13, -0.7, -0.12, -0.5);
+    ctx.lineTo(0.12, -0.5);
+    ctx.quadraticCurveTo(0.13, -0.7, 0.07, -0.9);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "rgba(0, 0, 0, 0.12)";
+    ctx.fillRect(-0.02, -0.82, 0.04, 0.32);
+    return;
+  }
   ctx.fillStyle = rgb(look.skin);
   ctx.beginPath();
   ctx.ellipse(0.004, -0.895, 0.058, 0.068, 0, 0, TAU);
@@ -578,7 +627,7 @@ function shawl(ctx: Ctx, look: Look) {
   ctx.stroke();
 }
 
-function arm(ctx: Ctx, look: Look, side: -1 | 1, upper: number, fore: number) {
+function arm(ctx: Ctx, look: Look, side: -1 | 1, upper: number, fore: number, back = false) {
   const sx = side * SHOULDER.x;
   const sy = SHOULDER.y;
   const ex = sx + Math.sin(upper) * UPPER;
@@ -586,6 +635,16 @@ function arm(ctx: Ctx, look: Look, side: -1 | 1, upper: number, fore: number) {
   const hx = ex + Math.sin(fore) * FOREARM;
   const hy = ey + Math.cos(fore) * FOREARM;
   ctx.lineCap = "round";
+  if (back) {
+    // From behind the hands are out of sight in front of the body: only the upper arm shows.
+    ctx.strokeStyle = rgb(look.top);
+    ctx.lineWidth = 0.058;
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(sx + side * 0.03, sy + UPPER * 0.95);
+    ctx.stroke();
+    return { x: hx, y: hy, angle: fore };
+  }
   // Kurtas and kameez have full sleeves; a kurti over a ghagra, three-quarter.
   ctx.strokeStyle = rgb(look.shawl ?? look.top);
   ctx.lineWidth = 0.055;
@@ -704,6 +763,22 @@ function held(ctx: Ctx, hold: Hold | undefined, left: { x: number; y: number; an
   const along = (d: number) => ({ x: right.x + Math.sin(right.angle) * d, y: right.y + Math.cos(right.angle) * d });
   ctx.lineCap = "round";
   switch (hold) {
+    case "dhol": {
+      // The dagga, a thick stick curved at the end, and the tilli, a thin cane.
+      ctx.strokeStyle = "#5a3418";
+      ctx.lineWidth = 0.022;
+      ctx.beginPath();
+      ctx.moveTo(right.x, right.y);
+      ctx.quadraticCurveTo(right.x + Math.sin(right.angle) * 0.12, right.y + Math.cos(right.angle) * 0.12, right.x + Math.sin(right.angle + 0.8) * 0.2, right.y + Math.cos(right.angle + 0.8) * 0.2);
+      ctx.stroke();
+      ctx.strokeStyle = "#c8a870";
+      ctx.lineWidth = 0.01;
+      ctx.beginPath();
+      ctx.moveTo(left.x, left.y);
+      ctx.lineTo(left.x + Math.sin(left.angle) * 0.24, left.y + Math.cos(left.angle) * 0.24);
+      ctx.stroke();
+      return right;
+    }
     case "lantern": {
       // A hurricane lantern hanging from the hand; its glow is added with the light.
       ctx.strokeStyle = "#3a3024";

@@ -25,8 +25,8 @@ export type RiverState = {
 export const SERPENT_LIGHT = "120, 230, 210";
 
 /** The shoreline on each bank, which leans away from us as it goes back. */
-export const shoreLeft = (y: number) => RIVER.from + (y - HORIZON) * 0.35;
-export const shoreRight = (y: number) => RIVER.to - (y - HORIZON) * 0.35;
+export const shoreLeft = (y: number) => RIVER.from - 0.5 + (y - HORIZON) * 0.3;
+export const shoreRight = (y: number) => RIVER.to + 0.5 - (y - HORIZON) * 0.3;
 
 const DEEP: RGB = [10, 20, 28];
 const WATER: RGB = [30, 56, 68];
@@ -218,18 +218,17 @@ export class River {
     for (let x = left; x <= right + step; x += step) pts.push({ x, y: this.surface(x, s) });
     const top = Math.min(...pts.map((pt) => pt.y));
     const water = ctx.createLinearGradient(0, top, 0, PATH_Y + 3);
-    water.addColorStop(0, rgb(mix(mix([46, 84, 96], [170, 180, 196], s.calm * 0.6), [150, 170, 210], s.flash * 0.5)));
-    water.addColorStop(0.35, rgb(mix(WATER, [90, 110, 130], s.calm * 0.5)));
-    water.addColorStop(1, rgb(mix(DEEP, [40, 50, 70], s.calm * 0.5)));
+    water.addColorStop(0, rgb(mix([40, 76, 88], [150, 170, 210], s.flash * 0.5), 0.72));
+    water.addColorStop(0.12, rgb(mix([28, 56, 68], [120, 140, 180], s.flash * 0.4), 0.9));
+    water.addColorStop(0.4, rgb(WATER, 0.97));
+    water.addColorStop(1, rgb(DEEP));
     ctx.fillStyle = water;
-    ctx.globalAlpha = 0.95;
     ctx.beginPath();
     ctx.moveTo(pts[0].x, 12);
     for (const pt of pts) ctx.lineTo(pt.x, pt.y);
     ctx.lineTo(pts[pts.length - 1].x, 12);
     ctx.closePath();
     ctx.fill();
-    ctx.globalAlpha = 1;
     // Foam along the top, heavier where the water is steep.
     ctx.lineJoin = "round";
     ctx.strokeStyle = rgb(mix([170, 200, 205], [240, 245, 255], s.flash), 0.7);

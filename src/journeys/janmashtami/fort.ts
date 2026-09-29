@@ -143,8 +143,8 @@ export class Fort {
   }
 
   /** The wall, the cell through the arch, and the people inside it. */
-  drawBack(ctx: Ctx, v: View, s: FortState) {
-    if (!onScreen(v, (WALL.from + WALL.to) / 2, -4, 12)) return;
+  drawBack(ctx: Ctx, v: View, s: FortState): { x: number; y: number } | null {
+    if (!onScreen(v, (WALL.from + WALL.to) / 2, -4, 12)) return null;
     const flash = s.flash;
     const warm = s.born;
     // The wall and its two towers.
@@ -276,8 +276,8 @@ export class Fort {
     ctx.restore();
 
     // Devaki, and the child in her arms.
-    const holding = s.child && s.child.x < 0;
-    drawPerson(ctx, -0.78, FORT.floor, DEVAKI, {
+    const holding = s.born > 0 && s.p < 0.24;
+    const hands = drawPerson(ctx, -0.78, FORT.floor, DEVAKI, {
       la: holding ? 0.9 : 0.6,
       lf: holding ? 1.9 : 1.3,
       ra: holding ? 0.7 : 0.45,
@@ -286,6 +286,7 @@ export class Fort {
       nod: holding ? 0.25 : 0.12 - s.born * 0.1,
       lean: holding ? 0.08 : 0.04,
     });
+    return { x: (hands.left.x + hands.right.x) / 2 + 0.05, y: (hands.left.y + hands.right.y) / 2 - 0.05 };
   }
 
   /** The arch itself, its gates, the guards and the torches, in front of whoever is in the cell. */
@@ -319,15 +320,19 @@ export class Fort {
     ctx.fillStyle = rgb(mix([54, 56, 70], [150, 120, 80], warm * 0.5));
     ctx.fillRect(-HALF - 0.4, -0.05, HALF * 2 + 0.8, 0.16);
 
-    // Two iron gates, swinging out towards us about their hinges.
-    const angle = s.open * 1.3;
+    // Two iron gates, swinging in about their hinges.
+    const angle = s.open * 1.35;
+    ctx.save();
+    archPath(ctx, HALF + 0.02);
+    ctx.clip();
     for (const side of [-1, 1]) {
       ctx.save();
       ctx.translate(side * HALF, 0);
-      ctx.scale(Math.cos(angle), 1 + Math.sin(angle) * 0.06);
-      gate(ctx, side, warm, s.lock);
+      ctx.scale(Math.cos(angle), 1 - Math.sin(angle) * 0.05);
+      gate(ctx, side, warm * (1 - s.open * 0.4), s.lock);
       ctx.restore();
     }
+    ctx.restore();
     // The chain and lock across the middle, until they fall.
     if (s.lock < 1) {
       const fall = s.lock * s.lock * 0.9;
@@ -405,7 +410,7 @@ export class Fort {
       );
     }
     // The first blaze pours out through the bars.
-    if (s.blaze > 0.01 && s.child) s.lights.push({ x: s.child.x, y: s.child.y, r: 14, a: 0.55 * s.blaze, color: DIVINE });
+    if (s.blaze > 0.01 && s.child) s.lights.push({ x: s.child.x, y: s.child.y, r: 12, a: 0.3 * s.blaze, color: DIVINE });
   }
 
   /** The wet ground in front, puddles catching the light. */
@@ -425,7 +430,7 @@ export class Fort {
       ctx.strokeStyle = "rgba(170, 180, 210, 0.35)";
       ctx.lineWidth = 0.012;
       for (let k = 0; k < 3; k++) {
-        const t = (s.seconds * 1.3 + k * 0.37 + pd.x) % 1;
+        const t = (((s.seconds * 1.3 + k * 0.37 + pd.x) % 1) + 1) % 1;
         const rx = pd.x + Math.sin(k * 7 + Math.floor(s.seconds * 1.3 + k * 0.37 + pd.x) * 3.1) * pd.w * 0.6;
         ctx.globalAlpha = 1 - t;
         ctx.beginPath();
@@ -479,7 +484,6 @@ function archPath(ctx: Ctx, half: number, closed = true) {
 function gate(ctx: Ctx, side: number, warm: number, lock: number) {
   const iron = rgb(mix([28, 28, 32], [120, 96, 60], warm * 0.6));
   const lit = rgb(mix([70, 72, 82], [250, 214, 150], warm), 0.9);
-  const H = SPRING - APEX;
   // The top of each bar follows the arch.
   const topAt = (x: number) => archY(side * HALF + x);
   ctx.lineCap = "butt";
