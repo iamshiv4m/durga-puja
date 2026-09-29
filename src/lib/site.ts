@@ -151,7 +151,12 @@ export function homeMetadata(): Metadata {
       locale: "en_IN",
       images: [image],
     },
-    twitter: { card: "summary_large_image", title: SITE.title, description: SITE.description, images: [image] },
+    twitter: {
+      card: "summary_large_image",
+      title: SITE.title,
+      description: SITE.description,
+      images: [image],
+    },
   };
 }
 
@@ -179,6 +184,11 @@ export function journeyMetadata(content: JourneyContent): Metadata {
       locale: "en_IN",
       images: [image],
     },
-    twitter: { card: "summary_large_image", title: content.pageTitle, description, images: [image] },
+    twitter: {
+      card: "summary_large_image",
+      title: content.pageTitle,
+      description,
+      images: [image],
+    },
   };
 }
